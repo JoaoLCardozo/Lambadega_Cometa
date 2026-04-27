@@ -1,0 +1,84 @@
+{
+    "explorer.compactFolders": false,
+    "scm.compactFolders": true,
+    "redhat.telemetry.enabled": true,
+    "java.import.gradle.java.home": "/usr/lib/jvm/java-1.8.0-openjdk-amd64",
+    "rsp-ui.enableStartServerOnActivation": [
+      {
+        "id": "redhat.vscode-community-server-connector",
+        "name": "Community Server Connector",
+        "startOnActivation": true
+      }
+    ],
+    "rsp-ui.rsp.java.home": "/usr/lib/jvm/java-1.21.0-openjdk-amd64",
+    "java.jdt.ls.java.home": "",
+    "workbench.colorTheme": "Tokyo Night",
+
+        // =========================
+        // FONTE (CONFORTO VISUAL)
+        // =========================
+        "editor.fontFamily": "JetBrains Mono, Fira Code, monospace",
+        "editor.fontSize": 14,
+        "editor.lineHeight": 22,
+        "editor.fontLigatures": false,
+
+        // =========================
+        // CURSOR & SCROLL
+        // =========================
+        "editor.cursorBlinking": "smooth",
+        "editor.smoothScrolling": true,
+
+        // =========================
+        // BLOCO ATIVO (JAVA CLEAN)
+        // =========================
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": "active",
+        "editor.guides.indentation": false,
+
+        // =========================
+        // LEITURA E LIMPEZA VISUAL
+        // =========================
+        "editor.semanticHighlighting.enabled": true,
+        "editor.renderWhitespace": "boundary",
+        "editor.renderLineHighlight": "line",
+        "editor.minimap.enabled": false,
+        "editor.wordWrap": "off",
+        "editor.lineNumbers": "on",
+
+        // =========================
+        // JAVA
+        // =========================
+        "java.semanticHighlighting.enabled": true,
+        "java.format.enabled": true,
+        "java.format.settings.profile": "GoogleStyle",
+
+        "[java]": {
+          "editor.tabSize": 4,
+          "editor.insertSpaces": true,
+          "editor.formatOnSave": false
+        },
+
+        // =========================
+        // JSP / HTML
+        // =========================
+        "[jsp]": {
+          "editor.tabSize": 2,
+          "editor.insertSpaces": true
+        },
+
+        // =========================
+        // PRODUTIVIDADE
+        // =========================
+        "editor.codeLens": true,
+        "editor.stickyScroll.enabled": true,
+        "explorer.compactFolders": false,
+        "workbench.iconTheme": "material-icon-theme",
+        "explorer.confirmDragAndDrop": false,
+        "explorer.confirmDelete": false,
+        "diffEditor.ignoreTrimWhitespace": false,
+        "gitlens.ai.model": "gemini:gemini-3-pro-preview",
+        "workbench.editorAssociations": {
+          "*.jasper": "default"
+        },
+        "material-icon-theme.activeIconPack": "angular",
+} 
