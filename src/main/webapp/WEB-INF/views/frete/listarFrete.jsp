@@ -35,15 +35,15 @@
     </c:if>
     <table class="bordaFina" width="85%" align="center">
         <form action="${pageContext.request.contextPath}/FreteControlador" method="get">
-            <input type="hidden" name="acao" value="listar">
             <tr>
                 <td class="CelulaZebra1" width="15%">Nº / Remetente:</td>
-                <td class="CelulaZebra1" width="55%">
+                <td class="CelulaZebra1" width="45%">
                     <input type="text" name="filtro" class="inputtexto" size="40"
                            value="<c:out value='${filtro}'/>"/>
                 </td>
                 <td class="CelulaZebra1">
-                    <input type="submit" class="inputbotao" value="Pesquisar"/>
+                    <button type="submit" name="acao" value="listar" class="inputbotao">Pesquisar</button>
+                    <button type="submit" name="acao" value="exportarCsv" class="inputbotao">Exportar CSV</button>
                 </td>
             </tr>
         </form>

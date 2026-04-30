@@ -38,6 +38,7 @@ public class FreteControlador extends HttpServlet {
         try {
             switch (acao) {
                 case "listar":         listar(req, resp);        break;
+                case "exportarCsv":    exportarCsv(req, resp);   break;
                 case "novo":           novo(req, resp);           break;
                 case "detalhe":        detalhe(req, resp);        break;
                 case "confirmarSaida": confirmarSaida(req, resp); break;
@@ -100,6 +101,19 @@ public class FreteControlador extends HttpServlet {
         req.setAttribute("paginaAtual",  pagina);
         req.setAttribute("totalPaginas", totalPaginas);
         req.getRequestDispatcher("/WEB-INF/views/frete/listarFrete.jsp").forward(req, resp);
+    }
+
+    private void exportarCsv(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, NegocioException {
+        String filtro = req.getParameter("filtro");
+        String csv = freteBO.exportarCsv(filtro);
+        String nomeArquivo = "fretes-" + LocalDate.now() + ".csv";
+
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/csv; charset=UTF-8");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"" + nomeArquivo + "\"");
+        resp.getWriter().write('\uFEFF');
+        resp.getWriter().write(csv);
     }
 
     private void novo(HttpServletRequest req, HttpServletResponse resp)

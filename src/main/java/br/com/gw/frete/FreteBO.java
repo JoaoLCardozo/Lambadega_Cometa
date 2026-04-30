@@ -33,6 +33,21 @@ public class FreteBO {
         return (int) Math.ceil((double) freteDAO.contarTotal(filtro) / limite);
     }
 
+    public String exportarCsv(String filtro) throws NegocioException {
+        List<Frete> fretes = freteDAO.listarParaExportacao(filtro);
+        StringBuilder csv = new StringBuilder();
+
+        csv.append("Numero;Status;Data emissao;Remetente;Destinatario;Motorista;Veiculo;Origem;Destino;")
+           .append("Previsao entrega;Data saida;Data entrega;Descricao carga;Peso kg;Volumes;")
+           .append("Valor frete;Aliquota ICMS;Valor ICMS;Valor total\n");
+
+        for (Frete frete : fretes) {
+            appendLinhaCsv(csv, frete);
+        }
+
+        return csv.toString();
+    }
+
     public Frete buscarPorId(int id) throws NegocioException {
         Frete f = freteDAO.buscarPorId(id);
         if (f == null) throw new FreteException("Frete não encontrado.");
@@ -353,5 +368,54 @@ public class FreteBO {
             if (oc.getDescricao() == null || oc.getDescricao().trim().isEmpty())
                 throw new FreteException("Descrição é obrigatória para o tipo: " + oc.getTipo());
         }
+    }
+
+    private void appendLinhaCsv(StringBuilder csv, Frete frete) {
+        appendCampo(csv, frete.getNumero());
+        appendCampo(csv, frete.getStatus());
+        appendCampo(csv, frete.getDataEmissao());
+        appendCampo(csv, frete.getRemetente() != null ? frete.getRemetente().getNomeRazaoSocial() : null);
+        appendCampo(csv, frete.getDestinatario() != null ? frete.getDestinatario().getNomeRazaoSocial() : null);
+        appendCampo(csv, frete.getMotorista() != null ? frete.getMotorista().getNome() : null);
+        appendCampo(csv, frete.getVeiculo() != null ? frete.getVeiculo().getPlaca() : null);
+        appendCampo(csv, montarLocalidade(frete.getMunicipioOrigem(), frete.getUfOrigem()));
+        appendCampo(csv, montarLocalidade(frete.getMunicipioDestino(), frete.getUfDestino()));
+        appendCampo(csv, frete.getDataPrevisaoEntrega());
+        appendCampo(csv, frete.getDataSaida());
+        appendCampo(csv, frete.getDataEntrega());
+        appendCampo(csv, frete.getDescricaoCarga());
+        appendCampo(csv, frete.getPesoKg());
+        appendCampo(csv, frete.getVolumes());
+        appendCampo(csv, frete.getValorFrete());
+        appendCampo(csv, frete.getAliquotaIcms());
+        appendCampo(csv, frete.getValorIcms());
+        appendUltimoCampo(csv, frete.getValorTotal());
+    }
+
+    private void appendCampo(StringBuilder csv, Object valor) {
+        appendValor(csv, valor);
+        csv.append(';');
+    }
+
+    private void appendUltimoCampo(StringBuilder csv, Object valor) {
+        appendValor(csv, valor);
+        csv.append('\n');
+    }
+
+    private void appendValor(StringBuilder csv, Object valor) {
+        if (valor == null) return;
+
+        String texto = String.valueOf(valor).replace("\"", "\"\"");
+        if (texto.contains(";") || texto.contains("\"") || texto.contains("\n") || texto.contains("\r")) {
+            csv.append('"').append(texto).append('"');
+        } else {
+            csv.append(texto);
+        }
+    }
+
+    private String montarLocalidade(String municipio, String uf) {
+        if (municipio == null || municipio.trim().isEmpty()) return uf;
+        if (uf == null || uf.trim().isEmpty()) return municipio;
+        return municipio + "/" + uf;
     }
 }

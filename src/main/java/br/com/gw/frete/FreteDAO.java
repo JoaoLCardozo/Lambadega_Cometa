@@ -53,6 +53,41 @@ public class FreteDAO {
         return lista;
     }
 
+    public List<Frete> listarParaExportacao(String filtro) throws NegocioException {
+        List<Frete> lista = new ArrayList<>();
+        String sql =
+            "SELECT f.id, f.numero, f.municipio_origem, f.uf_origem, f.municipio_destino, " +
+            "f.uf_destino, f.descricao_carga, f.peso_kg, f.volumes, f.valor_frete, " +
+            "f.aliquota_icms, f.valor_icms, f.valor_total, f.status, f.data_emissao, " +
+            "f.data_previsao_entrega, f.data_saida, f.data_entrega, " +
+            "r.id r_id, r.nome_razao_social r_razao, r.documento r_cnpj, " +
+            "d.id d_id, d.nome_razao_social d_razao, d.documento d_cnpj, " +
+            "m.id m_id, m.nome m_nome, m.cpf m_cpf, " +
+            "v.id v_id, v.placa v_placa, v.tipo v_tipo, v.capacidade_kg v_cap " +
+            "FROM frete f " +
+            "JOIN cliente r ON f.id_remetente    = r.id " +
+            "JOIN cliente d ON f.id_destinatario = d.id " +
+            "JOIN motorista m ON f.id_motorista  = m.id " +
+            "JOIN veiculo v   ON f.id_veiculo    = v.id " +
+            "WHERE f.numero ILIKE ? OR r.nome_razao_social ILIKE ? OR d.nome_razao_social ILIKE ? " +
+            "ORDER BY f.id DESC";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            String f = "%" + (filtro != null ? filtro : "") + "%";
+            stmt.setString(1, f);
+            stmt.setString(2, f);
+            stmt.setString(3, f);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) lista.add(mapearCompleto(rs));
+            }
+        } catch (SQLException e) {
+            logger.severe("Erro ao listar fretes para exportacao: " + e.getMessage());
+            throw new NegocioException("Erro ao exportar fretes.", e);
+        }
+        return lista;
+    }
+
     public int contarTotal(String filtro) throws NegocioException {
         String sql =
             "SELECT COUNT(*) FROM frete f " +
