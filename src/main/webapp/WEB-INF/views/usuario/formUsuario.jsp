@@ -4,89 +4,60 @@
 <html lang="pt-BR">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Novo Usuario - Lambadega Cometa</title>
-
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css" type="text/css">
+    <title>Novo Usuário - Lambadega Cometa</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
 </head>
+<body class="auth-page">
+    <main class="app-shell">
+        <section class="app-brand">
+            <div class="brand-row">
+                <span class="brand-mark">LC</span>
+                <div class="brand-copy">
+                    <h1 class="brand-title">Lambadega Cometa</h1>
+                    <p class="brand-subtitle">Criação de acesso ao sistema</p>
+                </div>
+            </div>
+            <a class="link-button" href="${pageContext.request.contextPath}/LoginControlador">Login</a>
+        </section>
 
-<body>
+        <c:if test="${not empty erro}">
+            <div class="alert alert-error"><c:out value="${erro}"/></div>
+        </c:if>
 
-    <img src="${pageContext.request.contextPath}/img/topo_frota.jpg" width="40%" height="44">
-
-    <table class="bordaFina" width="85%" align="center">
-        <tr>
-            <td>
-                <span class="style4">Criar novo usuario</span>
-            </td>
-            <td align="right">
-                <a href="${pageContext.request.contextPath}/LoginControlador">Voltar para o login</a>
-            </td>
-        </tr>
-    </table>
-
-    <br>
-
-    <c:if test="${not empty erro}">
-        <table width="85%" align="center">
-            <tr>
-                <td style="color:red;font-weight:bold;">
-                    <c:out value="${erro}"/>
-                </td>
-            </tr>
-        </table>
-        <br>
-    </c:if>
-
-    <form action="${pageContext.request.contextPath}/usuario" method="post">
-      <input type="hidden" name="acao" value="cadastrar">
-
-        <table class="bordaFina" width="50%" align="center">
-
-            <tr>
-                <td class="CelulaZebra1" width="35%" align="right">Nome:</td>
-                <td class="CelulaZebra1">
-                    <input type="text" name="nome" class="inputtexto" size="35" maxlength="100" value="<c:out value='${nome}'/>" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td class="CelulaZebra2" align="right">Email:</td>
-                <td class="CelulaZebra2">
-                    <input type="email" name="email" class="inputtexto" size="35" maxlength="100" value="<c:out value='${email}'/>" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td class="CelulaZebra1" align="right">Usuario:</td>
-                <td class="CelulaZebra1">
-                    <input type="text" name="usuario" class="inputtexto" size="25" maxlength="50" value="<c:out value='${usuario}'/>" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td class="CelulaZebra2" align="right">Senha:</td>
-                <td class="CelulaZebra2">
-                    <input type="password" name="senha" class="inputtexto" size="25" maxlength="50" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td class="CelulaZebra1" align="right">Confirmar Senha:</td>
-                <td class="CelulaZebra1">
-                    <input type="password" name="confirmaSenha" class="inputtexto" size="25" maxlength="50" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td colspan="2" align="center" class="CelulaZebra2">
-                    <input type="submit" class="inputbotao" value="Cadastrar">
-                    &nbsp;
-                </td>
-            </tr>
-
-        </table>
-    </form>
-
+        <section class="card auth-card">
+            <form action="${pageContext.request.contextPath}/usuario" method="post">
+                <input type="hidden" name="acao" value="cadastrar">
+                <div class="form-grid one-column">
+                    <div class="form-field full">
+                        <span class="app-eyebrow">Novo usuário</span>
+                        <h2 class="app-title">Dados de acesso</h2>
+                    </div>
+                    <div class="form-field">
+                        <label for="nome">Nome</label>
+                        <input type="text" name="nome" id="nome" class="inputtexto" maxlength="100" value="<c:out value='${nome}'/>" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" class="inputtexto" maxlength="100" value="<c:out value='${email}'/>" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="usuario">Usuário</label>
+                        <input type="text" name="usuario" id="usuario" class="inputtexto" maxlength="50" value="<c:out value='${usuario}'/>" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="senha">Senha</label>
+                        <input type="password" name="senha" id="senha" class="inputtexto" maxlength="50" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="confirmaSenha">Confirmar senha</label>
+                        <input type="password" name="confirmaSenha" id="confirmaSenha" class="inputtexto" maxlength="50" required>
+                    </div>
+                    <div class="form-actions">
+                        <input type="submit" class="inputbotao" value="Cadastrar">
+                    </div>
+                </div>
+            </form>
+        </section>
+    </main>
 </body>
 </html>
