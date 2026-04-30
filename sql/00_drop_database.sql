@@ -1,11 +1,12 @@
 -- Script de drop do banco de dados (para limpeza/reset) - PostgreSQL
--- Data: 23 de abril de 2026
-
--- Forçar encerramento de conexões ativas
-SELECT pg_terminate_backend(pg_stat_activity.pid)
-FROM pg_stat_activity
-WHERE pg_stat_activity.datname = 'lambadega_cometa'
-  AND pid <> pg_backend_pid();
 
 -- Remover o banco
-DROP DATABASE IF EXISTS lambadega_cometa;
+DROP DATABASE IF EXISTS LambadegaCometa;
+
+-- Limpar tabelas se existirem (ordem inversa de dependência)
+DROP TABLE IF EXISTS ocorrencia_frete CASCADE;
+DROP TABLE IF EXISTS frete CASCADE;
+DROP TABLE IF EXISTS veiculo CASCADE;
+DROP TABLE IF EXISTS motorista CASCADE;
+DROP TABLE IF EXISTS cliente CASCADE;
+DROP TABLE IF EXISTS usuario CASCADE;
