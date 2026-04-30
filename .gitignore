@@ -1,0 +1,27 @@
+# Credenciais — nunca commitar
+db.properties
+
+# Build
+build/
+dist/
+target/
+*.class
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# Gradle
+.gradle/
+gretty_ports.properties
+
+# System
+.DS_Store
+Thumbs.db
+*.log
+
+# Platform-specific
+gradlew.bat
