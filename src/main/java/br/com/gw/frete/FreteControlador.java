@@ -1,12 +1,12 @@
 package br.com.gw.frete;
 
 import br.com.gw.cliente.Cliente;
-import br.com.gw.cliente.ClienteDAO;
+import br.com.gw.cliente.ClienteBO;
 import br.com.gw.exception.NegocioException;
 import br.com.gw.motorista.Motorista;
-import br.com.gw.motorista.MotoristaDAO;
+import br.com.gw.motorista.MotoristaBO;
 import br.com.gw.veiculo.Veiculo;
-import br.com.gw.veiculo.VeiculoDAO;
+import br.com.gw.veiculo.VeiculoBO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,10 +24,11 @@ public class FreteControlador extends HttpServlet {
     private static final Logger logger = Logger.getLogger(FreteControlador.class.getName());
     private static final int LIMITE = 10;
 
+    // Apenas BOs — sem DAOs diretamente
     private final FreteBO    freteBO    = new FreteBO();
-    private final ClienteDAO clienteDAO = new ClienteDAO();
-    private final MotoristaDAO motoristaDAO = new MotoristaDAO();
-    private final VeiculoDAO veiculoDAO = new VeiculoDAO();
+    private final ClienteBO  clienteBO  = new ClienteBO();
+    private final MotoristaBO motoristaBO = new MotoristaBO();
+    private final VeiculoBO  veiculoBO  = new VeiculoBO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -36,26 +37,24 @@ public class FreteControlador extends HttpServlet {
         if (acao == null) acao = "listar";
         try {
             switch (acao) {
-                case "listar":           listar(req, resp);          break;
-                case "novo":             novo(req, resp);             break;
-                case "detalhe":          detalhe(req, resp);          break;
-                case "confirmarSaida":   confirmarSaida(req, resp);   break;
-                case "cancelar":         cancelar(req, resp);         break;
-                case "novaOcorrencia":   novaOcorrencia(req, resp);   break;
-                default:                 listar(req, resp);
+                case "listar":         listar(req, resp);        break;
+                case "novo":           novo(req, resp);           break;
+                case "detalhe":        detalhe(req, resp);        break;
+                case "confirmarSaida": confirmarSaida(req, resp); break;
+                case "cancelar":       cancelar(req, resp);       break;
+                case "novaOcorrencia": novaOcorrencia(req, resp); break;
+                default:               listar(req, resp);
             }
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             try { listar(req, resp); } catch (NegocioException ex) {
                 logger.severe("Erro ao recarregar listagem: " + ex.getMessage());
-                req.setAttribute("erro", "Erro ao listar fretes: " + ex.getMessage());
-                req.getRequestDispatcher("/erro.jsp").forward(req, resp);
+                resp.sendRedirect(req.getContextPath() + "/erro.jsp");
             }
         } catch (Exception e) {
-            logger.severe("Erro inesperado: " + e.getMessage());
-            e.printStackTrace();
-            req.setAttribute("erro", "Erro inesperado: " + e.getMessage());
-            req.getRequestDispatcher("/erro.jsp").forward(req, resp);
+            logger.severe("Erro inesperado FreteControlador GET: " + e.getMessage());
+            System.err.println("[FreteControlador] " + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/erro.jsp");
         }
     }
 
@@ -84,31 +83,31 @@ public class FreteControlador extends HttpServlet {
             }
             req.getRequestDispatcher("/WEB-INF/views/frete/detalharFrete.jsp").forward(req, resp);
         } catch (Exception e) {
-            logger.severe("Erro inesperado POST: " + e.getMessage());
-            e.printStackTrace();
-            req.setAttribute("erro", "Erro inesperado: " + e.getMessage());
-            req.getRequestDispatcher("/erro.jsp").forward(req, resp);
+            logger.severe("Erro inesperado FreteControlador POST: " + e.getMessage());
+            System.err.println("[FreteControlador] " + e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/erro.jsp");
         }
     }
 
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
-        String filtro    = req.getParameter("filtro");
-        int pagina       = parsePagina(req.getParameter("pagina"));
-        List<Frete> lista      = freteBO.listar(filtro, pagina, LIMITE);
-        int totalPaginas       = freteBO.contarPaginas(filtro, LIMITE);
-        req.setAttribute("listaFretes",   lista);
-        req.setAttribute("filtro",        filtro);
-        req.setAttribute("paginaAtual",   pagina);
-        req.setAttribute("totalPaginas",  totalPaginas);
+        String filtro   = req.getParameter("filtro");
+        int pagina      = parsePagina(req.getParameter("pagina"));
+        List<Frete> lista     = freteBO.listar(filtro, pagina, LIMITE);
+        int totalPaginas      = freteBO.contarPaginas(filtro, LIMITE);
+        req.setAttribute("listaFretes",  lista);
+        req.setAttribute("filtro",       filtro);
+        req.setAttribute("paginaAtual",  pagina);
+        req.setAttribute("totalPaginas", totalPaginas);
         req.getRequestDispatcher("/WEB-INF/views/frete/listarFrete.jsp").forward(req, resp);
     }
 
     private void novo(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
-        req.setAttribute("listaClientes",   clienteDAO.listar(null, 1, 999));
-        req.setAttribute("listaMotoristas", motoristaDAO.listar(null, 1, 999));
-        req.setAttribute("listaVeiculos",   veiculoDAO.listar(null, 1, 999));
+        // Controller chama BO — não DAO
+        req.setAttribute("listaClientes",   clienteBO.listar(null, 1, 999));
+        req.setAttribute("listaMotoristas", motoristaBO.listar(null, 1, 999));
+        req.setAttribute("listaVeiculos",   veiculoBO.listar(null, 1, 999));
         req.setAttribute("frete", new Frete());
         req.getRequestDispatcher("/WEB-INF/views/frete/formFrete.jsp").forward(req, resp);
     }
@@ -150,9 +149,9 @@ public class FreteControlador extends HttpServlet {
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             req.setAttribute("frete", f);
-            req.setAttribute("listaClientes",   clienteDAO.listar(null, 1, 999));
-            req.setAttribute("listaMotoristas", motoristaDAO.listar(null, 1, 999));
-            req.setAttribute("listaVeiculos",   veiculoDAO.listar(null, 1, 999));
+            req.setAttribute("listaClientes",   clienteBO.listar(null, 1, 999));
+            req.setAttribute("listaMotoristas", motoristaBO.listar(null, 1, 999));
+            req.setAttribute("listaVeiculos",   veiculoBO.listar(null, 1, 999));
             req.getRequestDispatcher("/WEB-INF/views/frete/formFrete.jsp").forward(req, resp);
         }
     }
@@ -160,24 +159,21 @@ public class FreteControlador extends HttpServlet {
     private void emTransito(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
-        OcorrenciaFrete oc = montarOcorrenciaDaRequisicao(req);
-        freteBO.registrarEmTransito(id, oc);
+        freteBO.registrarEmTransito(id, montarOcorrenciaDaRequisicao(req));
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
     private void registrarEntrega(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
-        OcorrenciaFrete oc = montarOcorrenciaDaRequisicao(req);
-        freteBO.registrarEntrega(id, oc);
+        freteBO.registrarEntrega(id, montarOcorrenciaDaRequisicao(req));
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
     private void naoEntregue(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
-        OcorrenciaFrete oc = montarOcorrenciaDaRequisicao(req);
-        freteBO.registrarNaoEntrega(id, oc);
+        freteBO.registrarNaoEntrega(id, montarOcorrenciaDaRequisicao(req));
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -185,7 +181,13 @@ public class FreteControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
         OcorrenciaFrete oc = montarOcorrenciaDaRequisicao(req);
-        freteBO.registrarOcorrencia(id, oc);
+
+        // TENTATIVA_ENTREGA deve ir para registrarNaoEntrega
+        if (oc.getTipo() == OcorrenciaFrete.Tipo.TENTATIVA_ENTREGA) {
+            freteBO.registrarNaoEntrega(id, oc);
+        } else {
+            freteBO.registrarOcorrencia(id, oc);
+        }
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -213,13 +215,13 @@ public class FreteControlador extends HttpServlet {
         f.setUfDestino(req.getParameter("ufDestino"));
         f.setDescricaoCarga(req.getParameter("descricaoCarga"));
         String peso = req.getParameter("pesoKg");
-        if (peso != null && !peso.isEmpty()) f.setPesoKg(new BigDecimal(peso));
+        if (peso != null && !peso.isEmpty()) f.setPesoKg(new BigDecimal(peso.replace(",",".")));
         String vol = req.getParameter("volumes");
         if (vol != null && !vol.isEmpty()) f.setVolumes(Integer.parseInt(vol));
         String vf = req.getParameter("valorFrete");
-        if (vf != null && !vf.isEmpty()) f.setValorFrete(new BigDecimal(vf));
+        if (vf != null && !vf.isEmpty()) f.setValorFrete(new BigDecimal(vf.replace(",",".")));
         String aliq = req.getParameter("aliquotaIcms");
-        if (aliq != null && !aliq.isEmpty()) f.setAliquotaIcms(new BigDecimal(aliq));
+        if (aliq != null && !aliq.isEmpty()) f.setAliquotaIcms(new BigDecimal(aliq.replace(",",".")));
         String prev = req.getParameter("dataPrevisaoEntrega");
         if (prev != null && !prev.isEmpty()) f.setDataPrevisaoEntrega(LocalDate.parse(prev));
         return f;
