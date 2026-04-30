@@ -1,0 +1,346 @@
+/* =========================================================
+   Lambadega Cometa Design System
+   Versao premium moderna
+   ========================================================= */
+
+:root {
+    --lc-bg: #f4f7fb;
+    --lc-bg-soft: #eef3f9;
+    --lc-surface: #ffffff;
+    --lc-surface-soft: #f8fafc;
+
+    --lc-primary: #1f5eff;
+    --lc-primary-dark: #1746bf;
+    --lc-primary-soft: #e8efff;
+
+    --lc-secondary: #0f172a;
+    --lc-muted: #64748b;
+    --lc-border: #d9e2ec;
+
+    --lc-success: #16a34a;
+    --lc-warning: #d97706;
+    --lc-danger: #dc2626;
+    --lc-info: #2563eb;
+
+    --lc-radius-sm: 6px;
+    --lc-radius-md: 10px;
+    --lc-radius-lg: 18px;
+
+    --lc-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+    --lc-shadow-md: 0 12px 32px rgba(15, 23, 42, 0.10);
+
+    --lc-font: Arial, Helvetica, sans-serif;
+}
+
+/* Base */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--lc-font);
+    color: var(--lc-secondary);
+    background:
+        radial-gradient(circle at top left, rgba(31, 94, 255, 0.12), transparent 32%),
+        linear-gradient(135deg, #f8fbff 0%, var(--lc-bg) 45%, #edf3fb 100%);
+    font-size: 14px;
+}
+
+/* Links */
+
+a {
+    color: var(--lc-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--lc-primary-dark);
+    text-decoration: underline;
+}
+
+/* Logo/imagem antiga do topo */
+
+body > img:first-child {
+    display: block;
+    max-width: 1180px;
+    width: 85% !important;
+    height: 58px !important;
+    object-fit: cover;
+    margin: 22px auto 18px auto;
+    border-radius: var(--lc-radius-lg);
+    box-shadow: var(--lc-shadow-sm);
+    background: var(--lc-surface);
+}
+
+/* Tabelas antigas virando cards modernos */
+
+table.bordaFina {
+    width: 92% !important;
+    max-width: 1180px;
+    margin: 0 auto 18px auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    box-shadow: var(--lc-shadow-sm);
+    overflow: hidden;
+}
+
+/* Celulas */
+
+table.bordaFina td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #edf2f7;
+    vertical-align: middle;
+}
+
+table.bordaFina tr:last-child td {
+    border-bottom: none;
+}
+
+.CelulaZebra1 {
+    background-color: var(--lc-surface);
+}
+
+.CelulaZebra2 {
+    background-color: var(--lc-surface-soft);
+}
+
+/* Cabecalhos de tabela */
+
+.tabela {
+    background: linear-gradient(135deg, var(--lc-secondary), #1e293b);
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 12px;
+}
+
+/* Titulos antigos */
+
+.style4 {
+    display: inline-block;
+    color: var(--lc-secondary);
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+}
+
+/* Inputs */
+
+.inputtexto,
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+select,
+textarea {
+    width: auto;
+    max-width: 100%;
+    min-height: 38px;
+    padding: 8px 11px;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    background-color: #ffffff;
+    color: var(--lc-secondary);
+    font-family: var(--lc-font);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.inputtexto:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--lc-primary);
+    box-shadow: 0 0 0 4px rgba(31, 94, 255, 0.12);
+}
+
+/* Botoes */
+
+.inputbotao,
+input[type="submit"],
+input[type="button"],
+button {
+    min-height: 38px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: var(--lc-radius-md);
+    background: linear-gradient(135deg, var(--lc-primary), var(--lc-primary-dark));
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 13px;
+    font-family: var(--lc-font);
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(31, 94, 255, 0.22);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.inputbotao:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(31, 94, 255, 0.28);
+    opacity: 0.96;
+}
+
+.inputbotao:active,
+input[type="submit"]:active,
+input[type="button"]:active,
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 14px rgba(31, 94, 255, 0.20);
+}
+
+/* Icones antigos */
+
+.imagemLink {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.imagemLink:hover {
+    opacity: 1;
+    transform: scale(1.12);
+}
+
+/* Mensagens */
+
+.alerta,
+.erro,
+.sucesso,
+.aviso {
+    width: 92%;
+    max-width: 1180px;
+    margin: 0 auto 16px auto;
+    padding: 12px 14px;
+    border-radius: var(--lc-radius-md);
+    font-weight: 700;
+}
+
+.erro {
+    background: #fef2f2;
+    color: var(--lc-danger);
+    border: 1px solid #fecaca;
+}
+
+.sucesso {
+    background: #f0fdf4;
+    color: var(--lc-success);
+    border: 1px solid #bbf7d0;
+}
+
+.aviso {
+    background: #fffbeb;
+    color: var(--lc-warning);
+    border: 1px solid #fde68a;
+}
+
+/* Status dos fretes */
+
+.status-EMITIDO {
+    color: var(--lc-muted) !important;
+    font-weight: 800;
+}
+
+.status-SAIDA_CONFIRMADA {
+    color: var(--lc-info) !important;
+    font-weight: 800;
+}
+
+.status-EM_TRANSITO {
+    color: var(--lc-warning) !important;
+    font-weight: 800;
+}
+
+.status-ENTREGUE {
+    color: var(--lc-success) !important;
+    font-weight: 800;
+}
+
+.status-NAO_ENTREGUE {
+    color: var(--lc-danger) !important;
+    font-weight: 800;
+}
+
+.status-CANCELADO {
+    color: #94a3b8 !important;
+    font-weight: 800;
+    text-decoration: line-through;
+}
+
+/* Login */
+
+.login-wrapper {
+    min-height: 70vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 16px;
+    margin-top: 0 !important;
+}
+
+.login-wrapper table.bordaFina {
+    width: 420px !important;
+    max-width: 94vw;
+    box-shadow: var(--lc-shadow-md);
+}
+
+.login-wrapper .style4 {
+    font-size: 20px !important;
+    line-height: 1.35;
+}
+
+/* Melhor responsividade */
+
+@media (max-width: 768px) {
+    body > img:first-child {
+        width: 94% !important;
+        height: 48px !important;
+        margin-top: 12px;
+    }
+
+    table.bordaFina {
+        width: 94% !important;
+        display: block;
+        overflow-x: auto;
+    }
+
+    table.bordaFina td {
+        padding: 10px;
+        white-space: nowrap;
+    }
+
+    .style4 {
+        font-size: 16px !important;
+    }
+
+    .inputbotao,
+    input[type="submit"],
+    input[type="button"],
+    button {
+        width: auto;
+        margin-top: 4px;
+    }
+}
