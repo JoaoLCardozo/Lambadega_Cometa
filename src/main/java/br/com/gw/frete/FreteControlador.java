@@ -48,11 +48,14 @@ public class FreteControlador extends HttpServlet {
             req.setAttribute("erro", e.getMessage());
             try { listar(req, resp); } catch (NegocioException ex) {
                 logger.severe("Erro ao recarregar listagem: " + ex.getMessage());
+                req.setAttribute("erro", "Erro ao listar fretes: " + ex.getMessage());
+                req.getRequestDispatcher("/erro.jsp").forward(req, resp);
             }
         } catch (Exception e) {
             logger.severe("Erro inesperado: " + e.getMessage());
-            System.err.println("[FreteControlador] " + e.getMessage());
-            resp.sendRedirect(req.getContextPath() + "/erro.jsp");
+            e.printStackTrace();
+            req.setAttribute("erro", "Erro inesperado: " + e.getMessage());
+            req.getRequestDispatcher("/erro.jsp").forward(req, resp);
         }
     }
 
@@ -79,11 +82,12 @@ public class FreteControlador extends HttpServlet {
                     req.setAttribute("frete", freteBO.buscarPorId(Integer.parseInt(idFrete)));
                 } catch (Exception ex) { /* ignora */ }
             }
-            req.getRequestDispatcher("/WEB-INF/views/frete/detalhe.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/frete/detalharFrete.jsp").forward(req, resp);
         } catch (Exception e) {
             logger.severe("Erro inesperado POST: " + e.getMessage());
-            System.err.println("[FreteControlador] " + e.getMessage());
-            resp.sendRedirect(req.getContextPath() + "/erro.jsp");
+            e.printStackTrace();
+            req.setAttribute("erro", "Erro inesperado: " + e.getMessage());
+            req.getRequestDispatcher("/erro.jsp").forward(req, resp);
         }
     }
 
@@ -97,7 +101,7 @@ public class FreteControlador extends HttpServlet {
         req.setAttribute("filtro",        filtro);
         req.setAttribute("paginaAtual",   pagina);
         req.setAttribute("totalPaginas",  totalPaginas);
-        req.getRequestDispatcher("/WEB-INF/views/frete/lista.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/frete/listarFrete.jsp").forward(req, resp);
     }
 
     private void novo(HttpServletRequest req, HttpServletResponse resp)
@@ -106,14 +110,14 @@ public class FreteControlador extends HttpServlet {
         req.setAttribute("listaMotoristas", motoristaDAO.listar(null, 1, 999));
         req.setAttribute("listaVeiculos",   veiculoDAO.listar(null, 1, 999));
         req.setAttribute("frete", new Frete());
-        req.getRequestDispatcher("/WEB-INF/views/frete/form.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/frete/formFrete.jsp").forward(req, resp);
     }
 
     private void detalhe(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         req.setAttribute("frete", freteBO.buscarPorId(id));
-        req.getRequestDispatcher("/WEB-INF/views/frete/detalhe.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/frete/detalharFrete.jsp").forward(req, resp);
     }
 
     private void confirmarSaida(HttpServletRequest req, HttpServletResponse resp)
@@ -134,7 +138,7 @@ public class FreteControlador extends HttpServlet {
             throws ServletException, IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         req.setAttribute("frete", freteBO.buscarPorId(id));
-        req.getRequestDispatcher("/WEB-INF/views/frete/ocorrencia.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/frete/ocorrenciaFrete.jsp").forward(req, resp);
     }
 
     private void emitir(HttpServletRequest req, HttpServletResponse resp)
@@ -149,7 +153,7 @@ public class FreteControlador extends HttpServlet {
             req.setAttribute("listaClientes",   clienteDAO.listar(null, 1, 999));
             req.setAttribute("listaMotoristas", motoristaDAO.listar(null, 1, 999));
             req.setAttribute("listaVeiculos",   veiculoDAO.listar(null, 1, 999));
-            req.getRequestDispatcher("/WEB-INF/views/frete/form.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/frete/formFrete.jsp").forward(req, resp);
         }
     }
 

@@ -23,8 +23,8 @@ public class FreteDAO {
             "f.uf_destino, f.descricao_carga, f.peso_kg, f.volumes, f.valor_frete, " +
             "f.aliquota_icms, f.valor_icms, f.valor_total, f.status, f.data_emissao, " +
             "f.data_previsao_entrega, f.data_saida, f.data_entrega, " +
-            "r.id r_id, r.razao_social r_razao, " +
-            "d.id d_id, d.razao_social d_razao, " +
+            "r.id r_id, r.nome_razao_social r_razao, " +
+            "d.id d_id, d.nome_razao_social d_razao, " +
             "m.id m_id, m.nome m_nome, " +
             "v.id v_id, v.placa v_placa " +
             "FROM frete f " +
@@ -32,7 +32,7 @@ public class FreteDAO {
             "JOIN cliente d ON f.id_destinatario = d.id " +
             "JOIN motorista m ON f.id_motorista  = m.id " +
             "JOIN veiculo v   ON f.id_veiculo    = v.id " +
-            "WHERE f.numero ILIKE ? OR r.razao_social ILIKE ? OR d.razao_social ILIKE ? " +
+            "WHERE f.numero ILIKE ? OR r.nome_razao_social ILIKE ? OR d.nome_razao_social ILIKE ? " +
             "ORDER BY f.id DESC LIMIT ? OFFSET ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -58,7 +58,7 @@ public class FreteDAO {
             "SELECT COUNT(*) FROM frete f " +
             "JOIN cliente r ON f.id_remetente    = r.id " +
             "JOIN cliente d ON f.id_destinatario = d.id " +
-            "WHERE f.numero ILIKE ? OR r.razao_social ILIKE ? OR d.razao_social ILIKE ?";
+            "WHERE f.numero ILIKE ? OR r.nome_razao_social ILIKE ? OR d.nome_razao_social ILIKE ?";
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             String f = "%" + (filtro != null ? filtro : "") + "%";
@@ -78,8 +78,8 @@ public class FreteDAO {
             "f.uf_destino, f.descricao_carga, f.peso_kg, f.volumes, f.valor_frete, " +
             "f.aliquota_icms, f.valor_icms, f.valor_total, f.status, f.data_emissao, " +
             "f.data_previsao_entrega, f.data_saida, f.data_entrega, " +
-            "r.id r_id, r.razao_social r_razao, r.cnpj r_cnpj, " +
-            "d.id d_id, d.razao_social d_razao, d.cnpj d_cnpj, " +
+            "r.id r_id, r.nome_razao_social r_razao, r.documento r_cnpj, " +
+            "d.id d_id, d.nome_razao_social d_razao, d.documento d_cnpj, " +
             "m.id m_id, m.nome m_nome, m.cpf m_cpf, " +
             "v.id v_id, v.placa v_placa, v.tipo v_tipo, v.capacidade_kg v_cap " +
             "FROM frete f " +
@@ -243,8 +243,8 @@ public class FreteDAO {
         Date dprev = rs.getDate("data_previsao_entrega");
         if (dprev != null) f.setDataPrevisaoEntrega(dprev.toLocalDate());
 
-        Cliente rem = new Cliente(); rem.setId(rs.getInt("r_id")); rem.setRazaoSocial(rs.getString("r_razao"));
-        Cliente dest = new Cliente(); dest.setId(rs.getInt("d_id")); dest.setRazaoSocial(rs.getString("d_razao"));
+        Cliente rem = new Cliente(); rem.setId(rs.getInt("r_id")); rem.setNomeRazaoSocial(rs.getString("r_razao"));
+        Cliente dest = new Cliente(); dest.setId(rs.getInt("d_id")); dest.setNomeRazaoSocial(rs.getString("d_razao"));
         Motorista mot = new Motorista(); mot.setId(rs.getInt("m_id")); mot.setNome(rs.getString("m_nome"));
         Veiculo vei = new Veiculo(); vei.setId(rs.getInt("v_id")); vei.setPlaca(rs.getString("v_placa"));
 
@@ -268,8 +268,8 @@ public class FreteDAO {
         if (dent != null) f.setDataEntrega(dent.toLocalDateTime());
 
         // complementar objetos com campos extras
-        f.getRemetente().setCnpj(rs.getString("r_cnpj"));
-        f.getDestinatario().setCnpj(rs.getString("d_cnpj"));
+        f.getRemetente().setDocumento(rs.getString("r_cnpj"));
+        f.getDestinatario().setDocumento(rs.getString("d_cnpj"));
         f.getMotorista().setCpf(rs.getString("m_cpf"));
         f.getVeiculo().setTipo(Veiculo.Tipo.valueOf(rs.getString("v_tipo")));
         f.getVeiculo().setCapacidadeKg(rs.getDouble("v_cap"));
@@ -289,6 +289,4 @@ public class FreteDAO {
         oc.setDocumentoRecebedor(rs.getString("documento_recebedor"));
         return oc;
     }
-
-    // necessário para import no mapearResumido
 }
