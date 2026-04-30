@@ -1,16 +1,16 @@
 package br.com.gw.frete;
 
-import br.com.gw.cliente.ClienteDAO;
 import br.com.gw.exception.FreteException;
 import br.com.gw.exception.NegocioException;
 import br.com.gw.motorista.Motorista;
 import br.com.gw.motorista.MotoristaDAO;
-import br.com.gw.util.ConnectionFactory;
 import br.com.gw.veiculo.Veiculo;
 import br.com.gw.veiculo.VeiculoDAO;
+import br.com.gw.util.ConnectionFactory;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +19,9 @@ import java.util.logging.Logger;
 public class FreteBO {
     private static final Logger logger = Logger.getLogger(FreteBO.class.getName());
 
-    private final FreteDAO   freteDAO   = new FreteDAO();
-    private final ClienteDAO clienteDAO = new ClienteDAO();
+    private final FreteDAO    freteDAO    = new FreteDAO();
     private final MotoristaDAO motoristaDAO = new MotoristaDAO();
-    private final VeiculoDAO veiculoDAO = new VeiculoDAO();
+    private final VeiculoDAO  veiculoDAO  = new VeiculoDAO();
 
     public List<Frete> listar(String filtro, int pagina, int limite) throws NegocioException {
         if (pagina < 1) pagina = 1;
@@ -41,18 +40,14 @@ public class FreteBO {
         return f;
     }
 
-    /**
-     * Gera o próximo número no formato FRT-AAAA-NNNNN — regra de negócio no BO.
-     */
     public String gerarNumeroFrete() throws NegocioException {
         int ano = LocalDate.now().getYear();
         String ultimo = freteDAO.buscarUltimoNumeroDoAno(ano);
-        int sequencial = 1;
+        int seq = 1;
         if (ultimo != null) {
-            String[] partes = ultimo.split("-");
-            sequencial = Integer.parseInt(partes[2]) + 1;
+            seq = Integer.parseInt(ultimo.split("-")[2]) + 1;
         }
-        return String.format("FRT-%d-%05d", ano, sequencial);
+        return String.format("FRT-%d-%05d", ano, seq);
     }
 
     public void emitir(Frete frete) throws NegocioException {
@@ -62,7 +57,6 @@ public class FreteBO {
         frete.setStatus(Frete.Status.EMITIDO);
         frete.setDataEmissao(LocalDateTime.now());
 
-        // Calcula valor total
         if (frete.getValorFrete() != null && frete.getAliquotaIcms() != null) {
             BigDecimal icms = frete.getValorFrete()
                 .multiply(frete.getAliquotaIcms())
@@ -80,7 +74,6 @@ public class FreteBO {
             logger.info("Frete emitido: " + frete.getNumero());
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
-            logger.severe("Erro ao emitir frete: " + e.getMessage());
             throw new FreteException("Erro ao emitir frete: " + e.getMessage(), e);
         } finally {
             ConnectionFactory.fechar(conn);
@@ -91,7 +84,7 @@ public class FreteBO {
         Frete frete = buscarPorId(idFrete);
 
         if (frete.getStatus() != Frete.Status.EMITIDO) {
-            throw new FreteException("Somente fretes com status EMITIDO podem ter saída confirmada.");
+            throw new FreteException("Somente fretes EMITIDOS podem ter saída confirmada.");
         }
 
         Connection conn = null;
@@ -99,9 +92,10 @@ public class FreteBO {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
 
-            freteDAO.atualizarStatus(idFrete, Frete.Status.SAIDA_CONFIRMADA,
-                new java.sql.Timestamp(System.currentTimeMillis()), null, conn);
-            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), "EM_VIAGEM", conn);
+            Timestamp agora = new Timestamp(System.currentTimeMillis());
+            freteDAO.atualizarStatus(idFrete, Frete.Status.SAIDA_CONFIRMADA, agora, null, conn);
+            // Usa enum — não String solta
+            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), Veiculo.Status.EM_VIAGEM, conn);
 
             OcorrenciaFrete oc = new OcorrenciaFrete();
             oc.setIdFrete(idFrete);
@@ -115,8 +109,7 @@ public class FreteBO {
             conn.commit();
             logger.info("Saida confirmada: " + frete.getNumero());
         } catch (NegocioException e) {
-            ConnectionFactory.rollback(conn);
-            throw e;
+            ConnectionFactory.rollback(conn); throw e;
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
             throw new FreteException("Erro ao confirmar saída: " + e.getMessage(), e);
@@ -139,15 +132,16 @@ public class FreteBO {
             conn.setAutoCommit(false);
 
             freteDAO.atualizarStatus(idFrete, Frete.Status.EM_TRANSITO,
-                new java.sql.Timestamp(System.currentTimeMillis()), null, conn);
+                new Timestamp(frete.getDataSaida() != null
+                    ? Timestamp.valueOf(frete.getDataSaida()).getTime()
+                    : System.currentTimeMillis()), null, conn);
+
             ocorrencia.setIdFrete(idFrete);
             ocorrencia.setTipo(OcorrenciaFrete.Tipo.EM_ROTA);
             freteDAO.salvarOcorrencia(ocorrencia, conn);
-
             conn.commit();
         } catch (NegocioException e) {
-            ConnectionFactory.rollback(conn);
-            throw e;
+            ConnectionFactory.rollback(conn); throw e;
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
             throw new FreteException("Erro ao registrar em trânsito: " + e.getMessage(), e);
@@ -175,22 +169,21 @@ public class FreteBO {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
 
-            java.sql.Timestamp agora = new java.sql.Timestamp(System.currentTimeMillis());
-            freteDAO.atualizarStatus(idFrete, Frete.Status.ENTREGUE,
-                new java.sql.Timestamp(frete.getDataSaida() != null
-                    ? java.sql.Timestamp.valueOf(frete.getDataSaida()).getTime()
-                    : System.currentTimeMillis()), agora, conn);
-            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), "DISPONIVEL", conn);
+            Timestamp agora   = new Timestamp(System.currentTimeMillis());
+            // Preserva data_saida existente
+            Timestamp saida   = frete.getDataSaida() != null
+                ? Timestamp.valueOf(frete.getDataSaida()) : agora;
+
+            freteDAO.atualizarStatus(idFrete, Frete.Status.ENTREGUE, saida, agora, conn);
+            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), Veiculo.Status.DISPONIVEL, conn);
 
             ocorrencia.setIdFrete(idFrete);
             ocorrencia.setTipo(OcorrenciaFrete.Tipo.ENTREGA_REALIZADA);
             freteDAO.salvarOcorrencia(ocorrencia, conn);
-
             conn.commit();
             logger.info("Entrega registrada: " + frete.getNumero());
         } catch (NegocioException e) {
-            ConnectionFactory.rollback(conn);
-            throw e;
+            ConnectionFactory.rollback(conn); throw e;
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
             throw new FreteException("Erro ao registrar entrega: " + e.getMessage(), e);
@@ -215,17 +208,19 @@ public class FreteBO {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
 
-            freteDAO.atualizarStatus(idFrete, Frete.Status.NAO_ENTREGUE, null, null, conn);
-            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), "DISPONIVEL", conn);
+            // Preserva data_saida — não passa null
+            Timestamp saida = frete.getDataSaida() != null
+                ? Timestamp.valueOf(frete.getDataSaida()) : null;
+
+            freteDAO.atualizarStatus(idFrete, Frete.Status.NAO_ENTREGUE, saida, null, conn);
+            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), Veiculo.Status.DISPONIVEL, conn);
 
             ocorrencia.setIdFrete(idFrete);
             ocorrencia.setTipo(OcorrenciaFrete.Tipo.TENTATIVA_ENTREGA);
             freteDAO.salvarOcorrencia(ocorrencia, conn);
-
             conn.commit();
         } catch (NegocioException e) {
-            ConnectionFactory.rollback(conn);
-            throw e;
+            ConnectionFactory.rollback(conn); throw e;
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
             throw new FreteException("Erro ao registrar não entrega: " + e.getMessage(), e);
@@ -242,8 +237,7 @@ public class FreteBO {
                 || frete.getStatus() == Frete.Status.ENTREGUE
                 || frete.getStatus() == Frete.Status.NAO_ENTREGUE
                 || frete.getStatus() == Frete.Status.CANCELADO) {
-            throw new FreteException(
-                "Não é possível cancelar um frete com status: " + frete.getStatus());
+            throw new FreteException("Não é possível cancelar um frete com status: " + frete.getStatus());
         }
 
         Connection conn = null;
@@ -254,8 +248,7 @@ public class FreteBO {
             conn.commit();
             logger.info("Frete cancelado: " + frete.getNumero());
         } catch (NegocioException e) {
-            ConnectionFactory.rollback(conn);
-            throw e;
+            ConnectionFactory.rollback(conn); throw e;
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
             throw new FreteException("Erro ao cancelar frete: " + e.getMessage(), e);
@@ -275,6 +268,10 @@ public class FreteBO {
             registrarEntrega(idFrete, ocorrencia);
             return;
         }
+        if (ocorrencia.getTipo() == OcorrenciaFrete.Tipo.TENTATIVA_ENTREGA) {
+            registrarNaoEntrega(idFrete, ocorrencia);
+            return;
+        }
         validarOcorrencia(ocorrencia, frete);
 
         Connection conn = null;
@@ -285,8 +282,7 @@ public class FreteBO {
             freteDAO.salvarOcorrencia(ocorrencia, conn);
             conn.commit();
         } catch (NegocioException e) {
-            ConnectionFactory.rollback(conn);
-            throw e;
+            ConnectionFactory.rollback(conn); throw e;
         } catch (Exception e) {
             ConnectionFactory.rollback(conn);
             throw new FreteException("Erro ao registrar ocorrência: " + e.getMessage(), e);
@@ -317,32 +313,39 @@ public class FreteBO {
         if (!f.getDataPrevisaoEntrega().isAfter(LocalDate.now()))
             throw new FreteException("A data prevista de entrega deve ser posterior à data de hoje.");
 
-        // Validar veículo disponível
         Veiculo veiculo = veiculoDAO.buscarPorId(f.getVeiculo().getId());
         if (veiculo.getStatus() != Veiculo.Status.DISPONIVEL)
-            throw new FreteException("O veículo selecionado não está disponível (status: " + veiculo.getStatus() + ").");
+            throw new FreteException("O veículo não está disponível (status: " + veiculo.getStatus() + ").");
 
-        // Validar capacidade
         if (f.getPesoKg() != null && f.getPesoKg().doubleValue() > veiculo.getCapacidadeKg())
-            throw new FreteException("O peso da carga (" + f.getPesoKg() + " kg) excede a capacidade do veículo ("
+            throw new FreteException("Peso da carga excede a capacidade do veículo ("
                 + veiculo.getCapacidadeKg() + " kg).");
 
-        // Validar motorista ativo e sem frete em andamento
         Motorista motorista = motoristaDAO.buscarPorId(f.getMotorista().getId());
         if (motorista.getStatus() != Motorista.Status.ATIVO)
-            throw new FreteException("O motorista selecionado não está ativo.");
-        if (motorista.isCnhVencida())
+            throw new FreteException("O motorista não está ativo.");
+
+        // CNH válida na data de emissão do frete — não apenas hoje
+        LocalDate dataEmissao = LocalDate.now();
+        if (motorista.getCnhValidade() != null && motorista.getCnhValidade().isBefore(dataEmissao))
             throw new FreteException("A CNH do motorista está vencida.");
+
+        // Motorista não pode ter frete em SAIDA_CONFIRMADA ou EM_TRANSITO
+        if (motoristaDAO.possuiFretesAtivos(motorista.getId()))
+            throw new FreteException("O motorista já possui frete em andamento (SAÍDA CONFIRMADA ou EM TRÂNSITO).");
     }
 
     private void validarOcorrencia(OcorrenciaFrete oc, Frete frete) throws NegocioException {
         if (oc.getDataHora() == null)
             throw new FreteException("Data/hora da ocorrência é obrigatória.");
+        if (oc.getMunicipio() == null || oc.getMunicipio().trim().isEmpty())
+            throw new FreteException("Município da ocorrência é obrigatório.");
+        if (oc.getUf() == null || oc.getUf().trim().isEmpty())
+            throw new FreteException("UF da ocorrência é obrigatória.");
 
-        LocalDateTime ultimaOcorrencia = freteDAO.buscarDataHoraUltimaOcorrencia(frete.getId());
-        if (ultimaOcorrencia != null && !oc.getDataHora().isAfter(ultimaOcorrencia))
-            throw new FreteException(
-                "A data/hora da ocorrência deve ser posterior à última ocorrência registrada.");
+        LocalDateTime ultima = freteDAO.buscarDataHoraUltimaOcorrencia(frete.getId());
+        if (ultima != null && !oc.getDataHora().isAfter(ultima))
+            throw new FreteException("A data/hora deve ser posterior à última ocorrência registrada.");
 
         if (oc.getTipo() == OcorrenciaFrete.Tipo.AVARIA
                 || oc.getTipo() == OcorrenciaFrete.Tipo.EXTRAVIO

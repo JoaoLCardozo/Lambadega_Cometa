@@ -164,11 +164,11 @@ public class FreteDAO {
         }
     }
 
-    public void atualizarStatusVeiculo(int idVeiculo, String status,
+    public void atualizarStatusVeiculo(int idVeiculo, br.com.gw.veiculo.Veiculo.Status status,
                                         Connection conn) throws NegocioException {
         String sql = "UPDATE veiculo SET status=? WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, status);
+            stmt.setString(1, status.name());
             stmt.setInt(2, idVeiculo);
             stmt.executeUpdate();
         } catch (SQLException e) {
