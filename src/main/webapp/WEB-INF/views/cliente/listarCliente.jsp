@@ -5,109 +5,108 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Clientes - Lambadega Cometa</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css" type="text/css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
 </head>
 <body>
-    <img src="${pageContext.request.contextPath}/img/topo_frota.jpg" width="40%" height="44">
+    <main class="app-shell">
+        <section class="app-brand">
+            <div class="brand-row">
+                <span class="brand-mark">LC</span>
+                <div class="brand-copy">
+                    <h1 class="brand-title">Lambadega Cometa</h1>
+                    <p class="brand-subtitle">Cadastro comercial e operacional</p>
+                </div>
+            </div>
+            <a class="link-button" href="${pageContext.request.contextPath}/index.jsp">Início</a>
+        </section>
 
-    <table class="bordaFina" width="85%" align="center">
-        <tr>
-            <td><span class="style4">Cadastro de Clientes</span></td>
-            <td align="right">
-                <input type="button" class="inputbotao" value="Novo Cliente"
-                    onclick="window.location='${pageContext.request.contextPath}/ClienteControlador?acao=novo'"/>
-                &nbsp;
-                <a href="${pageContext.request.contextPath}/index.jsp">← Início</a>
-            </td>
-        </tr>
-    </table>
-    <br>
+        <section class="app-header">
+            <div class="app-header-main">
+                <span class="app-eyebrow">Clientes</span>
+                <h2 class="app-title">Cadastro de clientes</h2>
+            </div>
+            <div class="app-actions">
+                <input type="button" class="inputbotao" value="Novo cliente"
+                       onclick="window.location='${pageContext.request.contextPath}/ClienteControlador?acao=novo'"/>
+            </div>
+        </section>
 
-    <c:if test="${not empty erro}">
-        <table width="85%" align="center">
-            <tr><td style="color:red; font-weight:bold;"><c:out value="${erro}"/></td></tr>
-        </table>
-    </c:if>
+        <c:if test="${not empty erro}">
+            <div class="alert alert-error"><c:out value="${erro}"/></div>
+        </c:if>
 
-    <table class="bordaFina" width="85%" align="center">
-        <form action="${pageContext.request.contextPath}/ClienteControlador" method="get" name="formulario">
-            <input type="hidden" name="acao" value="listar">
-            <tr>
-                <td class="CelulaZebra1" width="20%">Nome/Razão Social:</td>
-                <td class="CelulaZebra1" width="50%">
-                    <input type="text" name="filtro" class="inputtexto" size="40"
+        <section class="card filter-card">
+            <form class="filter-form" action="${pageContext.request.contextPath}/ClienteControlador" method="get" name="formulario">
+                <input type="hidden" name="acao" value="listar">
+                <div class="form-field">
+                    <label for="filtro">Nome ou razão social</label>
+                    <input type="text" name="filtro" id="filtro" class="inputtexto"
                            value="<c:out value='${filtro}'/>"/>
-                </td>
-                <td class="CelulaZebra1">
+                </div>
+                <div class="app-actions">
                     <input type="submit" class="inputbotao" value="Pesquisar"/>
-                </td>
-            </tr>
-        </form>
-    </table>
-    <br>
+                </div>
+            </form>
+        </section>
 
-    <table class="bordaFina" width="85%" align="center" cellpadding="2" cellspacing="1">
-        <tr>
-            <td class="tabela" width="3%"></td>
-            <td class="tabela" width="3%"></td>
-            <td class="tabela" width="8%">TIPO</td>
-            <td class="tabela" width="30%">NOME / RAZÃO SOCIAL</td>
-            <td class="tabela" width="20%">NOME FANTASIA</td>
-            <td class="tabela" width="18%">CPF / CNPJ</td>
-            <td class="tabela" width="10%">STATUS</td>
-        </tr>
-        <c:forEach var="cliente" varStatus="st" items="${listaClientes}">
-        <tr class="${st.count % 2 == 0 ? 'CelulaZebra1' : 'CelulaZebra2'}">
-            <td align="center">
-                <a href="${pageContext.request.contextPath}/ClienteControlador?acao=editar&id=${cliente.id}"
-                   title="Editar">
-                    <img src="${pageContext.request.contextPath}/img/edit.gif" class="imagemLink" border="0"/>
-                </a>
-            </td>
-            <td align="center">
-                <a href="javascript:if(confirm('Excluir o cliente ${cliente.nomeRazaoSocial}?'))
-                    window.location='${pageContext.request.contextPath}/ClienteControlador?acao=excluir&id=${cliente.id}'"
-                   title="Excluir">
-                    <img src="${pageContext.request.contextPath}/img/lixo.png" class="imagemLink"/>
-                </a>
-            </td>
-            <td align="center">
-                <c:choose>
-                    <c:when test="${cliente.tipoPessoa == 'F'}">PF</c:when>
-                    <c:when test="${cliente.tipoPessoa == 'J'}">PJ</c:when>
-                    <c:otherwise><c:out value="${cliente.tipoPessoa}"/></c:otherwise>
-                </c:choose>
-            </td>
-            <td><c:out value="${cliente.nomeRazaoSocial}"/></td>
-            <td><c:out value="${cliente.nomeFantasia}"/></td>
-            <td><c:out value="${cliente.documento}"/></td>
-            <td><c:out value="${cliente.status}"/></td>
-        </tr>
-        </c:forEach>
-    </table>
-    <br>
+        <section class="table-wrap">
+            <table class="bordaFina data-table" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="tabela" width="12%">Ações</td>
+                    <td class="tabela" width="8%">Tipo</td>
+                    <td class="tabela" width="30%">Nome / Razão social</td>
+                    <td class="tabela" width="20%">Nome fantasia</td>
+                    <td class="tabela" width="18%">CPF / CNPJ</td>
+                    <td class="tabela" width="12%">Status</td>
+                </tr>
+                <c:forEach var="cliente" varStatus="st" items="${listaClientes}">
+                    <tr class="${st.count % 2 == 0 ? 'CelulaZebra1' : 'CelulaZebra2'}">
+                        <td>
+                            <div class="table-actions">
+                                <a class="action-icon" href="${pageContext.request.contextPath}/ClienteControlador?acao=editar&id=${cliente.id}" title="Editar">Editar</a>
+                                <a class="action-icon danger" href="javascript:if(confirm('Excluir o cliente ${cliente.nomeRazaoSocial}?')) window.location='${pageContext.request.contextPath}/ClienteControlador?acao=excluir&id=${cliente.id}'" title="Excluir">Excluir</a>
+                            </div>
+                        </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${cliente.tipoPessoa == 'F'}"><span class="status-PF">PF</span></c:when>
+                                <c:when test="${cliente.tipoPessoa == 'J'}"><span class="status-PJ">PJ</span></c:when>
+                                <c:otherwise><c:out value="${cliente.tipoPessoa}"/></c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td><c:out value="${cliente.nomeRazaoSocial}"/></td>
+                        <td><c:out value="${cliente.nomeFantasia}"/></td>
+                        <td><c:out value="${cliente.documento}"/></td>
+                        <td><span class="status-${cliente.status}"><c:out value="${cliente.status}"/></span></td>
+                    </tr>
+                </c:forEach>
+                <c:if test="${empty listaClientes}">
+                    <tr><td colspan="6" class="empty-state">Nenhum cliente encontrado.</td></tr>
+                </c:if>
+            </table>
+        </section>
 
-    <table class="bordaFina" width="85%" align="center">
-        <tr class="CelulaZebra1">
-            <td width="40%" align="center">
-                Página <c:out value="${paginaAtual}"/> de <c:out value="${totalPaginas}"/>
-            </td>
-            <td width="30%" align="center">
+        <section class="card pagination-card">
+            <strong>Página <c:out value="${paginaAtual}"/> de <c:out value="${totalPaginas}"/></strong>
+            <div class="pagination-actions">
                 <c:if test="${paginaAtual > 1}">
-                    <a href="${pageContext.request.contextPath}/ClienteControlador?acao=listar&pagina=${paginaAtual - 1}&filtro=<c:out value='${filtro}'/>">
-                        <input type="button" class="inputbotao" value="ANTERIOR"/>
-                    </a>
+                    <c:url var="clienteAnteriorUrl" value="/ClienteControlador">
+                        <c:param name="acao" value="listar"/>
+                        <c:param name="pagina" value="${paginaAtual - 1}"/>
+                        <c:param name="filtro" value="${filtro}"/>
+                    </c:url>
+                    <a class="link-button" href="${clienteAnteriorUrl}">Anterior</a>
                 </c:if>
-            </td>
-            <td width="30%" align="center">
                 <c:if test="${paginaAtual < totalPaginas}">
-                    <a href="${pageContext.request.contextPath}/ClienteControlador?acao=listar&pagina=${paginaAtual + 1}&filtro=<c:out value='${filtro}'/>">
-                        <input type="button" class="inputbotao" value="PRÓXIMO"/>
-                    </a>
+                    <c:url var="clienteProximoUrl" value="/ClienteControlador">
+                        <c:param name="acao" value="listar"/>
+                        <c:param name="pagina" value="${paginaAtual + 1}"/>
+                        <c:param name="filtro" value="${filtro}"/>
+                    </c:url>
+                    <a class="link-button" href="${clienteProximoUrl}">Próximo</a>
                 </c:if>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
