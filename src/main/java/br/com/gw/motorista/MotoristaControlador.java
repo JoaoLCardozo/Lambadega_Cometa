@@ -115,12 +115,14 @@ public class MotoristaControlador extends HttpServlet {
 
     private Motorista montarMotoristaDaRequisicao(HttpServletRequest req) {
         Motorista m = new Motorista();
+        String id = req.getParameter("id");
+        if (id != null && !id.isEmpty()) m.setId(Integer.parseInt(id));
         m.setNome(req.getParameter("nome"));
-        m.setCpf(req.getParameter("cpf"));
+        m.setCpf(somenteDigitos(req.getParameter("cpf")));
         String dn = req.getParameter("dataNascimento");
         if (dn != null && !dn.isEmpty()) m.setDataNascimento(LocalDate.parse(dn));
-        m.setTelefone(req.getParameter("telefone"));
-        m.setCnhNumero(req.getParameter("cnhNumero"));
+        m.setTelefone(somenteDigitos(req.getParameter("telefone")));
+        m.setCnhNumero(somenteDigitos(req.getParameter("cnhNumero")));
         String cat = req.getParameter("cnhCategoria");
         if (cat != null && !cat.isEmpty()) m.setCnhCategoria(Motorista.CnhCategoria.valueOf(cat));
         String val = req.getParameter("cnhValidade");
@@ -131,6 +133,10 @@ public class MotoristaControlador extends HttpServlet {
         m.setStatus(st != null && !st.isEmpty()
             ? Motorista.Status.valueOf(st) : Motorista.Status.ATIVO);
         return m;
+    }
+
+    private String somenteDigitos(String valor) {
+        return valor != null ? valor.replaceAll("[^0-9]", "") : null;
     }
 
     private int parsePagina(String valor) {

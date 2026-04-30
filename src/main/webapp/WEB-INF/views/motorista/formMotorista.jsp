@@ -45,7 +45,8 @@
             <tr>
                 <td class="CelulaZebra2">CPF: *</td>
                 <td class="CelulaZebra2">
-                    <input type="text" name="cpf" class="inputtexto" size="15" maxlength="14"
+                    <input type="text" name="cpf" id="cpf" class="inputtexto" size="15" maxlength="14"
+                           placeholder="000.000.000-00"
                            value="<c:out value='${motorista.cpf}'/>"/>
                 </td>
                 <td class="CelulaZebra2">Data Nascimento:</td>
@@ -57,7 +58,8 @@
             <tr>
                 <td class="CelulaZebra1">Telefone:</td>
                 <td class="CelulaZebra1">
-                    <input type="text" name="telefone" class="inputtexto" size="20" maxlength="20"
+                    <input type="text" name="telefone" id="telefone" class="inputtexto" size="20" maxlength="15"
+                           placeholder="(00) 00000-0000"
                            value="<c:out value='${motorista.telefone}'/>"/>
                 </td>
                 <td class="CelulaZebra1">Tipo Vínculo: *</td>
@@ -74,7 +76,8 @@
             <tr>
                 <td class="CelulaZebra1">Número CNH: *</td>
                 <td class="CelulaZebra1">
-                    <input type="text" name="cnhNumero" class="inputtexto" size="20" maxlength="20"
+                    <input type="text" name="cnhNumero" id="cnhNumero" class="inputtexto" size="20" maxlength="11"
+                           placeholder="Somente numeros"
                            value="<c:out value='${motorista.cnhNumero}'/>"/>
                 </td>
                 <td class="CelulaZebra1">Categoria: *</td>
@@ -112,5 +115,45 @@
             </tr>
         </table>
     </form>
+    <script>
+        function somenteDigitos(valor, tamanho) {
+            return valor.replace(/\D/g, '').substring(0, tamanho);
+        }
+
+        function mascaraCpf(valor) {
+            valor = somenteDigitos(valor, 11);
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            return valor;
+        }
+
+        function mascaraTelefone(valor) {
+            valor = somenteDigitos(valor, 11);
+            if (valor.length <= 10) {
+                valor = valor.replace(/^(\d{2})(\d)/, '($1) $2');
+                valor = valor.replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+            } else {
+                valor = valor.replace(/^(\d{2})(\d)/, '($1) $2');
+                valor = valor.replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+            }
+            return valor;
+        }
+
+        function aplicarMascara(id, mascara) {
+            var campo = document.getElementById(id);
+            if (!campo) return;
+            campo.value = mascara(campo.value);
+            campo.addEventListener('input', function() {
+                this.value = mascara(this.value);
+            });
+        }
+
+        aplicarMascara('cpf', mascaraCpf);
+        aplicarMascara('telefone', mascaraTelefone);
+        aplicarMascara('cnhNumero', function(valor) {
+            return somenteDigitos(valor, 11);
+        });
+    </script>
 </body>
 </html>
