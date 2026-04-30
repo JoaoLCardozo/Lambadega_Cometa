@@ -1,0 +1,6 @@
+# Copie este arquivo para db.properties e preencha com suas credenciais reais
+# db.properties está no .gitignore e NÃO deve ser commitado
+
+db.url=jdbc:postgresql://localhost:5432/LambadegaCometa
+db.usuario=seu_usuario
+db.senha=sua_senha
