@@ -13,9 +13,19 @@
         <servlet-class>br.com.gw.usuario.LoginControladorServletImpl</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>UsuarioControlador</servlet-name>
+        <servlet-class>br.com.gw.usuario.UsuarioControladorServletImpl</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>LoginControlador</servlet-name>
         <url-pattern>/LoginControlador</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>UsuarioControlador</servlet-name>
+        <url-pattern>/usuario</url-pattern>
     </servlet-mapping>
 
     <filter>
