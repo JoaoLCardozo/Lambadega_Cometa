@@ -5,11 +5,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Veículo - Lambadega Cometa</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css" type="text/css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
 </head>
 <body>
-    <img src="${pageContext.request.contextPath}/img/topo_frota.jpg" width="40%" height="44">
     <table class="bordaFina" width="85%" align="center">
         <tr>
             <td><span class="style4">
@@ -24,9 +22,7 @@
         </tr>
     </table><br>
     <c:if test="${not empty erro}">
-        <table width="85%" align="center"><tr>
-            <td style="color:red;font-weight:bold;"><c:out value="${erro}"/></td>
-        </tr></table><br>
+        <div class="alert alert-error"><c:out value="${erro}"/></div>
     </c:if>
     <form action="${pageContext.request.contextPath}/VeiculoControlador" method="post">
         <c:choose>
