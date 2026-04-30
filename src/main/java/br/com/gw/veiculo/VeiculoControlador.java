@@ -57,7 +57,7 @@ public class VeiculoControlador extends HttpServlet {
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             req.setAttribute("veiculo", montarVeiculoDaRequisicao(req));
-            req.getRequestDispatcher("/WEB-INF/views/veiculo/form.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/veiculo/formVeiculo.jsp").forward(req, resp);
         } catch (Exception e) {
             logger.severe("Erro inesperado POST: " + e.getMessage());
             System.err.println("[VeiculoControlador] " + e.getMessage());
@@ -75,20 +75,20 @@ public class VeiculoControlador extends HttpServlet {
         req.setAttribute("filtro",         filtro);
         req.setAttribute("paginaAtual",    pagina);
         req.setAttribute("totalPaginas",   totalPaginas);
-        req.getRequestDispatcher("/WEB-INF/views/veiculo/lista.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/veiculo/listarVeiculo.jsp").forward(req, resp);
     }
 
     private void novo(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setAttribute("veiculo", new Veiculo());
-        req.getRequestDispatcher("/WEB-INF/views/veiculo/form.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/veiculo/formVeiculo.jsp").forward(req, resp);
     }
 
     private void editar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         req.setAttribute("veiculo", veiculoBO.buscarPorId(id));
-        req.getRequestDispatcher("/WEB-INF/views/veiculo/form.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/veiculo/formVeiculo.jsp").forward(req, resp);
     }
 
     private void excluir(HttpServletRequest req, HttpServletResponse resp)
