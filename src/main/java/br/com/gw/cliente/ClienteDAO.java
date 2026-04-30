@@ -15,12 +15,12 @@ public class ClienteDAO {
         List<Cliente> lista = new ArrayList<>();
         int offset = (pagina - 1) * limite;
 
-        String sql = "SELECT id, razao_social, nome_fantasia, cnpj, inscricao_estadual, " +
-                     "tipo, logradouro, numero, complemento, bairro, municipio, uf, cep, " +
+        String sql = "SELECT id, tipo_pessoa, nome_razao_social, nome_fantasia, documento, inscricao_estadual, " +
+                     "logradouro, numero, complemento, bairro, municipio, uf, cep, " +
                      "telefone, email, status " +
                      "FROM cliente " +
-                     "WHERE razao_social ILIKE ? " +
-                     "ORDER BY razao_social " +
+                     "WHERE nome_razao_social ILIKE ? " +
+                     "ORDER BY nome_razao_social " +
                      "LIMIT ? OFFSET ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -43,7 +43,7 @@ public class ClienteDAO {
     }
 
     public int contarTotal(String filtro) throws NegocioException {
-        String sql = "SELECT COUNT(*) FROM cliente WHERE razao_social ILIKE ?";
+        String sql = "SELECT COUNT(*) FROM cliente WHERE nome_razao_social ILIKE ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -61,8 +61,8 @@ public class ClienteDAO {
     }
 
     public Cliente buscarPorId(int id) throws NegocioException {
-        String sql = "SELECT id, razao_social, nome_fantasia, cnpj, inscricao_estadual, " +
-                     "tipo, logradouro, numero, complemento, bairro, municipio, uf, cep, " +
+        String sql = "SELECT id, tipo_pessoa, nome_razao_social, nome_fantasia, documento, inscricao_estadual, " +
+                     "logradouro, numero, complemento, bairro, municipio, uf, cep, " +
                      "telefone, email, status FROM cliente WHERE id = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -79,19 +79,19 @@ public class ClienteDAO {
         return null;
     }
 
-    public boolean existeCnpj(String cnpj, int idIgnorar) throws NegocioException {
-        String sql = "SELECT COUNT(*) FROM cliente WHERE cnpj = ? AND id <> ?";
+    public boolean existeDocumento(String documento, int idIgnorar) throws NegocioException {
+        String sql = "SELECT COUNT(*) FROM cliente WHERE documento = ? AND id <> ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, cnpj);
+            stmt.setString(1, documento);
             stmt.setInt(2, idIgnorar);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            throw new NegocioException("Erro ao verificar CNPJ.", e);
+            throw new NegocioException("Erro ao verificar documento.", e);
         }
         return false;
     }
@@ -115,8 +115,8 @@ public class ClienteDAO {
     }
 
     public void salvar(Cliente c) throws NegocioException {
-        String sql = "INSERT INTO cliente (razao_social, nome_fantasia, cnpj, inscricao_estadual, " +
-                     "tipo, logradouro, numero, complemento, bairro, municipio, uf, cep, " +
+        String sql = "INSERT INTO cliente (tipo_pessoa, nome_razao_social, nome_fantasia, documento, inscricao_estadual, " +
+                     "logradouro, numero, complemento, bairro, municipio, uf, cep, " +
                      "telefone, email, status) " +
                      "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
@@ -133,8 +133,8 @@ public class ClienteDAO {
     }
 
     public void atualizar(Cliente c) throws NegocioException {
-        String sql = "UPDATE cliente SET razao_social=?, nome_fantasia=?, cnpj=?, " +
-                     "inscricao_estadual=?, tipo=?, logradouro=?, numero=?, complemento=?, " +
+        String sql = "UPDATE cliente SET tipo_pessoa=?, nome_razao_social=?, nome_fantasia=?, documento=?, " +
+                     "inscricao_estadual=?, logradouro=?, numero=?, complemento=?, " +
                      "bairro=?, municipio=?, uf=?, cep=?, telefone=?, email=?, status=? " +
                      "WHERE id=?";
 
@@ -167,11 +167,11 @@ public class ClienteDAO {
     }
 
     private void preencherStatement(PreparedStatement stmt, Cliente c) throws SQLException {
-        stmt.setString(1, c.getRazaoSocial());
-        stmt.setString(2, c.getNomeFantasia());
-        stmt.setString(3, c.getCnpj());
-        stmt.setString(4, c.getInscricaoEstadual());
-        stmt.setString(5, c.getTipo() != null ? c.getTipo().name() : null);
+        stmt.setString(1, c.getTipoPessoa() != null ? c.getTipoPessoa().name() : null);
+        stmt.setString(2, c.getNomeRazaoSocial());
+        stmt.setString(3, c.getNomeFantasia());
+        stmt.setString(4, c.getDocumento());
+        stmt.setString(5, c.getInscricaoEstadual());
         stmt.setString(6, c.getLogradouro());
         stmt.setString(7, c.getNumero());
         stmt.setString(8, c.getComplemento());
@@ -187,11 +187,14 @@ public class ClienteDAO {
     private Cliente mapear(ResultSet rs) throws SQLException {
         Cliente c = new Cliente();
         c.setId(rs.getInt("id"));
-        c.setRazaoSocial(rs.getString("razao_social"));
+        String tipoPessoa = rs.getString("tipo_pessoa");
+        if (tipoPessoa != null) {
+            c.setTipoPessoa(Cliente.TipoPessoa.valueOf(tipoPessoa));
+        }
+        c.setNomeRazaoSocial(rs.getString("nome_razao_social"));
         c.setNomeFantasia(rs.getString("nome_fantasia"));
-        c.setCnpj(rs.getString("cnpj"));
+        c.setDocumento(rs.getString("documento"));
         c.setInscricaoEstadual(rs.getString("inscricao_estadual"));
-        c.setTipo(Cliente.Tipo.valueOf(rs.getString("tipo")));
         c.setLogradouro(rs.getString("logradouro"));
         c.setNumero(rs.getString("numero"));
         c.setComplemento(rs.getString("complemento"));

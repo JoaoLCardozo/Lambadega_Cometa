@@ -5,15 +5,15 @@ import java.io.Serializable;
 public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public enum Tipo   { REMETENTE, DESTINATARIO, AMBOS }
-    public enum Status { ATIVO, INATIVO }
+    public enum TipoPessoa { F, J }
+    public enum Status     { ATIVO, INATIVO }
 
-    private int    id;
-    private String razaoSocial;
-    private String nomeFantasia;
-    private String cnpj;
-    private String inscricaoEstadual;
-    private Tipo   tipo;
+    private int        id;
+    private TipoPessoa tipoPessoa;
+    private String     nomeRazaoSocial;
+    private String     nomeFantasia;
+    private String     documento;
+    private String     inscricaoEstadual;
 
     // Endereço
     private String logradouro;
@@ -35,20 +35,20 @@ public class Cliente implements Serializable {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public String getRazaoSocial() { return razaoSocial; }
-    public void setRazaoSocial(String razaoSocial) { this.razaoSocial = razaoSocial; }
+    public TipoPessoa getTipoPessoa() { return tipoPessoa; }
+    public void setTipoPessoa(TipoPessoa tipoPessoa) { this.tipoPessoa = tipoPessoa; }
+
+    public String getNomeRazaoSocial() { return nomeRazaoSocial; }
+    public void setNomeRazaoSocial(String nomeRazaoSocial) { this.nomeRazaoSocial = nomeRazaoSocial; }
 
     public String getNomeFantasia() { return nomeFantasia; }
     public void setNomeFantasia(String nomeFantasia) { this.nomeFantasia = nomeFantasia; }
 
-    public String getCnpj() { return cnpj; }
-    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
+    public String getDocumento() { return documento; }
+    public void setDocumento(String documento) { this.documento = documento; }
 
     public String getInscricaoEstadual() { return inscricaoEstadual; }
     public void setInscricaoEstadual(String inscricaoEstadual) { this.inscricaoEstadual = inscricaoEstadual; }
-
-    public Tipo getTipo() { return tipo; }
-    public void setTipo(Tipo tipo) { this.tipo = tipo; }
 
     public String getLogradouro() { return logradouro; }
     public void setLogradouro(String logradouro) { this.logradouro = logradouro; }
@@ -82,6 +82,9 @@ public class Cliente implements Serializable {
 
     @Override
     public String toString() {
-        return "Cliente{id=" + id + ", razaoSocial='" + razaoSocial + "', cnpj='" + cnpj + "', tipo=" + tipo + ", status=" + status + "}";
+        return "Cliente{id=" + id + ", tipoPessoa=" + tipoPessoa
+            + ", nomeRazaoSocial='" + nomeRazaoSocial
+            + "', documento='" + documento
+            + "', status=" + status + "}";
     }
 }

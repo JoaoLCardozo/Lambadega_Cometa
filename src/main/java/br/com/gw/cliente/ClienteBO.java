@@ -32,14 +32,14 @@ public class ClienteBO {
     public void salvar(Cliente c) throws NegocioException {
         validar(c, 0);
         clienteDAO.salvar(c);
-        logger.info("Cliente salvo: " + c.getRazaoSocial());
+        logger.info("Cliente salvo: " + c.getNomeRazaoSocial());
     }
 
     public void atualizar(Cliente c) throws NegocioException {
         if (c.getId() <= 0) throw new CadastroException("ID de cliente inválido para atualização.");
         validar(c, c.getId());
         clienteDAO.atualizar(c);
-        logger.info("Cliente atualizado: " + c.getRazaoSocial());
+        logger.info("Cliente atualizado: " + c.getNomeRazaoSocial());
     }
 
     public void excluir(int id) throws NegocioException {
@@ -52,24 +52,67 @@ public class ClienteBO {
     }
 
     private void validar(Cliente c, int idIgnorar) throws NegocioException {
-        if (c.getRazaoSocial() == null || c.getRazaoSocial().trim().isEmpty()) {
-            throw new CadastroException("O campo Razão Social é obrigatório.");
+        if (c.getTipoPessoa() == null) {
+            throw new CadastroException("O tipo de pessoa (F/J) é obrigatório.");
         }
-        if (c.getCnpj() == null || c.getCnpj().trim().isEmpty()) {
-            throw new CadastroException("O campo CNPJ é obrigatório.");
+        if (c.getNomeRazaoSocial() == null || c.getNomeRazaoSocial().trim().isEmpty()) {
+            throw new CadastroException("O campo Nome/Razão Social é obrigatório.");
         }
-        if (!validarCnpj(c.getCnpj())) {
-            throw new CadastroException("O CNPJ informado é inválido.");
+        if (c.getDocumento() == null || c.getDocumento().trim().isEmpty()) {
+            throw new CadastroException("O campo Documento é obrigatório.");
         }
-        if (clienteDAO.existeCnpj(c.getCnpj(), idIgnorar)) {
-            throw new CadastroException("Já existe um cliente cadastrado com este CNPJ.");
+        
+        // Validar documento conforme tipo
+        if (c.getTipoPessoa() == Cliente.TipoPessoa.F) {
+            // Validar CPF
+            if (!validarCpf(c.getDocumento())) {
+                throw new CadastroException("O CPF informado é inválido.");
+            }
+        } else if (c.getTipoPessoa() == Cliente.TipoPessoa.J) {
+            // Validar CNPJ
+            if (!validarCnpj(c.getDocumento())) {
+                throw new CadastroException("O CNPJ informado é inválido.");
+            }
         }
-        if (c.getTipo() == null) {
-            throw new CadastroException("O campo Tipo é obrigatório.");
+        
+        if (clienteDAO.existeDocumento(c.getDocumento(), idIgnorar)) {
+            throw new CadastroException("Já existe um cliente cadastrado com este documento.");
         }
         if (c.getStatus() == null) {
             c.setStatus(Cliente.Status.ATIVO);
         }
+    }
+
+    /**
+     * Valida CPF pelo dígito verificador.
+     */
+    public static boolean validarCpf(String cpf) {
+        if (cpf == null) return false;
+
+        // Remove máscara
+        cpf = cpf.replaceAll("[^0-9]", "");
+
+        if (cpf.length() != 11) return false;
+
+        // Rejeita sequências repetidas
+        if (cpf.matches("(\\d)\\1{10}")) return false;
+
+        int[] pesos1 = {10, 9, 8, 7, 6, 5, 4, 3, 2};
+        int[] pesos2 = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+
+        int soma = 0;
+        for (int i = 0; i < 9; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * pesos1[i];
+        }
+        int dig1 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+        soma = 0;
+        for (int i = 0; i < 10; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * pesos2[i];
+        }
+        int dig2 = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+
+        return cpf.charAt(9) == (char)('0' + dig1) && cpf.charAt(10) == (char)('0' + dig2);
     }
 
     /**

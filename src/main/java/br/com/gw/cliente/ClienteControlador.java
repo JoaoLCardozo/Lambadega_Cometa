@@ -28,19 +28,20 @@ public class ClienteControlador extends HttpServlet {
 
         try {
             switch (acao) {
-                case "listar":    listar(req, resp);    break;
-                case "novo":      novo(req, resp);       break;
-                case "editar":    editar(req, resp);     break;
-                case "excluir":   excluir(req, resp);    break;
-                default:          listar(req, resp);
+                case "listar":  listar(req, resp);  break;
+                case "novo":    novo(req, resp);     break;
+                case "editar":  editar(req, resp);   break;
+                case "excluir": excluir(req, resp);  break;
+                default:        listar(req, resp);
             }
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             try { listar(req, resp); } catch (NegocioException ex) {
                 logger.severe("Erro ao recarregar listagem: " + ex.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/erro.jsp");
             }
         } catch (Exception e) {
-            logger.severe("Erro inesperado em ClienteControlador: " + e.getMessage());
+            logger.severe("Erro inesperado em ClienteControlador GET: " + e.getMessage());
             System.err.println("[ClienteControlador] " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/erro.jsp");
         }
@@ -49,6 +50,10 @@ public class ClienteControlador extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
 
         String acao = req.getParameter("acao");
         if (acao == null) acao = "";
@@ -63,10 +68,7 @@ public class ClienteControlador extends HttpServlet {
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             req.setAttribute("cliente", montarClienteDaRequisicao(req));
-            String view = "salvar".equals(acao)
-                ? "/WEB-INF/views/cliente/form.jsp"
-                : "/WEB-INF/views/cliente/form.jsp";
-            req.getRequestDispatcher(view).forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/cliente/formCliente.jsp").forward(req, resp);
         } catch (Exception e) {
             logger.severe("Erro inesperado em ClienteControlador POST: " + e.getMessage());
             System.err.println("[ClienteControlador] " + e.getMessage());
@@ -74,37 +76,31 @@ public class ClienteControlador extends HttpServlet {
         }
     }
 
-    // -------------------------------------------------------
-
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
-
-        String filtro  = req.getParameter("filtro");
-        int pagina     = parsePagina(req.getParameter("pagina"));
-
-        List<Cliente> lista   = clienteBO.listar(filtro, pagina, LIMITE);
-        int totalPaginas      = clienteBO.contarPaginas(filtro, LIMITE);
-
-        req.setAttribute("listaClientes",  lista);
-        req.setAttribute("filtro",         filtro);
-        req.setAttribute("paginaAtual",    pagina);
-        req.setAttribute("totalPaginas",   totalPaginas);
+        String filtro    = req.getParameter("filtro");
+        int pagina       = parsePagina(req.getParameter("pagina"));
+        List<Cliente> lista  = clienteBO.listar(filtro, pagina, LIMITE);
+        int totalPaginas     = clienteBO.contarPaginas(filtro, LIMITE);
+        req.setAttribute("listaClientes",    lista);
+        req.setAttribute("filtro",           filtro);
+        req.setAttribute("paginaAtual",      pagina);
+        req.setAttribute("totalPaginas",     totalPaginas);
         req.setAttribute("limiteResultados", LIMITE);
-
-        req.getRequestDispatcher("/WEB-INF/views/cliente/lista.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/cliente/listarCliente.jsp").forward(req, resp);
     }
 
     private void novo(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setAttribute("cliente", new Cliente());
-        req.getRequestDispatcher("/WEB-INF/views/cliente/form.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/cliente/formCliente.jsp").forward(req, resp);
     }
 
     private void editar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         req.setAttribute("cliente", clienteBO.buscarPorId(id));
-        req.getRequestDispatcher("/WEB-INF/views/cliente/form.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/cliente/formCliente.jsp").forward(req, resp);
     }
 
     private void excluir(HttpServletRequest req, HttpServletResponse resp)
@@ -130,14 +126,14 @@ public class ClienteControlador extends HttpServlet {
 
     private Cliente montarClienteDaRequisicao(HttpServletRequest req) {
         Cliente c = new Cliente();
-        c.setRazaoSocial(req.getParameter("razaoSocial"));
-        c.setNomeFantasia(req.getParameter("nomeFantasia"));
-        c.setCnpj(req.getParameter("cnpj"));
-        c.setInscricaoEstadual(req.getParameter("inscricaoEstadual"));
-        String tipo = req.getParameter("tipo");
-        if (tipo != null && !tipo.isEmpty()) {
-            c.setTipo(Cliente.Tipo.valueOf(tipo));
+        String tipoPessoa = req.getParameter("tipoPessoa");
+        if (tipoPessoa != null && !tipoPessoa.isEmpty()) {
+            c.setTipoPessoa(Cliente.TipoPessoa.valueOf(tipoPessoa));
         }
+        c.setNomeRazaoSocial(req.getParameter("nomeRazaoSocial"));
+        c.setNomeFantasia(req.getParameter("nomeFantasia"));
+        c.setDocumento(req.getParameter("documento"));
+        c.setInscricaoEstadual(req.getParameter("inscricaoEstadual"));
         c.setLogradouro(req.getParameter("logradouro"));
         c.setNumero(req.getParameter("numero"));
         c.setComplemento(req.getParameter("complemento"));
