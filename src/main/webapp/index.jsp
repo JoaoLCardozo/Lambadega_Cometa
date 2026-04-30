@@ -10,6 +10,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Início - Lambadega Cometa</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css" type="text/css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
 </head>
 <body>
 

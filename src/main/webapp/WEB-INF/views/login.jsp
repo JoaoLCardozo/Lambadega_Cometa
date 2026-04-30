@@ -1,125 +1,119 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE HTML>
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Login - Lambadega Cometa</title>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/estilo.css" type="text/css">
 
-    <style type="text/css">
-        .style4 {
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .login-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 40px;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css" type="text/css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
 </head>
 
 <body>
 
-    <div class="login-wrapper">
-        <form action="<%= request.getContextPath() %>/LoginControlador" method="post">
+    <img src="${pageContext.request.contextPath}/img/topo_frota.jpg" width="40%" height="44">
 
+    <table class="bordaFina" width="85%" align="center">
+        <tr>
+            <td>
+                <span class="style4">Login - Sistema de Gerenciamento de Fretes</span>
+            </td>
+            <td align="right">
+                <input type="button"
+                       class="inputbotao"
+                       value="Criar novo usuario"
+                       onclick="window.location='${pageContext.request.contextPath}/LoginControlador?acao=novoUsuario'"/>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <c:if test="${not empty erro}">
+        <table width="85%" align="center">
+            <tr>
+                <td style="color:red;font-weight:bold;">
+                    <c:out value="${erro}"/>
+                </td>
+            </tr>
+        </table>
+        <br>
+    </c:if>
+
+    <c:if test="${not empty sucesso}">
+        <table width="85%" align="center">
+            <tr>
+                <td style="color:green;font-weight:bold;">
+                    <c:out value="${sucesso}"/>
+                </td>
+            </tr>
+        </table>
+        <br>
+    </c:if>
+
+    <c:if test="${not empty aviso}">
+        <table width="85%" align="center">
+            <tr>
+                <td style="color:#cc8800;font-weight:bold;">
+                    <c:out value="${aviso}"/>
+                </td>
+            </tr>
+        </table>
+        <br>
+    </c:if>
+
+    <table class="bordaFina" width="40%" align="center">
+        <form action="${pageContext.request.contextPath}/LoginControlador" method="post">
             <input type="hidden" name="acao" value="login">
 
-            <table class="bordaFina" width="35%" align="center">
+            <tr>
+                <td colspan="2" align="center" class="CelulaZebra1">
+                    <span class="style4">Acesso ao Sistema</span>
+                </td>
+            </tr>
 
-                <tr>
-                    <td colspan="2" align="center">
-                        <span class="style4">Lambadega Cometa - Sistema de Gerenciamento de Fretes</span>
-                    </td>
-                </tr>
+            <tr>
+                <td class="CelulaZebra1" width="35%" align="right">Usuario:</td>
+                <td class="CelulaZebra1" width="65%">
+                    <input type="text"
+                           name="usuario"
+                           id="usuario"
+                           class="inputtexto"
+                           size="25"
+                           maxlength="50"
+                           value="<c:out value='${usuario}'/>"
+                           autofocus/>
+                </td>
+            </tr>
 
-                <%
-                    String erro = (String) request.getAttribute("erro");
-                    String sucesso = (String) request.getAttribute("sucesso");
-                    String aviso = (String) request.getAttribute("aviso");
-                    String usuarioInformado = (String) request.getAttribute("usuario");
+            <tr>
+                <td class="CelulaZebra2" align="right">Senha:</td>
+                <td class="CelulaZebra2">
+                    <input type="password"
+                           name="senha"
+                           id="senha"
+                           class="inputtexto"
+                           size="25"
+                           maxlength="50"/>
+                </td>
+            </tr>
 
-                    if (usuarioInformado == null) {
-                        usuarioInformado = "";
-                    }
-                %>
+            <tr>
+                <td colspan="2" align="center" class="CelulaZebra1">
+                    <input type="submit" class="inputbotao" value="Entrar"/>
+                    &nbsp;
+                </td>
+            </tr>
 
-                <% if (erro != null && !erro.trim().isEmpty()) { %>
-                    <tr>
-                        <td colspan="2" class="CelulaZebra1" align="center">
-                            <span style="color: red; font-weight: bold;">
-                                <%= erro %>
-                            </span>
-                        </td>
-                    </tr>
-                <% } %>
-
-                <% if (sucesso != null && !sucesso.trim().isEmpty()) { %>
-                    <tr>
-                        <td colspan="2" class="CelulaZebra1" align="center">
-                            <span style="color: green; font-weight: bold;">
-                                <%= sucesso %>
-                            </span>
-                        </td>
-                    </tr>
-                <% } %>
-
-                <% if (aviso != null && !aviso.trim().isEmpty()) { %>
-                    <tr>
-                        <td colspan="2" class="CelulaZebra1" align="center">
-                            <span style="color: #cc8800; font-weight: bold;">
-                                <%= aviso %>
-                            </span>
-                        </td>
-                    </tr>
-                <% } %>
-
-                <tr>
-                    <td width="35%" class="CelulaZebra1" align="right">Usuario:</td>
-                    <td width="65%" class="CelulaZebra1">
-                        <input type="text"
-                               name="usuario"
-                               id="usuario"
-                               class="inputtexto"
-                               size="25"
-                               maxlength="50"
-                               value="<%= usuarioInformado %>"
-                               autofocus>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="CelulaZebra2" align="right">Senha:</td>
-                    <td class="CelulaZebra2">
-                        <input type="password"
-                               name="senha"
-                               id="senha"
-                               class="inputtexto"
-                               size="25"
-                               maxlength="50">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2" align="center" class="CelulaZebra1">
-                        <input type="submit" class="inputbotao" value="Entrar">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2" align="center" class="CelulaZebra2">
-                        <small>Sistema Lambadega Cometa v1.0 - 2026</small>
-                    </td>
-                </tr>
-
-            </table>
-
+            <tr>
+                <td colspan="2" align="center" class="CelulaZebra2">
+                    <small>Sistema Lambadega Cometa v1.0 - 2026</small>
+                </td>
+            </tr>
         </form>
-    </div>
+    </table>
 
 </body>
 </html>
