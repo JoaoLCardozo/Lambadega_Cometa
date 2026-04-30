@@ -5,119 +5,127 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Frete <c:out value="${frete.numero}"/> - Lambadega Cometa</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css" type="text/css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
-    <style>
-        .status-EMITIDO          { color: #555;    font-weight:bold; }
-        .status-SAIDA_CONFIRMADA { color: #0066cc; font-weight:bold; }
-        .status-EM_TRANSITO      { color: #cc6600; font-weight:bold; }
-        .status-ENTREGUE         { color: #008800; font-weight:bold; }
-        .status-NAO_ENTREGUE     { color: #cc0000; font-weight:bold; }
-        .status-CANCELADO        { color: #999;    font-weight:bold; text-decoration:line-through; }
-    </style>
 </head>
 <body>
-    <img src="${pageContext.request.contextPath}/img/topo_frota.jpg" width="40%" height="44">
-    <table class="bordaFina" width="85%" align="center">
-        <tr>
-            <td><span class="style4">Frete: <c:out value="${frete.numero}"/></span></td>
-            <td align="right"><a href="${pageContext.request.contextPath}/FreteControlador?acao=listar">← Voltar</a></td>
-        </tr>
-    </table><br>
-    <c:if test="${not empty erro}">
-        <table width="85%" align="center"><tr>
-            <td style="color:red;font-weight:bold;"><c:out value="${erro}"/></td>
-        </tr></table><br>
-    </c:if>
+    <main class="app-shell">
+        <section class="app-brand">
+            <div class="brand-row">
+                <span class="brand-mark">LC</span>
+                <div class="brand-copy">
+                    <h1 class="brand-title">Lambadega Cometa</h1>
+                    <p class="brand-subtitle">Detalhamento e histórico do frete</p>
+                </div>
+            </div>
+            <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=listar">Voltar</a>
+        </section>
 
-    <%-- Dados do frete --%>
-    <table class="bordaFina" width="85%" align="center" cellpadding="2" cellspacing="1">
-        <tr><td colspan="4" class="tabela"><b>Dados do Frete</b></td></tr>
-        <tr>
-            <td class="CelulaZebra1" width="20%">Número:</td>
-            <td class="CelulaZebra1"><c:out value="${frete.numero}"/></td>
-            <td class="CelulaZebra1" width="20%">Status:</td>
-            <td class="CelulaZebra1">
+        <section class="app-header">
+            <div class="app-header-main">
+                <span class="app-eyebrow">Frete</span>
+                <h2 class="app-title"><c:out value="${frete.numero}"/></h2>
+            </div>
+            <div class="app-actions">
                 <span class="status-${frete.status}"><c:out value="${frete.status}"/></span>
-            </td>
-        </tr>
-        <tr>
-            <td class="CelulaZebra2">Remetente:</td>
-            <td class="CelulaZebra2"><c:out value="${frete.remetente.nomeRazaoSocial}"/></td>
-            <td class="CelulaZebra2">Destinatário:</td>
-            <td class="CelulaZebra2"><c:out value="${frete.destinatario.nomeRazaoSocial}"/></td>
-        </tr>
-        <tr>
-            <td class="CelulaZebra1">Motorista:</td>
-            <td class="CelulaZebra1"><c:out value="${frete.motorista.nome}"/></td>
-            <td class="CelulaZebra1">Veículo:</td>
-            <td class="CelulaZebra1"><c:out value="${frete.veiculo.placa}"/></td>
-        </tr>
-        <tr>
-            <td class="CelulaZebra2">Origem:</td>
-            <td class="CelulaZebra2"><c:out value="${frete.municipioOrigem}"/>/<c:out value="${frete.ufOrigem}"/></td>
-            <td class="CelulaZebra2">Destino:</td>
-            <td class="CelulaZebra2"><c:out value="${frete.municipioDestino}"/>/<c:out value="${frete.ufDestino}"/></td>
-        </tr>
-        <tr>
-            <td class="CelulaZebra1">Previsão Entrega:</td>
-            <td class="CelulaZebra1"><c:out value="${frete.dataPrevisaoEntrega}"/></td>
-            <td class="CelulaZebra1">Emissão:</td>
-            <td class="CelulaZebra1"><c:out value="${frete.dataEmissao}"/></td>
-        </tr>
-        <tr>
-            <td class="CelulaZebra2">Peso (kg):</td>
-            <td class="CelulaZebra2"><c:out value="${frete.pesoKg}"/></td>
-            <td class="CelulaZebra2">Valor Total:</td>
-            <td class="CelulaZebra2">R$ <c:out value="${frete.valorTotal}"/></td>
-        </tr>
-    </table><br>
+            </div>
+        </section>
 
-    <%-- Ações disponíveis por status --%>
-    <table class="bordaFina" width="85%" align="center">
-        <tr class="CelulaZebra1">
-            <td align="center">
+        <c:if test="${not empty erro}">
+            <div class="alert alert-error"><c:out value="${erro}"/></div>
+        </c:if>
+
+        <section class="card">
+            <div class="section-title">Dados do frete</div>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Número</span>
+                    <span class="detail-value"><c:out value="${frete.numero}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="status-${frete.status}"><c:out value="${frete.status}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Remetente</span>
+                    <span class="detail-value"><c:out value="${frete.remetente.nomeRazaoSocial}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Destinatário</span>
+                    <span class="detail-value"><c:out value="${frete.destinatario.nomeRazaoSocial}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Motorista</span>
+                    <span class="detail-value"><c:out value="${frete.motorista.nome}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Veículo</span>
+                    <span class="detail-value"><c:out value="${frete.veiculo.placa}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Origem</span>
+                    <span class="detail-value"><c:out value="${frete.municipioOrigem}"/>/<c:out value="${frete.ufOrigem}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Destino</span>
+                    <span class="detail-value"><c:out value="${frete.municipioDestino}"/>/<c:out value="${frete.ufDestino}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Previsão de entrega</span>
+                    <span class="detail-value"><c:out value="${frete.dataPrevisaoEntrega}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Emissão</span>
+                    <span class="detail-value"><c:out value="${frete.dataEmissao}"/></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Peso</span>
+                    <span class="detail-value"><c:out value="${frete.pesoKg}"/> kg</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Valor total</span>
+                    <span class="detail-value">R$ <c:out value="${frete.valorTotal}"/></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card pagination-card">
+            <strong>Ações disponíveis</strong>
+            <div class="pagination-actions">
                 <c:if test="${frete.status == 'EMITIDO'}">
-                    <a href="${pageContext.request.contextPath}/FreteControlador?acao=confirmarSaida&id=${frete.id}">
-                        <input type="button" class="inputbotao" value="✓ Confirmar Saída"/>
-                    </a>
-                    &nbsp;
-                    <a href="${pageContext.request.contextPath}/FreteControlador?acao=cancelar&id=${frete.id}"
-                       onclick="return confirm('Cancelar o frete ${frete.numero}?')">
-                        <input type="button" class="inputbotao" value="✗ Cancelar Frete"/>
-                    </a>
+                    <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=confirmarSaida&id=${frete.id}">Confirmar saída</a>
+                    <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=cancelar&id=${frete.id}"
+                       onclick="return confirm('Cancelar o frete ${frete.numero}?')">Cancelar frete</a>
                 </c:if>
                 <c:if test="${frete.status == 'SAIDA_CONFIRMADA' or frete.status == 'EM_TRANSITO'}">
-                    <a href="${pageContext.request.contextPath}/FreteControlador?acao=novaOcorrencia&id=${frete.id}">
-                        <input type="button" class="inputbotao" value="+ Registrar Ocorrência"/>
-                    </a>
+                    <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=novaOcorrencia&id=${frete.id}">Registrar ocorrência</a>
                 </c:if>
-            </td>
-        </tr>
-    </table><br>
+            </div>
+        </section>
 
-    <%-- Ocorrências --%>
-    <table class="bordaFina" width="85%" align="center" cellpadding="2" cellspacing="1">
-        <tr><td colspan="5" class="tabela"><b>Histórico de Ocorrências</b></td></tr>
-        <tr>
-            <td class="tabela" width="20%">DATA/HORA</td>
-            <td class="tabela" width="20%">TIPO</td>
-            <td class="tabela" width="15%">MUNICÍPIO/UF</td>
-            <td class="tabela" width="25%">DESCRIÇÃO</td>
-            <td class="tabela" width="20%">RECEBEDOR</td>
-        </tr>
-        <c:forEach var="oc" varStatus="st" items="${frete.ocorrencias}">
-        <tr class="${st.count % 2 == 0 ? 'CelulaZebra1' : 'CelulaZebra2'}">
-            <td><c:out value="${oc.dataHora}"/></td>
-            <td><c:out value="${oc.tipo}"/></td>
-            <td><c:out value="${oc.municipio}"/>/<c:out value="${oc.uf}"/></td>
-            <td><c:out value="${oc.descricao}"/></td>
-            <td><c:out value="${oc.nomeRecebedor}"/></td>
-        </tr>
-        </c:forEach>
-        <c:if test="${empty frete.ocorrencias}">
-            <tr><td colspan="5" class="CelulaZebra1" align="center">Nenhuma ocorrência registrada.</td></tr>
-        </c:if>
-    </table>
+        <section class="table-wrap">
+            <table class="bordaFina data-table" cellpadding="0" cellspacing="0">
+                <tr><td colspan="5" class="tabela">Histórico de ocorrências</td></tr>
+                <tr>
+                    <td class="tabela" width="20%">Data/Hora</td>
+                    <td class="tabela" width="20%">Tipo</td>
+                    <td class="tabela" width="15%">Município/UF</td>
+                    <td class="tabela" width="25%">Descrição</td>
+                    <td class="tabela" width="20%">Recebedor</td>
+                </tr>
+                <c:forEach var="oc" varStatus="st" items="${frete.ocorrencias}">
+                    <tr class="${st.count % 2 == 0 ? 'CelulaZebra1' : 'CelulaZebra2'}">
+                        <td><c:out value="${oc.dataHora}"/></td>
+                        <td><c:out value="${oc.tipo}"/></td>
+                        <td><c:out value="${oc.municipio}"/>/<c:out value="${oc.uf}"/></td>
+                        <td><c:out value="${oc.descricao}"/></td>
+                        <td><c:out value="${oc.nomeRecebedor}"/></td>
+                    </tr>
+                </c:forEach>
+                <c:if test="${empty frete.ocorrencias}">
+                    <tr><td colspan="5" class="empty-state">Nenhuma ocorrência registrada.</td></tr>
+                </c:if>
+            </table>
+        </section>
+    </main>
 </body>
 </html>
