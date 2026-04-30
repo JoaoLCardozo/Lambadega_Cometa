@@ -229,4 +229,31 @@ public class LoginControlador implements Serializable {
            "- Usuario deve ser unico no sistema\n" +
            "- Usuario deve estar ativo";
     }
+
+    /**
+     * Cadastra um novo usuário no sistema.
+     * 
+     * @param usuario objeto Usuario com os dados a cadastrar
+     * @throws ApplicationException em caso de erro de validação ou banco de dados
+     */
+    public void cadastrarUsuario(Usuario usuario) throws ApplicationException {
+        if (usuario == null) {
+            throw new ApplicationException("Usuário não pode ser nulo");
+        }
+        
+        logger.info("Tentativa de cadastro para usuário: " + usuario.getUsuario());
+        
+        try {
+            // Chamar BO para inserir (inclui validações)
+            usuarioBO.inserir(usuario);
+            logger.info("Usuário cadastrado com sucesso: " + usuario.getUsuario());
+        } catch (ApplicationException e) {
+            logger.warning("Erro ao cadastrar usuário: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.severe("Erro geral no cadastro de usuário: " + e.getMessage());
+            e.printStackTrace();
+            throw new ApplicationException("Erro ao processar cadastro: " + e.getMessage(), e);
+        }
+    }
 }
