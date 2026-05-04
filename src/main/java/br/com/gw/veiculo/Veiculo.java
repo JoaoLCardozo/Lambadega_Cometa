@@ -6,7 +6,7 @@ public class Veiculo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Tipo   { TRUCK, CARRETA, VAN, UTILITARIO }
-    public enum Status { DISPONIVEL, EM_VIAGEM, EM_MANUTENCAO }
+    public enum Status { DISPONIVEL, RESERVADO, EM_VIAGEM, EM_MANUTENCAO }
 
     private int    id;
     private String placa;

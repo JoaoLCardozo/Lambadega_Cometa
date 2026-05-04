@@ -85,6 +85,7 @@ public class FreteBO {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
             freteDAO.salvar(frete, conn);
+            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), Veiculo.Status.RESERVADO, conn);
             conn.commit();
             logger.info("Frete emitido: " + frete.getNumero());
         } catch (Exception e) {
@@ -260,6 +261,7 @@ public class FreteBO {
             conn = ConnectionFactory.getConnection();
             conn.setAutoCommit(false);
             freteDAO.atualizarStatus(idFrete, Frete.Status.CANCELADO, null, null, conn);
+            freteDAO.atualizarStatusVeiculo(frete.getVeiculo().getId(), Veiculo.Status.DISPONIVEL, conn);
             conn.commit();
             logger.info("Frete cancelado: " + frete.getNumero());
         } catch (NegocioException e) {

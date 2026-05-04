@@ -86,6 +86,7 @@
                 <td class="CelulaZebra2">
                     <select name="status" class="inputtexto">
                         <option value="DISPONIVEL"   ${veiculo.status == 'DISPONIVEL'   ? 'selected' : ''}>Disponível</option>
+                        <option value="RESERVADO"    ${veiculo.status == 'RESERVADO'    ? 'selected' : ''}>Reservado</option>
                         <option value="EM_VIAGEM"    ${veiculo.status == 'EM_VIAGEM'    ? 'selected' : ''}>Em Viagem</option>
                         <option value="EM_MANUTENCAO"${veiculo.status == 'EM_MANUTENCAO'? 'selected' : ''}>Em Manutenção</option>
                     </select>

@@ -77,7 +77,8 @@ public class VeiculoDAO {
     }
 
     public boolean estaEmTransito(int id) throws NegocioException {
-        String sql = "SELECT COUNT(*) FROM frete WHERE id_veiculo = ? AND status = 'EM_TRANSITO'";
+        String sql = "SELECT COUNT(*) FROM frete " +
+                     "WHERE id_veiculo = ? AND status IN ('EMITIDO','SAIDA_CONFIRMADA','EM_TRANSITO')";
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
