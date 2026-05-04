@@ -50,11 +50,30 @@
                     </div>
                     <div class="form-field">
                         <label for="senha">Senha</label>
-                        <input type="password"
-                               name="senha"
-                               id="senha"
-                               class="inputtexto"
-                               maxlength="50"/>
+                        <div class="password-field">
+                            <input type="password"
+                                   name="senha"
+                                   id="senha"
+                                   class="inputtexto"
+                                   maxlength="50"/>
+                            <button type="button"
+                                    class="password-toggle"
+                                    id="toggleSenha"
+                                    aria-controls="senha"
+                                    aria-label="Mostrar senha"
+                                    aria-pressed="false"
+                                    title="Mostrar senha">
+                                <svg class="password-icon password-icon-show is-hidden" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg class="password-icon password-icon-hide" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M4 20 20 4"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-actions">
                         <input type="submit" class="inputbotao" value="Entrar"/>
@@ -63,5 +82,20 @@
             </form>
         </section>
     </main>
+    <script>
+        document.getElementById('toggleSenha').addEventListener('click', function() {
+            var campoSenha = document.getElementById('senha');
+            var iconeMostrar = this.querySelector('.password-icon-show');
+            var iconeOcultar = this.querySelector('.password-icon-hide');
+            var mostrarSenha = campoSenha.type === 'password';
+
+            campoSenha.type = mostrarSenha ? 'text' : 'password';
+            iconeMostrar.classList.toggle('is-hidden', !mostrarSenha);
+            iconeOcultar.classList.toggle('is-hidden', mostrarSenha);
+            this.setAttribute('aria-label', mostrarSenha ? 'Ocultar senha' : 'Mostrar senha');
+            this.setAttribute('aria-pressed', mostrarSenha ? 'true' : 'false');
+            this.setAttribute('title', mostrarSenha ? 'Ocultar senha' : 'Mostrar senha');
+        });
+    </script>
 </body>
 </html>

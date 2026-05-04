@@ -353,6 +353,65 @@ textarea:focus {
     box-shadow: 0 0 0 4px rgba(36, 87, 214, 0.13);
 }
 
+.password-field {
+    position: relative;
+}
+
+.password-field .inputtexto {
+    padding-right: 48px;
+}
+
+.password-field input[type="password"]::-ms-clear,
+.password-field input[type="password"]::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    color: #4f6280;
+    background: transparent;
+    border-color: transparent;
+    border-radius: var(--lc-radius-md);
+    box-shadow: none;
+    transform: translateY(-50%);
+}
+
+.password-toggle:hover,
+.password-toggle:focus {
+    color: var(--lc-primary-dark);
+    background: var(--lc-primary-soft);
+    border-color: var(--lc-border);
+    box-shadow: none;
+    transform: translateY(-50%);
+}
+
+.password-icon {
+    display: block;
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.password-icon.is-hidden {
+    display: none;
+}
+
 .inputbotao,
 .btn,
 input[type="submit"],
@@ -686,5 +745,9 @@ button:hover {
     input[type="button"],
     button {
         width: 100%;
+    }
+
+    .password-toggle {
+        width: 32px;
     }
 }
