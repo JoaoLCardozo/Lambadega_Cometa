@@ -16,7 +16,7 @@ CREATE DATABASE LambadegaCometa
 CREATE TABLE usuario (
     id               SERIAL PRIMARY KEY,
     nome             VARCHAR(100) NOT NULL,
-    email            VARCHAR(100),
+    email            VARCHAR(100) NOT NULL UNIQUE,
     usuario          VARCHAR(50)  NOT NULL UNIQUE,
     senha            VARCHAR(100) NOT NULL,
     ativo            BOOLEAN      NOT NULL DEFAULT TRUE,
@@ -41,8 +41,8 @@ CREATE TABLE cliente (
     municipio          VARCHAR(100),
     uf                 CHAR(2),
     cep                VARCHAR(9),
-    telefone           VARCHAR(20),
-    email              VARCHAR(100),
+    telefone           VARCHAR(20) NOT NULL,
+    email              VARCHAR(100) NOT NULL UNIQUE,
     status             VARCHAR(10)  NOT NULL DEFAULT 'ATIVO' CHECK (status IN ('ATIVO','INATIVO'))
 );
 
@@ -53,9 +53,9 @@ CREATE TABLE motorista (
     id               SERIAL PRIMARY KEY,
     nome             VARCHAR(100) NOT NULL,
     cpf              VARCHAR(11)  NOT NULL UNIQUE,
-    data_nascimento  DATE,
-    telefone         VARCHAR(13),
-    cnh_numero       VARCHAR(20)  NOT NULL,
+    data_nascimento  DATE NOT NULL,
+    telefone         VARCHAR(13) NOT NULL,
+    cnh_numero       VARCHAR(20)  NOT NULL UNIQUE,
     cnh_categoria    CHAR(1)      NOT NULL CHECK (cnh_categoria IN ('A','B','C','D','E')),
     cnh_validade     DATE         NOT NULL,
     tipo_vinculo     VARCHAR(20)  NOT NULL CHECK (tipo_vinculo IN ('FUNCIONARIO','AGREGADO','TERCEIRO')),
@@ -69,12 +69,12 @@ CREATE TABLE veiculo (
     id               SERIAL PRIMARY KEY,
     placa            VARCHAR(8)   NOT NULL UNIQUE,
     rntrc            VARCHAR(20),
-    ano_fabricacao   INTEGER,
+    ano_fabricacao   INTEGER NOT NULL,
     tipo             VARCHAR(20)  NOT NULL CHECK (tipo IN ('TRUCK','CARRETA','VAN','UTILITARIO')),
     tara_kg          NUMERIC(10,2),
     capacidade_kg    NUMERIC(10,2),
     volume_m3        NUMERIC(10,2),
-    status           VARCHAR(20)  NOT NULL DEFAULT 'DISPONIVEL' CHECK (status IN ('DISPONIVEL','EM_VIAGEM','EM_MANUTENCAO'))
+    status           VARCHAR(20)  NOT NULL DEFAULT 'DISPONIVEL' CHECK (status IN ('DISPONIVEL','RESERVADO','EM_VIAGEM','EM_MANUTENCAO'))
 );
 
 -- ============================================================
@@ -93,12 +93,12 @@ CREATE TABLE frete (
     uf_destino             CHAR(2)        NOT NULL,
     descricao_carga        VARCHAR(255),
     peso_kg                NUMERIC(10,2),
-    volumes                INTEGER,
-    valor_frete            NUMERIC(12,2),
-    aliquota_icms          NUMERIC(5,2),
-    valor_icms             NUMERIC(12,2),
-    valor_total            NUMERIC(12,2),
-    status                 VARCHAR(20)    NOT NULL DEFAULT 'EMITIDO'
+    volumes                INTEGER       NOT NULL,
+    valor_frete            NUMERIC(12,2) NOT NULL,
+    aliquota_icms          NUMERIC(5,2)  NOT NULL,
+    valor_icms             NUMERIC(12,2) NOT NULL,
+    valor_total            NUMERIC(12,2) NOT NULL,
+    status                 VARCHAR(20)   NOT NULL DEFAULT 'EMITIDO'
                                CHECK (status IN ('EMITIDO','SAIDA_CONFIRMADA','EM_TRANSITO','ENTREGUE','NAO_ENTREGUE','CANCELADO')),
     data_emissao           TIMESTAMP      NOT NULL DEFAULT NOW(),
     data_previsao_entrega  DATE           NOT NULL,
@@ -122,6 +122,51 @@ CREATE TABLE ocorrencia_frete (
     nome_recebedor      VARCHAR(100),
     documento_recebedor VARCHAR(20)
 );
+
+-- ============================================================
+-- TRIGGER: ATUALIZA STATUS DO VEICULO AO INSERIR FRETE
+-- ============================================================
+CREATE OR REPLACE FUNCTION atualizar_status_veiculo_apos_insert_frete()
+RETURNS TRIGGER AS $$
+DECLARE
+    status_atual VARCHAR(20);
+    novo_status  VARCHAR(20);
+BEGIN
+    IF NEW.status IN ('EMITIDO','SAIDA_CONFIRMADA','EM_TRANSITO') THEN
+        SELECT status
+          INTO status_atual
+          FROM veiculo
+         WHERE id = NEW.id_veiculo
+         FOR UPDATE;
+
+        IF status_atual IS NULL THEN
+            RAISE EXCEPTION 'Veiculo % nao encontrado.', NEW.id_veiculo;
+        END IF;
+
+        IF status_atual <> 'DISPONIVEL' THEN
+            RAISE EXCEPTION 'Veiculo % nao esta disponivel. Status atual: %.',
+                NEW.id_veiculo, status_atual;
+        END IF;
+
+        IF NEW.status = 'EMITIDO' THEN
+            novo_status := 'RESERVADO';
+        ELSE
+            novo_status := 'EM_VIAGEM';
+        END IF;
+
+        UPDATE veiculo
+           SET status = novo_status
+         WHERE id = NEW.id_veiculo;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_atualizar_status_veiculo_insert_frete
+AFTER INSERT ON frete
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_status_veiculo_apos_insert_frete();
 
 -- USUARIO (senha: 123456 — em produção usar hash)
 INSERT INTO usuario (nome, email, usuario, senha, ativo) VALUES
