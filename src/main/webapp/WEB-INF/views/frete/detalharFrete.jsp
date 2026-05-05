@@ -6,6 +6,16 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Frete <c:out value="${frete.numero}"/> - Lambadega Cometa</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
+    <script>
+        function abrirJanelaRomaneio(url) {
+            window.open(
+                url,
+                "romaneioFrete${frete.id}",
+                "width=900,height=780,left=120,top=40,resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no"
+            );
+            return false;
+        }
+    </script>
 </head>
 <body>
     <main class="app-shell">
@@ -91,6 +101,8 @@
         <section class="card pagination-card">
             <strong>Ações disponíveis</strong>
             <div class="pagination-actions">
+                <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=romaneio&id=${frete.id}"
+                   onclick="return abrirJanelaRomaneio(this.href)">Gerar romaneio PDF</a>
                 <c:if test="${frete.status == 'EMITIDO'}">
                     <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=confirmarSaida&id=${frete.id}">Confirmar saída</a>
                     <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=cancelar&id=${frete.id}"

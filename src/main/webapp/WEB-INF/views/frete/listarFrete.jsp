@@ -6,6 +6,19 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Fretes - Lambadega Cometa</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/design-system.css" type="text/css">
+    <script>
+        function abrirJanelaRelatorioFretes(form) {
+            var filtro = form.filtro ? form.filtro.value : "";
+            var url = "${pageContext.request.contextPath}/FreteControlador?acao=relatorioFretesAbertos"
+                + "&filtro=" + encodeURIComponent(filtro);
+
+            window.open(
+                url,
+                "relatorioFretesAbertos",
+                "width=1100,height=780,left=80,top=40,resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no"
+            );
+        }
+    </script>
 </head>
 <body>
     <main class="app-shell">
@@ -45,6 +58,8 @@
                 <div class="app-actions">
                     <button type="submit" name="acao" value="listar" class="inputbotao">Pesquisar</button>
                     <button type="submit" name="acao" value="exportarCsv" class="inputbotao secondary">Exportar CSV</button>
+                    <button type="button" class="inputbotao secondary"
+                            onclick="abrirJanelaRelatorioFretes(this.form)">Imprimir fretes em aberto</button>
                 </div>
             </form>
         </section>
@@ -66,11 +81,7 @@
                             <a class="action-icon" href="${pageContext.request.contextPath}/FreteControlador?acao=detalhe&id=${f.id}"
                                title="Ver detalhe">Abrir</a>
                         </td>
-                        <td>
-                            <a href="${pageContext.request.contextPath}/FreteControlador?acao=detalhe&id=${f.id}">
-                                <c:out value="${f.numero}"/>
-                            </a>
-                        </td>
+                        <td><c:out value="${f.numero}"/></td>
                         <td><c:out value="${f.remetente.nomeRazaoSocial}"/></td>
                         <td><c:out value="${f.destinatario.nomeRazaoSocial}"/></td>
                         <td><c:out value="${f.municipioDestino}"/>/<c:out value="${f.ufDestino}"/></td>

@@ -7,13 +7,23 @@ import br.com.gw.motorista.MotoristaDAO;
 import br.com.gw.veiculo.Veiculo;
 import br.com.gw.veiculo.VeiculoDAO;
 import br.com.gw.util.ConnectionFactory;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class FreteBO {
@@ -48,11 +58,48 @@ public class FreteBO {
         return csv.toString();
     }
 
+    public byte[] gerarRelatorioFretesAbertos() throws NegocioException {
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("DATA_GERACAO", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        return gerarPdf("relatorios/fretes_abertos.jrxml", parametros);
+    }
+
+    public byte[] gerarRomaneio(int idFrete) throws NegocioException {
+        buscarPorId(idFrete);
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("ID_FRETE", idFrete);
+        parametros.put("DATA_GERACAO", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        return gerarPdf("relatorios/romaneio_frete.jrxml", parametros);
+    }
+
     public Frete buscarPorId(int id) throws NegocioException {
         Frete f = freteDAO.buscarPorId(id);
         if (f == null) throw new FreteException("Frete não encontrado.");
         f.setOcorrencias(freteDAO.listarOcorrencias(id));
         return f;
+    }
+
+    private byte[] gerarPdf(String caminhoJrxml, Map<String, Object> parametros) throws NegocioException {
+        try (InputStream jrxml = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream(caminhoJrxml);
+             Connection conn = ConnectionFactory.getConnection()) {
+
+            if (jrxml == null) {
+                throw new FreteException("Template de relatório não encontrado: " + caminhoJrxml);
+            }
+
+            JasperReport relatorio = JasperCompileManager.compileReport(jrxml);
+            JasperPrint impressao = JasperFillManager.fillReport(relatorio, parametros, conn);
+            return JasperExportManager.exportReportToPdf(impressao);
+        } catch (JRException e) {
+            throw new FreteException("Erro ao gerar relatório PDF.", e);
+        } catch (Exception e) {
+            if (e instanceof NegocioException) {
+                throw (NegocioException) e;
+            }
+            throw new FreteException("Erro ao gerar relatório PDF.", e);
+        }
     }
 
     public String gerarNumeroFrete() throws NegocioException {

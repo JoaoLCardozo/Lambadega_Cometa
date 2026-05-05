@@ -93,9 +93,25 @@ Responsabilidades:
 - Cadastro de veículos
 - Emissão e acompanhamento de fretes
 - Registro de ocorrências de frete
+- Relatório PDF de fretes em aberto com JasperReports
+- Romaneio PDF individual por frete com JasperReports
 - Exportação da listagem de fretes para CSV
 - Tratamento de exceções de negócio
 - Script SQL com estrutura e dados iniciais
+
+## Relatórios JasperReports
+
+O sistema possui dois relatórios em PDF:
+
+- **Fretes em aberto**: disponível na listagem de fretes pelo botão **Imprimir fretes em aberto**. Considera fretes com status `EMITIDO`, `SAIDA_CONFIRMADA` e `EM_TRANSITO`.
+- **Romaneio de frete**: disponível no detalhe do frete pelo botão **Gerar romaneio PDF**.
+
+Os templates ficam em:
+
+```text
+src/main/resources/relatorios/fretes_abertos.jrxml
+src/main/resources/relatorios/romaneio_frete.jrxml
+```
 
 ## Diferencial Escolhido
 

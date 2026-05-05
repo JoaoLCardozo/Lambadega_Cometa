@@ -39,6 +39,10 @@ public class FreteControlador extends HttpServlet {
             switch (acao) {
                 case "listar":         listar(req, resp);        break;
                 case "exportarCsv":    exportarCsv(req, resp);   break;
+                case "relatorioFretesAbertos":
+                    relatorioFretesAbertos(req, resp);
+                    break;
+                case "romaneio":       romaneio(req, resp);      break;
                 case "novo":           novo(req, resp);           break;
                 case "detalhe":        detalhe(req, resp);        break;
                 case "confirmarSaida": confirmarSaida(req, resp); break;
@@ -114,6 +118,28 @@ public class FreteControlador extends HttpServlet {
         resp.setHeader("Content-Disposition", "attachment; filename=\"" + nomeArquivo + "\"");
         resp.getWriter().write('\uFEFF');
         resp.getWriter().write(csv);
+    }
+
+    private void relatorioFretesAbertos(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, NegocioException {
+        enviarPdf(resp, freteBO.gerarRelatorioFretesAbertos(),
+            "fretes-em-aberto-" + LocalDate.now() + ".pdf");
+    }
+
+    private void romaneio(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, NegocioException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Frete frete = freteBO.buscarPorId(id);
+        enviarPdf(resp, freteBO.gerarRomaneio(id),
+            "romaneio-" + frete.getNumero() + ".pdf");
+    }
+
+    private void enviarPdf(HttpServletResponse resp, byte[] pdf, String nomeArquivo)
+            throws IOException {
+        resp.setContentType("application/pdf");
+        resp.setHeader("Content-Disposition", "inline; filename=\"" + nomeArquivo + "\"");
+        resp.setContentLength(pdf.length);
+        resp.getOutputStream().write(pdf);
     }
 
     private void novo(HttpServletRequest req, HttpServletResponse resp)

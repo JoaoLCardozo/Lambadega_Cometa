@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="romaneio_frete" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              whenNoDataType="AllSectionsNoDetail" uuid="dd89251f-0fec-4089-99ea-924895816e02">
+    <parameter name="ID_FRETE" class="java.lang.Integer"/>
+    <parameter name="DATA_GERACAO" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[
+            SELECT f.numero,
+                   f.status,
+                   f.data_emissao,
+                   f.data_previsao_entrega,
+                   f.data_saida,
+                   f.data_entrega,
+                   f.municipio_origem || '/' || f.uf_origem AS origem,
+                   f.municipio_destino || '/' || f.uf_destino AS destino,
+                   f.descricao_carga,
+                   f.peso_kg,
+                   f.volumes,
+                   f.valor_frete,
+                   f.valor_icms,
+                   f.valor_total,
+                   r.nome_razao_social AS remetente,
+                   r.documento AS documento_remetente,
+                   r.telefone AS telefone_remetente,
+                   COALESCE(r.logradouro, '') || ', ' || COALESCE(r.numero, '') || ' - ' ||
+                   COALESCE(r.municipio, '') || '/' || COALESCE(r.uf, '') AS endereco_remetente,
+                   d.nome_razao_social AS destinatario,
+                   d.documento AS documento_destinatario,
+                   d.telefone AS telefone_destinatario,
+                   COALESCE(d.logradouro, '') || ', ' || COALESCE(d.numero, '') || ' - ' ||
+                   COALESCE(d.municipio, '') || '/' || COALESCE(d.uf, '') AS endereco_destinatario,
+                   m.nome AS motorista,
+                   m.cpf AS cpf_motorista,
+                   m.cnh_numero AS cnh_motorista,
+                   v.placa AS placa_veiculo,
+                   v.tipo AS tipo_veiculo
+              FROM frete f
+              JOIN cliente r ON f.id_remetente = r.id
+              JOIN cliente d ON f.id_destinatario = d.id
+              JOIN motorista m ON f.id_motorista = m.id
+              JOIN veiculo v ON f.id_veiculo = v.id
+             WHERE f.id = $P{ID_FRETE}
+        ]]>
+    </queryString>
+    <field name="numero" class="java.lang.String"/>
+    <field name="status" class="java.lang.String"/>
+    <field name="data_emissao" class="java.sql.Timestamp"/>
+    <field name="data_previsao_entrega" class="java.sql.Date"/>
+    <field name="data_saida" class="java.sql.Timestamp"/>
+    <field name="data_entrega" class="java.sql.Timestamp"/>
+    <field name="origem" class="java.lang.String"/>
+    <field name="destino" class="java.lang.String"/>
+    <field name="descricao_carga" class="java.lang.String"/>
+    <field name="peso_kg" class="java.math.BigDecimal"/>
+    <field name="volumes" class="java.lang.Integer"/>
+    <field name="valor_frete" class="java.math.BigDecimal"/>
+    <field name="valor_icms" class="java.math.BigDecimal"/>
+    <field name="valor_total" class="java.math.BigDecimal"/>
+    <field name="remetente" class="java.lang.String"/>
+    <field name="documento_remetente" class="java.lang.String"/>
+    <field name="telefone_remetente" class="java.lang.String"/>
+    <field name="endereco_remetente" class="java.lang.String"/>
+    <field name="destinatario" class="java.lang.String"/>
+    <field name="documento_destinatario" class="java.lang.String"/>
+    <field name="telefone_destinatario" class="java.lang.String"/>
+    <field name="endereco_destinatario" class="java.lang.String"/>
+    <field name="motorista" class="java.lang.String"/>
+    <field name="cpf_motorista" class="java.lang.String"/>
+    <field name="cnh_motorista" class="java.lang.String"/>
+    <field name="placa_veiculo" class="java.lang.String"/>
+    <field name="tipo_veiculo" class="java.lang.String"/>
+    <title>
+        <band height="92">
+            <staticText>
+                <reportElement x="0" y="0" width="240" height="26" uuid="33cf4298-b102-40b0-96fb-3e7471507f26"/>
+                <textElement><font size="17" isBold="true"/></textElement>
+                <text><![CDATA[Lambadega Cometa]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="30" width="180" height="20" uuid="2761cf6c-04be-471e-acff-23eb6cb80fb3"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <text><![CDATA[Romaneio de frete]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="355" y="4" width="200" height="16" uuid="751641b1-b0a5-47f1-ba42-c15c4180c118"/>
+                <textElement textAlignment="Right"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA["Gerado em " + $P{DATA_GERACAO}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="355" y="28" width="200" height="26" uuid="4535f287-b622-450c-aed2-aef8b2265154"/>
+                <textElement textAlignment="Right"><font size="16" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{numero}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="355" y="55" width="200" height="18" uuid="80f97fe2-65ed-4fe0-a059-d4797818635f"/>
+                <textElement textAlignment="Right"><font size="10"/></textElement>
+                <textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
+            </textField>
+            <line>
+                <reportElement x="0" y="82" width="555" height="1" uuid="a806124c-45c8-4b9a-8a45-d2b8c3bcda4f"/>
+            </line>
+        </band>
+    </title>
+    <detail>
+        <band height="545">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="18" uuid="a2b9df9e-5736-4c4e-826c-43094d3940d9"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Dados da viagem]]></text>
+            </staticText>
+            <staticText><reportElement x="0" y="28" width="70" height="14" uuid="752d56dd-d482-4357-9570-bce0206f145a"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Origem]]></text></staticText>
+            <textField><reportElement x="80" y="28" width="190" height="14" uuid="48cf08bd-5c59-4583-ab2f-a3f9304e58d5"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{origem}]]></textFieldExpression></textField>
+            <staticText><reportElement x="290" y="28" width="70" height="14" uuid="e1b9840a-8ec4-478c-a1a4-b67ad9e492c7"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Destino]]></text></staticText>
+            <textField><reportElement x="365" y="28" width="190" height="14" uuid="6483a1d6-29c1-48aa-8c2a-801da9f2f1e2"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{destino}]]></textFieldExpression></textField>
+            <staticText><reportElement x="0" y="50" width="70" height="14" uuid="1529d46f-c6d4-4064-b1f3-cf9521b6d851"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Emissão]]></text></staticText>
+            <textField><reportElement x="80" y="50" width="190" height="14" uuid="f61d86bc-bf5f-4d50-ae35-c483a3b16917"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($F{data_emissao})]]></textFieldExpression></textField>
+            <staticText><reportElement x="290" y="50" width="70" height="14" uuid="362524d5-a3f2-4725-83d0-8049d62a02e7"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Previsão]]></text></staticText>
+            <textField><reportElement x="365" y="50" width="190" height="14" uuid="d91038bd-3ff1-44d5-a3bc-f1f2bdbfbca0"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{data_previsao_entrega})]]></textFieldExpression></textField>
+
+            <staticText>
+                <reportElement x="0" y="88" width="555" height="18" uuid="77192135-32b9-4ac9-9945-4a607d0fdc8d"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Remetente]]></text>
+            </staticText>
+            <textField><reportElement x="0" y="112" width="270" height="16" uuid="59899fd5-00a4-4560-8131-4bbeab1ac56b"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{remetente}]]></textFieldExpression></textField>
+            <textField><reportElement x="290" y="112" width="265" height="16" uuid="31ce3a16-0ad6-44b5-b263-166f87524c74"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Documento: " + $F{documento_remetente}]]></textFieldExpression></textField>
+            <textField><reportElement x="0" y="132" width="555" height="16" uuid="af831e05-1766-4786-a645-fc5f56efc260"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{endereco_remetente} + " | Tel.: " + $F{telefone_remetente}]]></textFieldExpression></textField>
+
+            <staticText>
+                <reportElement x="0" y="172" width="555" height="18" uuid="a7c5f3d3-e7a0-403d-a1fb-a17c7982eacd"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Destinatário]]></text>
+            </staticText>
+            <textField><reportElement x="0" y="196" width="270" height="16" uuid="aa65ea71-06be-4339-a50f-a0e3401cbcd1"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{destinatario}]]></textFieldExpression></textField>
+            <textField><reportElement x="290" y="196" width="265" height="16" uuid="6f20f462-b8fa-40c2-bb09-6e044afba44e"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Documento: " + $F{documento_destinatario}]]></textFieldExpression></textField>
+            <textField><reportElement x="0" y="216" width="555" height="16" uuid="172b31e4-1a7f-487f-8350-4845051d4e20"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{endereco_destinatario} + " | Tel.: " + $F{telefone_destinatario}]]></textFieldExpression></textField>
+
+            <staticText>
+                <reportElement x="0" y="256" width="555" height="18" uuid="fd150fdb-fc66-4fc1-a0b3-d9e29b8d3b78"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Motorista e veículo]]></text>
+            </staticText>
+            <textField><reportElement x="0" y="280" width="270" height="16" uuid="5182f586-1a59-43ea-bfc9-baa1a0cd092b"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Motorista: " + $F{motorista}]]></textFieldExpression></textField>
+            <textField><reportElement x="290" y="280" width="265" height="16" uuid="26512155-5927-4cf0-98ec-cb9c350b9bc7"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["CPF: " + $F{cpf_motorista} + " | CNH: " + $F{cnh_motorista}]]></textFieldExpression></textField>
+            <textField><reportElement x="0" y="302" width="270" height="16" uuid="f7768428-3442-4d1f-9b60-459b19d77ecb"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Veículo: " + $F{placa_veiculo}]]></textFieldExpression></textField>
+            <textField><reportElement x="290" y="302" width="265" height="16" uuid="33b25153-99de-4ea7-af0d-506d52f075d2"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Tipo: " + $F{tipo_veiculo}]]></textFieldExpression></textField>
+
+            <staticText>
+                <reportElement x="0" y="342" width="555" height="18" uuid="d23b966e-cff8-4575-958f-90d87dd9a164"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Carga e valores]]></text>
+            </staticText>
+            <textField><reportElement x="0" y="366" width="555" height="16" uuid="34346138-7218-409f-bbd9-3f520d3e2a1e"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Carga: " + ($F{descricao_carga} == null ? "" : $F{descricao_carga})]]></textFieldExpression></textField>
+            <textField><reportElement x="0" y="388" width="170" height="16" uuid="3bdf806a-3e0b-4b82-9550-932be074e662"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Peso: " + new java.text.DecimalFormat("#,##0.00").format($F{peso_kg}) + " kg"]]></textFieldExpression></textField>
+            <textField><reportElement x="190" y="388" width="170" height="16" uuid="d9628f84-45ed-46bc-b71b-b028255d959d"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Volumes: " + $F{volumes}]]></textFieldExpression></textField>
+            <textField><reportElement x="0" y="418" width="170" height="16" uuid="6f7f8470-b484-4cfc-9a63-7707af05b5db"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["Frete: R$ " + new java.text.DecimalFormat("#,##0.00").format($F{valor_frete})]]></textFieldExpression></textField>
+            <textField><reportElement x="190" y="418" width="170" height="16" uuid="061cbcc3-eea2-42b0-b538-24306e7acbd3"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA["ICMS: R$ " + new java.text.DecimalFormat("#,##0.00").format($F{valor_icms})]]></textFieldExpression></textField>
+            <textField><reportElement x="380" y="418" width="175" height="16" uuid="87fbc689-704a-4a4f-83bf-d4de56cd88cd"/><textElement textAlignment="Right"><font size="10" isBold="true"/></textElement><textFieldExpression><![CDATA["Total: R$ " + new java.text.DecimalFormat("#,##0.00").format($F{valor_total})]]></textFieldExpression></textField>
+
+            <staticText>
+                <reportElement x="0" y="478" width="230" height="14" uuid="87d125bf-32a6-42e1-b51a-0748db5203a9"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[________________________________________]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="325" y="478" width="230" height="14" uuid="119c8270-0648-46c7-8561-548a40b516ef"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[________________________________________]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="496" width="230" height="14" uuid="0ce91104-bc99-48f6-a492-5a064dd8fbe2"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[Motorista]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="325" y="496" width="230" height="14" uuid="e4a9cb05-1c4e-479c-b6c2-ec03130a2213"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[Recebimento]]></text>
+            </staticText>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="405" y="2" width="150" height="12" uuid="625b01b8-5f15-4ad5-b316-946756c91e9e"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>
