@@ -81,11 +81,11 @@
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Previsão de entrega</span>
-                    <span class="detail-value"><c:out value="${frete.dataPrevisaoEntrega}"/></span>
+                    <span class="detail-value"><c:out value="${frete.dataPrevisaoEntregaFormatada}"/></span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Emissão</span>
-                    <span class="detail-value"><c:out value="${frete.dataEmissao}"/></span>
+                    <span class="detail-value"><c:out value="${frete.dataEmissaoFormatada}"/></span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Peso</span>
@@ -126,7 +126,7 @@
                 </tr>
                 <c:forEach var="oc" varStatus="st" items="${frete.ocorrencias}">
                     <tr class="${st.count % 2 == 0 ? 'CelulaZebra1' : 'CelulaZebra2'}">
-                        <td><c:out value="${oc.dataHora}"/></td>
+                        <td><c:out value="${oc.dataHoraFormatada}"/></td>
                         <td><c:out value="${oc.tipo}"/></td>
                         <td><c:out value="${oc.municipio}"/>/<c:out value="${oc.uf}"/></td>
                         <td><c:out value="${oc.descricao}"/></td>

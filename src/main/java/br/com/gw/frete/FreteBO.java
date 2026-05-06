@@ -455,16 +455,16 @@ public class FreteBO {
     private void appendLinhaCsv(StringBuilder csv, Frete frete) {
         appendCampo(csv, frete.getNumero());
         appendCampo(csv, frete.getStatus());
-        appendCampo(csv, frete.getDataEmissao());
+        appendCampo(csv, frete.getDataEmissaoFormatada());
         appendCampo(csv, frete.getRemetente() != null ? frete.getRemetente().getNomeRazaoSocial() : null);
         appendCampo(csv, frete.getDestinatario() != null ? frete.getDestinatario().getNomeRazaoSocial() : null);
         appendCampo(csv, frete.getMotorista() != null ? frete.getMotorista().getNome() : null);
         appendCampo(csv, frete.getVeiculo() != null ? frete.getVeiculo().getPlaca() : null);
         appendCampo(csv, montarLocalidade(frete.getMunicipioOrigem(), frete.getUfOrigem()));
         appendCampo(csv, montarLocalidade(frete.getMunicipioDestino(), frete.getUfDestino()));
-        appendCampo(csv, frete.getDataPrevisaoEntrega());
-        appendCampo(csv, frete.getDataSaida());
-        appendCampo(csv, frete.getDataEntrega());
+        appendCampo(csv, frete.getDataPrevisaoEntregaFormatada());
+        appendCampo(csv, frete.getDataSaidaFormatada());
+        appendCampo(csv, frete.getDataEntregaFormatada());
         appendCampo(csv, frete.getDescricaoCarga());
         appendCampo(csv, frete.getPesoKg());
         appendCampo(csv, frete.getVolumes());

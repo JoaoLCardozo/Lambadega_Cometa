@@ -1,5 +1,7 @@
 package br.com.gw.usuario;
 
+import br.com.gw.util.DateUtils;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -42,9 +44,11 @@ public class Usuario implements Serializable {
 
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
+    public String getDataCriacaoFormatada() { return DateUtils.formatarDataHora(dataCriacao); }
 
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) { this.dataAtualizacao = dataAtualizacao; }
+    public String getDataAtualizacaoFormatada() { return DateUtils.formatarDataHora(dataAtualizacao); }
 
     @Override
     public String toString() {

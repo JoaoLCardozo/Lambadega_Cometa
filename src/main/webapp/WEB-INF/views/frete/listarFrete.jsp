@@ -87,7 +87,7 @@
                         <td><c:out value="${f.remetente.nomeRazaoSocial}"/></td>
                         <td><c:out value="${f.destinatario.nomeRazaoSocial}"/></td>
                         <td><c:out value="${f.municipioDestino}"/>/<c:out value="${f.ufDestino}"/></td>
-                        <td><c:out value="${f.dataPrevisaoEntrega}"/></td>
+                        <td><c:out value="${f.dataPrevisaoEntregaFormatada}"/></td>
                         <td><span class="status-${f.status}"><c:out value="${f.status}"/></span></td>
                     </tr>
                 </c:forEach>

@@ -1,5 +1,7 @@
 package br.com.gw.motorista;
 
+import br.com.gw.util.DateUtils;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -34,6 +36,7 @@ public class Motorista implements Serializable {
 
     public LocalDate getDataNascimento() { return dataNascimento; }
     public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
+    public String getDataNascimentoFormatada() { return DateUtils.formatarData(dataNascimento); }
 
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
@@ -46,6 +49,7 @@ public class Motorista implements Serializable {
 
     public LocalDate getCnhValidade() { return cnhValidade; }
     public void setCnhValidade(LocalDate cnhValidade) { this.cnhValidade = cnhValidade; }
+    public String getCnhValidadeFormatada() { return DateUtils.formatarData(cnhValidade); }
 
     public TipoVinculo getTipoVinculo() { return tipoVinculo; }
     public void setTipoVinculo(TipoVinculo tipoVinculo) { this.tipoVinculo = tipoVinculo; }

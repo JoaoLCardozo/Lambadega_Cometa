@@ -2,6 +2,7 @@ package br.com.gw.frete;
 
 import br.com.gw.cliente.Cliente;
 import br.com.gw.motorista.Motorista;
+import br.com.gw.util.DateUtils;
 import br.com.gw.veiculo.Veiculo;
 
 import java.io.Serializable;
@@ -99,15 +100,19 @@ public class Frete implements Serializable {
 
     public LocalDateTime getDataEmissao() { return dataEmissao; }
     public void setDataEmissao(LocalDateTime dataEmissao) { this.dataEmissao = dataEmissao; }
+    public String getDataEmissaoFormatada() { return DateUtils.formatarDataHora(dataEmissao); }
 
     public LocalDate getDataPrevisaoEntrega() { return dataPrevisaoEntrega; }
     public void setDataPrevisaoEntrega(LocalDate dataPrevisaoEntrega) { this.dataPrevisaoEntrega = dataPrevisaoEntrega; }
+    public String getDataPrevisaoEntregaFormatada() { return DateUtils.formatarData(dataPrevisaoEntrega); }
 
     public LocalDateTime getDataSaida() { return dataSaida; }
     public void setDataSaida(LocalDateTime dataSaida) { this.dataSaida = dataSaida; }
+    public String getDataSaidaFormatada() { return DateUtils.formatarDataHora(dataSaida); }
 
     public LocalDateTime getDataEntrega() { return dataEntrega; }
     public void setDataEntrega(LocalDateTime dataEntrega) { this.dataEntrega = dataEntrega; }
+    public String getDataEntregaFormatada() { return DateUtils.formatarDataHora(dataEntrega); }
 
     public List<OcorrenciaFrete> getOcorrencias() { return ocorrencias; }
     public void setOcorrencias(List<OcorrenciaFrete> ocorrencias) { this.ocorrencias = ocorrencias; }

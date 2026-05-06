@@ -1,5 +1,7 @@
 package br.com.gw.frete;
 
+import br.com.gw.util.DateUtils;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -34,6 +36,7 @@ public class OcorrenciaFrete implements Serializable {
 
     public LocalDateTime getDataHora() { return dataHora; }
     public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
+    public String getDataHoraFormatada() { return DateUtils.formatarDataHora(dataHora); }
 
     public String getMunicipio() { return municipio; }
     public void setMunicipio(String municipio) { this.municipio = municipio; }

@@ -72,7 +72,7 @@
                         <td><c:out value="${m.cpf}"/></td>
                         <td><span class="badge"><c:out value="${m.cnhCategoria}"/></span></td>
                         <td>
-                            <c:out value="${m.cnhValidade}"/>
+                            <c:out value="${m.cnhValidadeFormatada}"/>
                             <c:if test="${m.cnhVencida}">
                                 <span class="status-SUSPENSO">Vencida</span>
                             </c:if>
