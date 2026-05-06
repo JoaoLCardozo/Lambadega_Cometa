@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="performance_motorista" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              whenNoDataType="AllSectionsNoDetail" uuid="799af21f-f59d-445a-9554-7cdbb6f7f44c">
+    <parameter name="ID_MOTORISTA" class="java.lang.Integer"/>
+    <parameter name="DATA_INICIO" class="java.sql.Date"/>
+    <parameter name="DATA_FIM" class="java.sql.Date"/>
+    <parameter name="PERIODO" class="java.lang.String"/>
+    <parameter name="DATA_GERACAO" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[
+            SELECT m.nome AS motorista,
+                   m.cpf AS cpf_motorista,
+                   m.tipo_vinculo AS tipo_vinculo,
+                   COUNT(f.id)::integer AS quantidade_fretes,
+                   COALESCE(SUM(CASE WHEN f.status = 'ENTREGUE' THEN 1 ELSE 0 END), 0)::integer AS entregas_realizadas,
+                   COALESCE(SUM(CASE WHEN f.status = 'ENTREGUE'
+                                      AND f.data_entrega::date > f.data_previsao_entrega
+                                      THEN 1 ELSE 0 END), 0)::integer AS entregas_atrasadas,
+                   COALESCE(SUM(CASE WHEN f.status = 'NAO_ENTREGUE' THEN 1 ELSE 0 END), 0)::integer AS nao_entregas,
+                   COALESCE(SUM(f.peso_kg), 0) AS total_transportado_kg,
+                   COALESCE(SUM(f.valor_total), 0) AS valor_total_fretes
+              FROM motorista m
+              LEFT JOIN frete f ON f.id_motorista = m.id
+                   AND f.data_emissao::date BETWEEN $P{DATA_INICIO} AND $P{DATA_FIM}
+             WHERE m.id = $P{ID_MOTORISTA}
+             GROUP BY m.id, m.nome, m.cpf, m.tipo_vinculo
+        ]]>
+    </queryString>
+    <field name="motorista" class="java.lang.String"/>
+    <field name="cpf_motorista" class="java.lang.String"/>
+    <field name="tipo_vinculo" class="java.lang.String"/>
+    <field name="quantidade_fretes" class="java.lang.Integer"/>
+    <field name="entregas_realizadas" class="java.lang.Integer"/>
+    <field name="entregas_atrasadas" class="java.lang.Integer"/>
+    <field name="nao_entregas" class="java.lang.Integer"/>
+    <field name="total_transportado_kg" class="java.math.BigDecimal"/>
+    <field name="valor_total_fretes" class="java.math.BigDecimal"/>
+    <title>
+        <band height="92">
+            <staticText>
+                <reportElement x="0" y="0" width="240" height="26" uuid="3c2ad404-1065-4284-a36e-7aee407ec46e"/>
+                <textElement><font size="17" isBold="true"/></textElement>
+                <text><![CDATA[Lambadega Cometa]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="30" width="320" height="20" uuid="2b3904fe-e2fb-4cef-94c5-2430bb58002d"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <text><![CDATA[Relatório de performance de motorista]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="355" y="4" width="200" height="16" uuid="3d5d41c2-ffb5-4f60-b7a2-f646693107c4"/>
+                <textElement textAlignment="Right"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA["Gerado em " + $P{DATA_GERACAO}]]></textFieldExpression>
+            </textField>
+            <line>
+                <reportElement x="0" y="82" width="555" height="1" uuid="fc4e2460-3177-4c87-9308-10f91f02d421"/>
+            </line>
+        </band>
+    </title>
+    <detail>
+        <band height="390">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="18" uuid="6213ba17-9e6f-4ffe-8b49-2fa5e1a91f4b"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Motorista e período]]></text>
+            </staticText>
+            <staticText><reportElement x="0" y="30" width="80" height="14" uuid="e4f9b255-b3bf-468e-89e7-6d8968002286"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Motorista]]></text></staticText>
+            <textField><reportElement x="90" y="30" width="465" height="14" uuid="b397a04d-5557-4401-85e5-b69d8ff51b20"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{motorista}]]></textFieldExpression></textField>
+            <staticText><reportElement x="0" y="52" width="80" height="14" uuid="c952c4a7-a907-44aa-b3b7-99f56f24eac4"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[CPF]]></text></staticText>
+            <textField><reportElement x="90" y="52" width="180" height="14" uuid="88c2ccba-a889-483f-8a59-2e023a22d99d"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{cpf_motorista}]]></textFieldExpression></textField>
+            <staticText><reportElement x="290" y="52" width="70" height="14" uuid="52641d43-4813-46fe-8143-8f945c9be218"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Vínculo]]></text></staticText>
+            <textField><reportElement x="365" y="52" width="190" height="14" uuid="5fe764ea-b44f-4035-af33-8c5e3fc37c0e"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$F{tipo_vinculo}]]></textFieldExpression></textField>
+            <staticText><reportElement x="0" y="74" width="80" height="14" uuid="8b07180b-441b-4795-978d-a481df8a7446"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[Período]]></text></staticText>
+            <textField><reportElement x="90" y="74" width="465" height="14" uuid="8a4cb376-7688-4486-aeae-3a1ceab53af5"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[$P{PERIODO}]]></textFieldExpression></textField>
+
+            <staticText>
+                <reportElement x="0" y="118" width="555" height="18" uuid="7fb370d4-d994-42b4-b3cc-87983b976d9e"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[Indicadores]]></text>
+            </staticText>
+            <staticText><reportElement x="0" y="152" width="230" height="18" uuid="d8b05091-3837-4146-934c-a551bb0d8708"/><textElement><font size="10" isBold="true"/></textElement><text><![CDATA[Quantidade de fretes]]></text></staticText>
+            <textField><reportElement x="410" y="150" width="145" height="20" uuid="b3fb9e47-c3ba-4816-89c3-a8d07b49e51c"/><textElement textAlignment="Right"><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[String.valueOf($F{quantidade_fretes})]]></textFieldExpression></textField>
+            <line><reportElement x="0" y="176" width="555" height="1" uuid="e9b7a0a6-c1ea-4afe-877a-399d045af367"/></line>
+
+            <staticText><reportElement x="0" y="194" width="230" height="18" uuid="7a51b34b-c622-4ca9-98bf-1702f885a66f"/><textElement><font size="10" isBold="true"/></textElement><text><![CDATA[Entregas realizadas]]></text></staticText>
+            <textField><reportElement x="410" y="192" width="145" height="20" uuid="89fae26a-e90e-4022-bf7a-14fa2ae08e3e"/><textElement textAlignment="Right"><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[String.valueOf($F{entregas_realizadas})]]></textFieldExpression></textField>
+            <line><reportElement x="0" y="218" width="555" height="1" uuid="62059207-77eb-484f-bae1-35c045fe900b"/></line>
+
+            <staticText><reportElement x="0" y="236" width="230" height="18" uuid="725fe0f4-9bae-4036-a38d-6723567700ce"/><textElement><font size="10" isBold="true"/></textElement><text><![CDATA[Entregas atrasadas]]></text></staticText>
+            <textField><reportElement x="410" y="234" width="145" height="20" uuid="d1620860-f59d-441e-8c92-e7fa6bb558f4"/><textElement textAlignment="Right"><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[String.valueOf($F{entregas_atrasadas})]]></textFieldExpression></textField>
+            <line><reportElement x="0" y="260" width="555" height="1" uuid="b4864599-3c36-4246-b334-885b9c04eafe"/></line>
+
+            <staticText><reportElement x="0" y="278" width="230" height="18" uuid="3fbf529d-7df0-42af-a536-c8a5379badb0"/><textElement><font size="10" isBold="true"/></textElement><text><![CDATA[Não entregas]]></text></staticText>
+            <textField><reportElement x="410" y="276" width="145" height="20" uuid="6efaa19b-8bbe-495c-bf84-4cda77c2ad76"/><textElement textAlignment="Right"><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[String.valueOf($F{nao_entregas})]]></textFieldExpression></textField>
+            <line><reportElement x="0" y="302" width="555" height="1" uuid="79d4fdd4-5e98-4b61-a3a0-54c4f7efff66"/></line>
+
+            <staticText><reportElement x="0" y="320" width="230" height="18" uuid="4b1e5df1-5ec2-40e9-9d86-065a185a41b4"/><textElement><font size="10" isBold="true"/></textElement><text><![CDATA[Total transportado]]></text></staticText>
+            <textField><reportElement x="325" y="318" width="230" height="20" uuid="d8b99be8-4292-4351-9add-b6f02d0a5880"/><textElement textAlignment="Right"><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("#,##0.00").format($F{total_transportado_kg}) + " kg"]]></textFieldExpression></textField>
+            <line><reportElement x="0" y="344" width="555" height="1" uuid="24e7eb68-05e4-4655-a289-d1dd58cc5e22"/></line>
+
+            <staticText><reportElement x="0" y="362" width="230" height="18" uuid="d75b2e49-71e9-4016-896d-eb6933273c58"/><textElement><font size="10" isBold="true"/></textElement><text><![CDATA[Valor total dos fretes]]></text></staticText>
+            <textField><reportElement x="325" y="360" width="230" height="20" uuid="950858c0-0ad6-4f3b-8b42-6831f1aef40a"/><textElement textAlignment="Right"><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA["R$ " + new java.text.DecimalFormat("#,##0.00").format($F{valor_total_fretes})]]></textFieldExpression></textField>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="18">
+            <textField>
+                <reportElement x="405" y="2" width="150" height="12" uuid="21943137-118b-4d7a-b95d-e729c3ae0188"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

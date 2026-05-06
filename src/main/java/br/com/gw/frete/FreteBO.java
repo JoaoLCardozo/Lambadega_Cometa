@@ -72,6 +72,20 @@ public class FreteBO {
         return gerarPdf("relatorios/romaneio_frete.jrxml", parametros);
     }
 
+    public byte[] gerarPerformanceMotorista(int idMotorista, LocalDate dataInicio, LocalDate dataFim)
+            throws NegocioException {
+        validarParametrosPerformanceMotorista(idMotorista, dataInicio, dataFim);
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("ID_MOTORISTA", idMotorista);
+        parametros.put("DATA_INICIO", java.sql.Date.valueOf(dataInicio));
+        parametros.put("DATA_FIM", java.sql.Date.valueOf(dataFim));
+        parametros.put("PERIODO", dataInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            + " a " + dataFim.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        parametros.put("DATA_GERACAO", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        return gerarPdf("relatorios/performance_motorista.jrxml", parametros);
+    }
+
     public Frete buscarPorId(int id) throws NegocioException {
         Frete f = freteDAO.buscarPorId(id);
         if (f == null) throw new FreteException("Frete não encontrado.");
@@ -99,6 +113,25 @@ public class FreteBO {
                 throw (NegocioException) e;
             }
             throw new FreteException("Erro ao gerar relatório PDF.", e);
+        }
+    }
+
+    private void validarParametrosPerformanceMotorista(int idMotorista, LocalDate dataInicio, LocalDate dataFim)
+            throws NegocioException {
+        if (idMotorista <= 0) {
+            throw new FreteException("Motorista é obrigatório para gerar o relatório.");
+        }
+        if (dataInicio == null) {
+            throw new FreteException("Data inicial é obrigatória para gerar o relatório.");
+        }
+        if (dataFim == null) {
+            throw new FreteException("Data final é obrigatória para gerar o relatório.");
+        }
+        if (dataFim.isBefore(dataInicio)) {
+            throw new FreteException("Data final não pode ser anterior à data inicial.");
+        }
+        if (motoristaDAO.buscarPorId(idMotorista) == null) {
+            throw new FreteException("Motorista não encontrado.");
         }
     }
 

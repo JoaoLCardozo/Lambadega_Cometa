@@ -43,6 +43,12 @@ public class FreteControlador extends HttpServlet {
                     relatorioFretesAbertos(req, resp);
                     break;
                 case "romaneio":       romaneio(req, resp);      break;
+                case "performanceMotorista":
+                    performanceMotorista(req, resp);
+                    break;
+                case "relatorioPerformanceMotorista":
+                    relatorioPerformanceMotorista(req, resp);
+                    break;
                 case "novo":           novo(req, resp);           break;
                 case "detalhe":        detalhe(req, resp);        break;
                 case "confirmarSaida": confirmarSaida(req, resp); break;
@@ -132,6 +138,23 @@ public class FreteControlador extends HttpServlet {
         Frete frete = freteBO.buscarPorId(id);
         enviarPdf(resp, freteBO.gerarRomaneio(id),
             "romaneio-" + frete.getNumero() + ".pdf");
+    }
+
+    private void performanceMotorista(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException, NegocioException {
+        req.setAttribute("listaMotoristas", motoristaBO.listar(null, 1, 999));
+        req.getRequestDispatcher("/WEB-INF/views/frete/performanceMotorista.jsp").forward(req, resp);
+    }
+
+    private void relatorioPerformanceMotorista(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, NegocioException {
+        int idMotorista = parseIdMotorista(req.getParameter("idMotorista"));
+        LocalDate dataInicio = parseDataObrigatoria(req.getParameter("dataInicio"), "Data inicial");
+        LocalDate dataFim = parseDataObrigatoria(req.getParameter("dataFim"), "Data final");
+        Motorista motorista = motoristaBO.buscarPorId(idMotorista);
+
+        enviarPdf(resp, freteBO.gerarPerformanceMotorista(idMotorista, dataInicio, dataFim),
+            "performance-motorista-" + motorista.getId() + "-" + LocalDate.now() + ".pdf");
     }
 
     private void enviarPdf(HttpServletResponse resp, byte[] pdf, String nomeArquivo)
@@ -284,5 +307,26 @@ public class FreteControlador extends HttpServlet {
     private int parsePagina(String valor) {
         try { return Math.max(1, Integer.parseInt(valor)); }
         catch (Exception e) { return 1; }
+    }
+
+    private int parseIdMotorista(String valor) throws NegocioException {
+        try {
+            int id = Integer.parseInt(valor);
+            if (id <= 0) throw new NumberFormatException();
+            return id;
+        } catch (Exception e) {
+            throw new NegocioException("Motorista é obrigatório para gerar o relatório.");
+        }
+    }
+
+    private LocalDate parseDataObrigatoria(String valor, String campo) throws NegocioException {
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new NegocioException(campo + " é obrigatória para gerar o relatório.");
+        }
+        try {
+            return LocalDate.parse(valor);
+        } catch (Exception e) {
+            throw new NegocioException(campo + " inválida para gerar o relatório.");
+        }
     }
 }

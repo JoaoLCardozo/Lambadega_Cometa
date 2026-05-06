@@ -41,6 +41,8 @@
             <div class="app-actions">
                 <input type="button" class="inputbotao" value="Novo frete"
                        onclick="window.location='${pageContext.request.contextPath}/FreteControlador?acao=novo'"/>
+                <input type="button" class="inputbotao secondary" value="Performance motoristas"
+                       onclick="window.location='${pageContext.request.contextPath}/FreteControlador?acao=performanceMotorista'"/>
             </div>
         </section>
 
