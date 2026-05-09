@@ -29,6 +29,15 @@
     </servlet-mapping>
 
     <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>br.com.gw.filter.EncodingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
         <filter-name>AutenticacaoFiltro</filter-name>
         <filter-class>br.com.gw.filter.AutenticacaoFiltroImpl</filter-class>
     </filter>

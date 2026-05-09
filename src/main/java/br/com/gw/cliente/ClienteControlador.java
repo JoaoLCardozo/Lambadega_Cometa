@@ -51,10 +51,6 @@ public class ClienteControlador extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html; charset=UTF-8");
-
         String acao = req.getParameter("acao");
         if (acao == null) acao = "";
 
