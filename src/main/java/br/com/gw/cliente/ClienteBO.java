@@ -58,29 +58,35 @@ public class ClienteBO {
         if (c.getNomeRazaoSocial() == null || c.getNomeRazaoSocial().trim().isEmpty()) {
             throw new CadastroException("O campo Nome/Razão Social é obrigatório.");
         }
-        if (c.getDocumento() == null || c.getDocumento().trim().isEmpty()) {
+        String documento = somenteDigitos(c.getDocumento());
+        if (documento == null || documento.isEmpty()) {
             throw new CadastroException("O campo Documento é obrigatório.");
         }
+        c.setDocumento(documento);
         
         // Validar documento conforme tipo
         if (c.getTipoPessoa() == Cliente.TipoPessoa.F) {
             // Validar CPF
-            if (!validarCpf(c.getDocumento())) {
+            if (!validarCpf(documento)) {
                 throw new CadastroException("O CPF informado é inválido.");
             }
         } else if (c.getTipoPessoa() == Cliente.TipoPessoa.J) {
             // Validar CNPJ
-            if (!validarCnpj(c.getDocumento())) {
+            if (!validarCnpj(documento)) {
                 throw new CadastroException("O CNPJ informado é inválido.");
             }
         }
         
-        if (clienteDAO.existeDocumento(c.getDocumento(), idIgnorar)) {
+        if (clienteDAO.existeDocumento(documento, idIgnorar)) {
             throw new CadastroException("Já existe um cliente cadastrado com este documento.");
         }
         if (c.getStatus() == null) {
             c.setStatus(Cliente.Status.ATIVO);
         }
+    }
+
+    private String somenteDigitos(String valor) {
+        return valor != null ? valor.replaceAll("[^0-9]", "") : null;
     }
 
     /**

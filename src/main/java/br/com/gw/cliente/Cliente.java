@@ -47,6 +47,27 @@ public class Cliente implements Serializable {
     public String getDocumento() { return documento; }
     public void setDocumento(String documento) { this.documento = documento; }
 
+    public String getDocumentoFormatado() {
+        String digitos = somenteDigitos(documento);
+
+        if (tipoPessoa == TipoPessoa.F && digitos.length() == 11) {
+            return digitos.substring(0, 3) + "."
+                + digitos.substring(3, 6) + "."
+                + digitos.substring(6, 9) + "-"
+                + digitos.substring(9);
+        }
+
+        if (tipoPessoa == TipoPessoa.J && digitos.length() == 14) {
+            return digitos.substring(0, 2) + "."
+                + digitos.substring(2, 5) + "."
+                + digitos.substring(5, 8) + "/"
+                + digitos.substring(8, 12) + "-"
+                + digitos.substring(12);
+        }
+
+        return documento;
+    }
+
     public String getInscricaoEstadual() { return inscricaoEstadual; }
     public void setInscricaoEstadual(String inscricaoEstadual) { this.inscricaoEstadual = inscricaoEstadual; }
 
@@ -79,6 +100,10 @@ public class Cliente implements Serializable {
 
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
+
+    private String somenteDigitos(String valor) {
+        return valor != null ? valor.replaceAll("[^0-9]", "") : "";
+    }
 
     @Override
     public String toString() {

@@ -76,7 +76,7 @@
                         </td>
                         <td><c:out value="${cliente.nomeRazaoSocial}"/></td>
                         <td><c:out value="${cliente.nomeFantasia}"/></td>
-                        <td><c:out value="${cliente.documento}"/></td>
+                        <td><c:out value="${cliente.documentoFormatado}"/></td>
                         <td><span class="status-${cliente.status}"><c:out value="${cliente.status}"/></span></td>
                     </tr>
                 </c:forEach>

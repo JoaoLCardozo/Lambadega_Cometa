@@ -32,7 +32,7 @@ CREATE TABLE cliente (
 	tipo_pessoa CHAR(1) NOT NULL CHECK (tipo_pessoa IN ('F','J')),
     nome_razao_social       VARCHAR(150) NOT NULL,
     nome_fantasia      VARCHAR(150),
-    documento               VARCHAR(18)  NOT NULL UNIQUE,
+    documento               VARCHAR(14)  NOT NULL UNIQUE,
     inscricao_estadual VARCHAR(20),
     logradouro         VARCHAR(150),
     numero             VARCHAR(10),
