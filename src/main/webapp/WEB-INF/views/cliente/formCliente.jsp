@@ -100,6 +100,22 @@
             <tr><td colspan="4" class="tabela"><b>Endereço</b></td></tr>
 
             <tr>
+                <td class="CelulaZebra1">CEP:</td>
+                <td class="CelulaZebra1">
+                    <%-- maxlength=9 alinhado com VARCHAR(9) no banco --%>
+                    <input type="text" name="cep" id="cep" class="inputtexto"
+                           size="10" maxlength="9" style="max-width: 150px;"
+                           placeholder="00000-000"
+                           value="<c:out value='${cliente.cep}'/>"/>
+                </td>
+                <td class="CelulaZebra1">UF:</td>
+                <td class="CelulaZebra1">
+                    <input type="text" name="uf" class="inputtexto" size="3" maxlength="2"
+                           style="max-width: 72px;"
+                           value="<c:out value='${cliente.uf}'/>"/>
+                </td>
+            </tr>
+            <tr>
                 <td class="CelulaZebra1">Logradouro:</td>
                 <td class="CelulaZebra1" colspan="3">
                     <input type="text" name="logradouro" class="inputtexto" size="60" maxlength="150"
@@ -110,6 +126,7 @@
                 <td class="CelulaZebra2">Número:</td>
                 <td class="CelulaZebra2">
                     <input type="text" name="numero" class="inputtexto" size="10" maxlength="10"
+                           style="max-width: 130px;"
                            value="<c:out value='${cliente.numero}'/>"/>
                 </td>
                 <td class="CelulaZebra2">Complemento:</td>
@@ -124,25 +141,10 @@
                     <input type="text" name="bairro" class="inputtexto" size="30" maxlength="100"
                            value="<c:out value='${cliente.bairro}'/>"/>
                 </td>
-                <td class="CelulaZebra1">CEP:</td>
+                <td class="CelulaZebra1">Município:</td>
                 <td class="CelulaZebra1">
-                    <%-- maxlength=9 alinhado com VARCHAR(9) no banco --%>
-                    <input type="text" name="cep" id="cep" class="inputtexto"
-                           size="10" maxlength="9"
-                           placeholder="00000-000"
-                           value="<c:out value='${cliente.cep}'/>"/>
-                </td>
-            </tr>
-            <tr>
-                <td class="CelulaZebra2">Município:</td>
-                <td class="CelulaZebra2">
                     <input type="text" name="municipio" class="inputtexto" size="30" maxlength="100"
                            value="<c:out value='${cliente.municipio}'/>"/>
-                </td>
-                <td class="CelulaZebra2">UF:</td>
-                <td class="CelulaZebra2">
-                    <input type="text" name="uf" class="inputtexto" size="3" maxlength="2"
-                           value="<c:out value='${cliente.uf}'/>"/>
                 </td>
             </tr>
 
@@ -222,6 +224,58 @@
             return v;
         }
 
+        var ultimoCepConsultado = '';
+        var consultaCepAtual = 0;
+
+        function campoFormulario(nome) {
+            return document.forms.formulario.elements[nome];
+        }
+
+        function preencherEnderecoPorCep(dados) {
+            campoFormulario('logradouro').value = dados.logradouro || '';
+            campoFormulario('bairro').value = dados.bairro || '';
+            campoFormulario('municipio').value = dados.localidade || '';
+            campoFormulario('uf').value = dados.uf || '';
+            campoFormulario('numero').focus();
+        }
+
+        function consultarCep() {
+            var cep = campoFormulario('cep').value.replace(/\D/g, '');
+
+            if (cep.length !== 8 || cep === ultimoCepConsultado) {
+                return;
+            }
+
+            ultimoCepConsultado = cep;
+            var consulta = ++consultaCepAtual;
+
+            fetch('https://viacep.com.br/ws/' + cep + '/json/')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Erro ao consultar CEP');
+                    }
+                    return response.json();
+                })
+                .then(function(dados) {
+                    if (consulta !== consultaCepAtual) {
+                        return;
+                    }
+
+                    if (dados.erro) {
+                        alert('CEP não encontrado.');
+                        return;
+                    }
+
+                    preencherEnderecoPorCep(dados);
+                })
+                .catch(function() {
+                    if (consulta === consultaCepAtual) {
+                        ultimoCepConsultado = '';
+                        alert('Não foi possível consultar o CEP agora.');
+                    }
+                });
+        }
+
         document.getElementById('documento').addEventListener('input', function() {
             var tipo = document.querySelector('input[name="tipoPessoa"]:checked').value;
             this.value = tipo === 'F' ? mascaraCpf(this.value) : mascaraCnpj(this.value);
@@ -229,7 +283,10 @@
 
         document.getElementById('cep').addEventListener('input', function() {
             this.value = mascaraCep(this.value);
+            consultarCep();
         });
+
+        document.getElementById('cep').addEventListener('blur', consultarCep);
 
         document.getElementById('telefone').addEventListener('input', function() {
             this.value = mascaraTelefone(this.value);
