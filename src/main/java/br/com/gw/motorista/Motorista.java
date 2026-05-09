@@ -34,6 +34,19 @@ public class Motorista implements Serializable {
     public String getCpf() { return cpf; }
     public void setCpf(String cpf) { this.cpf = cpf; }
 
+    public String getCpfFormatado() {
+        String digitos = somenteDigitos(cpf);
+
+        if (digitos.length() == 11) {
+            return digitos.substring(0, 3) + "."
+                + digitos.substring(3, 6) + "."
+                + digitos.substring(6, 9) + "-"
+                + digitos.substring(9);
+        }
+
+        return cpf;
+    }
+
     public LocalDate getDataNascimento() { return dataNascimento; }
     public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
     public String getDataNascimentoFormatada() { return DateUtils.formatarData(dataNascimento); }
@@ -59,6 +72,10 @@ public class Motorista implements Serializable {
 
     public boolean isCnhVencida() {
         return cnhValidade != null && cnhValidade.isBefore(LocalDate.now());
+    }
+
+    private String somenteDigitos(String valor) {
+        return valor != null ? valor.replaceAll("[^0-9]", "") : "";
     }
 
     @Override

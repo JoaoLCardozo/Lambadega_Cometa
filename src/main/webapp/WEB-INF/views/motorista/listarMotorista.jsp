@@ -69,7 +69,7 @@
                             </div>
                         </td>
                         <td><c:out value="${m.nome}"/></td>
-                        <td><c:out value="${m.cpf}"/></td>
+                        <td><c:out value="${m.cpfFormatado}"/></td>
                         <td><span class="badge"><c:out value="${m.cnhCategoria}"/></span></td>
                         <td>
                             <c:out value="${m.cnhValidadeFormatada}"/>
