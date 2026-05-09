@@ -145,100 +145,20 @@
             </form>
         </section>
     </main>
+    <script src="${pageContext.request.contextPath}/js/localidades.js"></script>
     <script>
-        var IBGE_LOCALIDADES_URL = 'https://servicodados.ibge.gov.br/api/v1/localidades';
-
-        function criarOpcao(valor, texto) {
-            var opcao = document.createElement('option');
-            opcao.value = valor;
-            opcao.textContent = texto;
-            return opcao;
-        }
-
-        function prepararSelect(select, textoInicial) {
-            select.innerHTML = '';
-            select.appendChild(criarOpcao('', textoInicial));
-        }
-
-        function selecionarValor(select, valor) {
-            if (!valor) return;
-            select.value = valor;
-        }
-
-        function preencherUfs(select, estados) {
-            prepararSelect(select, 'Selecione a UF');
-
-            estados.forEach(function(estado) {
-                select.appendChild(criarOpcao(estado.sigla, estado.sigla + ' - ' + estado.nome));
-            });
-
-            selecionarValor(select, (select.dataset.selected || '').toUpperCase());
-        }
-
-        function preencherMunicipios(select, municipios) {
-            prepararSelect(select, 'Selecione o município');
-
-            municipios.forEach(function(municipio) {
-                select.appendChild(criarOpcao(municipio.nome, municipio.nome));
-            });
-
-            selecionarValor(select, select.dataset.selected || '');
-            select.disabled = false;
-        }
-
-        function carregarMunicipios(ufSelect, municipioSelect) {
-            var uf = ufSelect.value;
-            municipioSelect.disabled = true;
-
-            if (!uf) {
-                prepararSelect(municipioSelect, 'Selecione a UF primeiro');
-                return;
+        LocalidadesIBGE.configurar([
+            {
+                ufId: 'ufOrigem',
+                municipioId: 'municipioOrigem',
+                municipioSemUf: 'Selecione a UF origem'
+            },
+            {
+                ufId: 'ufDestino',
+                municipioId: 'municipioDestino',
+                municipioSemUf: 'Selecione a UF destino'
             }
-
-            prepararSelect(municipioSelect, 'Carregando municípios...');
-
-            fetch(IBGE_LOCALIDADES_URL + '/estados/' + uf + '/municipios?orderBy=nome')
-                .then(function(response) {
-                    if (!response.ok) throw new Error('Erro ao carregar municípios');
-                    return response.json();
-                })
-                .then(function(municipios) {
-                    preencherMunicipios(municipioSelect, municipios);
-                })
-                .catch(function() {
-                    prepararSelect(municipioSelect, 'Não foi possível carregar municípios');
-                });
-        }
-
-        function configurarLocalidade(ufId, municipioId) {
-            var ufSelect = document.getElementById(ufId);
-            var municipioSelect = document.getElementById(municipioId);
-
-            ufSelect.addEventListener('change', function() {
-                municipioSelect.dataset.selected = '';
-                carregarMunicipios(ufSelect, municipioSelect);
-            });
-
-            if (ufSelect.dataset.selected) {
-                carregarMunicipios(ufSelect, municipioSelect);
-            }
-        }
-
-        fetch(IBGE_LOCALIDADES_URL + '/estados?orderBy=nome')
-            .then(function(response) {
-                if (!response.ok) throw new Error('Erro ao carregar UFs');
-                return response.json();
-            })
-            .then(function(estados) {
-                preencherUfs(document.getElementById('ufOrigem'), estados);
-                preencherUfs(document.getElementById('ufDestino'), estados);
-                configurarLocalidade('ufOrigem', 'municipioOrigem');
-                configurarLocalidade('ufDestino', 'municipioDestino');
-            })
-            .catch(function() {
-                prepararSelect(document.getElementById('ufOrigem'), 'Não foi possível carregar UFs');
-                prepararSelect(document.getElementById('ufDestino'), 'Não foi possível carregar UFs');
-            });
+        ]);
     </script>
 </body>
 </html>

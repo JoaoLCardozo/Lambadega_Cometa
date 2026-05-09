@@ -70,12 +70,16 @@
                         <input type="datetime-local" name="dataHora" id="dataHora" class="inputtexto"/>
                     </div>
                     <div class="form-field">
-                        <label for="municipio">Município</label>
-                        <input type="text" name="municipio" id="municipio" class="inputtexto"/>
+                        <label for="uf">UF</label>
+                        <select name="uf" id="uf" class="inputtexto">
+                            <option value="">Carregando UFs...</option>
+                        </select>
                     </div>
                     <div class="form-field">
-                        <label for="uf">UF</label>
-                        <input type="text" name="uf" id="uf" class="inputtexto" maxlength="2"/>
+                        <label for="municipio">Município</label>
+                        <select name="municipio" id="municipio" class="inputtexto" disabled>
+                            <option value="">Selecione a UF</option>
+                        </select>
                     </div>
                     <div class="form-field full">
                         <label for="descricao">Descrição</label>
@@ -99,7 +103,16 @@
         </section>
     </main>
 
+    <script src="${pageContext.request.contextPath}/js/localidades.js"></script>
     <script>
+        LocalidadesIBGE.configurar([
+            {
+                ufId: 'uf',
+                municipioId: 'municipio',
+                municipioSemUf: 'Selecione a UF'
+            }
+        ]);
+
         function toggleCampos(tipo) {
             var rec = document.getElementById('camposRecebedor');
             var doc = document.getElementById('camposDocumento');
