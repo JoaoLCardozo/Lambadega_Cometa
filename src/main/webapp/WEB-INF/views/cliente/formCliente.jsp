@@ -306,6 +306,8 @@
             document.getElementById('documento').value = isPJ
                 ? mascaraCnpj(document.getElementById('documento').value)
                 : mascaraCpf(document.getElementById('documento').value);
+            document.getElementById('cep').value = mascaraCep(document.getElementById('cep').value);
+            document.getElementById('telefone').value = mascaraTelefone(document.getElementById('telefone').value);
         });
     </script>
 </body>
