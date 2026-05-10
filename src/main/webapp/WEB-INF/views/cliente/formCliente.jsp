@@ -77,7 +77,7 @@
                     <input type="text" name="documento" id="documento"
                            class="inputtexto" size="20" maxlength="18"
                            placeholder="000.000.000-00"
-                           value="<c:out value='${cliente.documento}'/>"/>
+                           value="<c:out value='${cliente.documentoFormatado}'/>"/>
                 </td>
                 <td class="CelulaZebra2" id="labelIE">Inscrição Estadual:</td>
                 <td class="CelulaZebra2" id="tdIE">
@@ -303,6 +303,9 @@
             document.getElementById('trNomeFantasia').style.display = isPJ ? '' : 'none';
             document.getElementById('labelIE').style.display        = isPJ ? '' : 'none';
             document.getElementById('tdIE').style.display           = isPJ ? '' : 'none';
+            document.getElementById('documento').value = isPJ
+                ? mascaraCnpj(document.getElementById('documento').value)
+                : mascaraCpf(document.getElementById('documento').value);
         });
     </script>
 </body>
