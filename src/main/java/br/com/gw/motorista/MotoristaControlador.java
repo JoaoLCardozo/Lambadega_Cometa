@@ -15,6 +15,7 @@ public class MotoristaControlador extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(MotoristaControlador.class.getName());
     private static final int LIMITE = 10;
+    private static final String SUCESSO_MOTORISTA = "motoristaSucesso";
 
     private final MotoristaBO motoristaBO = new MotoristaBO();
 
@@ -76,6 +77,7 @@ public class MotoristaControlador extends HttpServlet {
         req.setAttribute("filtro",          filtro);
         req.setAttribute("paginaAtual",     pagina);
         req.setAttribute("totalPaginas",    totalPaginas);
+        carregarMensagemSucesso(req);
         req.getRequestDispatcher("/WEB-INF/views/motorista/listarMotorista.jsp").forward(req, resp);
     }
 
@@ -102,6 +104,7 @@ public class MotoristaControlador extends HttpServlet {
     private void salvar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
         motoristaBO.salvar(montarMotoristaDaRequisicao(req));
+        req.getSession().setAttribute(SUCESSO_MOTORISTA, "Motorista cadastrado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/MotoristaControlador?acao=listar");
     }
 
@@ -110,6 +113,7 @@ public class MotoristaControlador extends HttpServlet {
         Motorista m = montarMotoristaDaRequisicao(req);
         m.setId(Integer.parseInt(req.getParameter("id")));
         motoristaBO.atualizar(m);
+        req.getSession().setAttribute(SUCESSO_MOTORISTA, "Motorista atualizado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/MotoristaControlador?acao=listar");
     }
 
@@ -142,5 +146,16 @@ public class MotoristaControlador extends HttpServlet {
     private int parsePagina(String valor) {
         try { return Math.max(1, Integer.parseInt(valor)); }
         catch (Exception e) { return 1; }
+    }
+
+    private void carregarMensagemSucesso(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return;
+
+        Object sucesso = session.getAttribute(SUCESSO_MOTORISTA);
+        if (sucesso != null) {
+            req.setAttribute("sucesso", sucesso);
+            session.removeAttribute(SUCESSO_MOTORISTA);
+        }
     }
 }
