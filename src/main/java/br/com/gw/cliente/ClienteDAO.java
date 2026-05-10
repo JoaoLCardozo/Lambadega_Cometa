@@ -12,23 +12,29 @@ public class ClienteDAO {
     private static final Logger logger = Logger.getLogger(ClienteDAO.class.getName());
 
     public List<Cliente> listar(String filtro, int pagina, int limite) throws NegocioException {
+        return listar(filtro, null, null, null, null, pagina, limite);
+    }
+
+    public List<Cliente> listar(String filtro, String documento, String municipio,
+                                String tipoPessoa, String status, int pagina, int limite)
+            throws NegocioException {
         List<Cliente> lista = new ArrayList<>();
         int offset = (pagina - 1) * limite;
 
-        String sql = "SELECT id, tipo_pessoa, nome_razao_social, nome_fantasia, documento, inscricao_estadual, " +
-                     "logradouro, numero, complemento, bairro, municipio, uf, cep, " +
-                     "telefone, email, status " +
-                     "FROM cliente " +
-                     "WHERE nome_razao_social ILIKE ? " +
-                     "ORDER BY nome_razao_social " +
-                     "LIMIT ? OFFSET ?";
+        StringBuilder sql = new StringBuilder(
+            "SELECT id, tipo_pessoa, nome_razao_social, nome_fantasia, documento, inscricao_estadual, " +
+            "logradouro, numero, complemento, bairro, municipio, uf, cep, " +
+            "telefone, email, status FROM cliente WHERE 1=1");
+        List<String> parametros = new ArrayList<>();
+        adicionarFiltros(sql, parametros, filtro, documento, municipio, tipoPessoa, status);
+        sql.append(" ORDER BY nome_razao_social LIMIT ? OFFSET ?");
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-            stmt.setString(1, "%" + (filtro != null ? filtro : "") + "%");
-            stmt.setInt(2, limite);
-            stmt.setInt(3, offset);
+            int indice = preencherParametros(stmt, parametros);
+            stmt.setInt(indice++, limite);
+            stmt.setInt(indice, offset);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -43,12 +49,19 @@ public class ClienteDAO {
     }
 
     public int contarTotal(String filtro) throws NegocioException {
-        String sql = "SELECT COUNT(*) FROM cliente WHERE nome_razao_social ILIKE ?";
+        return contarTotal(filtro, null, null, null, null);
+    }
+
+    public int contarTotal(String filtro, String documento, String municipio,
+                           String tipoPessoa, String status) throws NegocioException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM cliente WHERE 1=1");
+        List<String> parametros = new ArrayList<>();
+        adicionarFiltros(sql, parametros, filtro, documento, municipio, tipoPessoa, status);
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-            stmt.setString(1, "%" + (filtro != null ? filtro : "") + "%");
+            preencherParametros(stmt, parametros);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
@@ -58,6 +71,57 @@ public class ClienteDAO {
             throw new NegocioException("Erro ao contar clientes.", e);
         }
         return 0;
+    }
+
+    private void adicionarFiltros(StringBuilder sql, List<String> parametros, String filtro,
+                                  String documento, String municipio, String tipoPessoa, String status) {
+        String filtroNome = normalizarTexto(filtro);
+        if (filtroNome != null) {
+            sql.append(" AND nome_razao_social ILIKE ?");
+            parametros.add("%" + filtroNome + "%");
+        }
+
+        String filtroDocumento = somenteDigitos(documento);
+        if (filtroDocumento != null && !filtroDocumento.isEmpty()) {
+            sql.append(" AND documento LIKE ?");
+            parametros.add("%" + filtroDocumento + "%");
+        }
+
+        String filtroMunicipio = normalizarTexto(municipio);
+        if (filtroMunicipio != null) {
+            sql.append(" AND municipio ILIKE ?");
+            parametros.add("%" + filtroMunicipio + "%");
+        }
+
+        String filtroTipoPessoa = normalizarTexto(tipoPessoa);
+        if (filtroTipoPessoa != null) {
+            sql.append(" AND tipo_pessoa = ?");
+            parametros.add(filtroTipoPessoa);
+        }
+
+        String filtroStatus = normalizarTexto(status);
+        if (filtroStatus != null) {
+            sql.append(" AND status = ?");
+            parametros.add(filtroStatus);
+        }
+    }
+
+    private int preencherParametros(PreparedStatement stmt, List<String> parametros) throws SQLException {
+        int indice = 1;
+        for (String parametro : parametros) {
+            stmt.setString(indice++, parametro);
+        }
+        return indice;
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) return null;
+        String texto = valor.trim();
+        return texto.isEmpty() ? null : texto;
+    }
+
+    private String somenteDigitos(String valor) {
+        return valor != null ? valor.replaceAll("[^0-9]", "") : null;
     }
 
     public Cliente buscarPorId(int id) throws NegocioException {

@@ -12,13 +12,26 @@ public class ClienteBO {
     private final ClienteDAO clienteDAO = new ClienteDAO();
 
     public List<Cliente> listar(String filtro, int pagina, int limite) throws NegocioException {
+        return listar(filtro, null, null, null, null, pagina, limite);
+    }
+
+    public List<Cliente> listar(String filtro, String documento, String municipio,
+                                String tipoPessoa, String status, int pagina, int limite)
+            throws NegocioException {
         if (pagina < 1) pagina = 1;
         if (limite < 1) limite = 10;
-        return clienteDAO.listar(filtro, pagina, limite);
+        return clienteDAO.listar(filtro, documento, municipio, tipoPessoa, status, pagina, limite);
     }
 
     public int contarPaginas(String filtro, int limite) throws NegocioException {
-        int total = clienteDAO.contarTotal(filtro);
+        return contarPaginas(filtro, null, null, null, null, limite);
+    }
+
+    public int contarPaginas(String filtro, String documento, String municipio,
+                             String tipoPessoa, String status, int limite)
+            throws NegocioException {
+        if (limite < 1) limite = 10;
+        int total = clienteDAO.contarTotal(filtro, documento, municipio, tipoPessoa, status);
         return (int) Math.ceil((double) total / limite);
     }
 

@@ -39,15 +39,42 @@
         </c:if>
 
         <section class="card filter-card">
-            <form class="filter-form" action="${pageContext.request.contextPath}/ClienteControlador" method="get" name="formulario">
+            <form class="filter-form cliente-filter-form" action="${pageContext.request.contextPath}/ClienteControlador" method="get" name="formulario">
                 <input type="hidden" name="acao" value="listar">
                 <div class="form-field">
                     <label for="filtro">Nome ou razão social</label>
                     <input type="text" name="filtro" id="filtro" class="inputtexto"
                            value="<c:out value='${filtro}'/>"/>
                 </div>
+                <div class="form-field">
+                    <label for="documento">CPF / CNPJ</label>
+                    <input type="text" name="documento" id="documento" class="inputtexto"
+                           value="<c:out value='${documento}'/>"/>
+                </div>
+                <div class="form-field">
+                    <label for="municipio">Município</label>
+                    <input type="text" name="municipio" id="municipio" class="inputtexto"
+                           value="<c:out value='${municipio}'/>"/>
+                </div>
+                <div class="form-field">
+                    <label for="tipoPessoa">Tipo</label>
+                    <select name="tipoPessoa" id="tipoPessoa" class="inputtexto">
+                        <option value="">Todos</option>
+                        <option value="F" ${tipoPessoa == 'F' ? 'selected' : ''}>Físico</option>
+                        <option value="J" ${tipoPessoa == 'J' ? 'selected' : ''}>Jurídico</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="inputtexto">
+                        <option value="">Todos</option>
+                        <option value="ATIVO" ${status == 'ATIVO' ? 'selected' : ''}>Ativo</option>
+                        <option value="INATIVO" ${status == 'INATIVO' ? 'selected' : ''}>Inativo</option>
+                    </select>
+                </div>
                 <div class="app-actions">
                     <input type="submit" class="inputbotao" value="Pesquisar"/>
+                    <a class="link-button" href="${pageContext.request.contextPath}/ClienteControlador?acao=listar">Limpar</a>
                 </div>
             </form>
         </section>
@@ -55,12 +82,13 @@
         <section class="table-wrap">
             <table class="bordaFina data-table" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td class="tabela" width="12%">Ações</td>
-                    <td class="tabela" width="8%">Tipo</td>
-                    <td class="tabela" width="30%">Nome / Razão social</td>
-                    <td class="tabela" width="20%">Nome fantasia</td>
-                    <td class="tabela" width="18%">CPF / CNPJ</td>
-                    <td class="tabela" width="12%">Status</td>
+                    <td class="tabela" width="10%">Ações</td>
+                    <td class="tabela" width="7%">Tipo</td>
+                    <td class="tabela" width="25%">Nome / Razão social</td>
+                    <td class="tabela" width="18%">Nome fantasia</td>
+                    <td class="tabela" width="16%">Município</td>
+                    <td class="tabela" width="14%">CPF / CNPJ</td>
+                    <td class="tabela" width="10%">Status</td>
                 </tr>
                 <c:forEach var="cliente" varStatus="st" items="${listaClientes}">
                     <tr class="${st.count % 2 == 0 ? 'CelulaZebra1' : 'CelulaZebra2'}">
@@ -79,12 +107,13 @@
                         </td>
                         <td><c:out value="${cliente.nomeRazaoSocial}"/></td>
                         <td><c:out value="${cliente.nomeFantasia}"/></td>
+                        <td><c:out value="${cliente.municipio}"/></td>
                         <td><c:out value="${cliente.documentoFormatado}"/></td>
                         <td><span class="status-${cliente.status}"><c:out value="${cliente.status}"/></span></td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty listaClientes}">
-                    <tr><td colspan="6" class="empty-state">Nenhum cliente encontrado.</td></tr>
+                    <tr><td colspan="7" class="empty-state">Nenhum cliente encontrado.</td></tr>
                 </c:if>
             </table>
         </section>
@@ -97,6 +126,10 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual - 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:param name="documento" value="${documento}"/>
+                        <c:param name="municipio" value="${municipio}"/>
+                        <c:param name="tipoPessoa" value="${tipoPessoa}"/>
+                        <c:param name="status" value="${status}"/>
                     </c:url>
                     <a class="link-button" href="${clienteAnteriorUrl}">Anterior</a>
                 </c:if>
@@ -105,6 +138,10 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual + 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:param name="documento" value="${documento}"/>
+                        <c:param name="municipio" value="${municipio}"/>
+                        <c:param name="tipoPessoa" value="${tipoPessoa}"/>
+                        <c:param name="status" value="${status}"/>
                     </c:url>
                     <a class="link-button" href="${clienteProximoUrl}">Próximo</a>
                 </c:if>

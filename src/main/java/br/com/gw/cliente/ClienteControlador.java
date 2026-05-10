@@ -77,11 +77,19 @@ public class ClienteControlador extends HttpServlet {
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
         String filtro    = req.getParameter("filtro");
-        int pagina       = parsePagina(req.getParameter("pagina"));
-        List<Cliente> lista  = clienteBO.listar(filtro, pagina, LIMITE);
-        int totalPaginas     = clienteBO.contarPaginas(filtro, LIMITE);
+        String documento  = req.getParameter("documento");
+        String municipio  = req.getParameter("municipio");
+        String tipoPessoa = req.getParameter("tipoPessoa");
+        String status     = req.getParameter("status");
+        int pagina        = parsePagina(req.getParameter("pagina"));
+        List<Cliente> lista  = clienteBO.listar(filtro, documento, municipio, tipoPessoa, status, pagina, LIMITE);
+        int totalPaginas     = clienteBO.contarPaginas(filtro, documento, municipio, tipoPessoa, status, LIMITE);
         req.setAttribute("listaClientes",    lista);
         req.setAttribute("filtro",           filtro);
+        req.setAttribute("documento",        documento);
+        req.setAttribute("municipio",        municipio);
+        req.setAttribute("tipoPessoa",       tipoPessoa);
+        req.setAttribute("status",           status);
         req.setAttribute("paginaAtual",      pagina);
         req.setAttribute("totalPaginas",     totalPaginas);
         req.setAttribute("limiteResultados", LIMITE);
