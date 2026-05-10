@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ public class ClienteControlador extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(ClienteControlador.class.getName());
     private static final int LIMITE = 10;
+    private static final String SUCESSO_CLIENTE = "clienteSucesso";
 
     private final ClienteBO clienteBO = new ClienteBO();
 
@@ -83,6 +85,7 @@ public class ClienteControlador extends HttpServlet {
         req.setAttribute("paginaAtual",      pagina);
         req.setAttribute("totalPaginas",     totalPaginas);
         req.setAttribute("limiteResultados", LIMITE);
+        carregarMensagemSucesso(req);
         req.getRequestDispatcher("/WEB-INF/views/cliente/listarCliente.jsp").forward(req, resp);
     }
 
@@ -109,6 +112,7 @@ public class ClienteControlador extends HttpServlet {
     private void salvar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
         clienteBO.salvar(montarClienteDaRequisicao(req));
+        req.getSession().setAttribute(SUCESSO_CLIENTE, "Cliente cadastrado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/ClienteControlador?acao=listar");
     }
 
@@ -117,6 +121,7 @@ public class ClienteControlador extends HttpServlet {
         Cliente c = montarClienteDaRequisicao(req);
         c.setId(Integer.parseInt(req.getParameter("id")));
         clienteBO.atualizar(c);
+        req.getSession().setAttribute(SUCESSO_CLIENTE, "Cliente atualizado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/ClienteControlador?acao=listar");
     }
 
@@ -149,5 +154,16 @@ public class ClienteControlador extends HttpServlet {
     private int parsePagina(String valor) {
         try { return Math.max(1, Integer.parseInt(valor)); }
         catch (Exception e) { return 1; }
+    }
+
+    private void carregarMensagemSucesso(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return;
+
+        Object sucesso = session.getAttribute(SUCESSO_CLIENTE);
+        if (sucesso != null) {
+            req.setAttribute("sucesso", sucesso);
+            session.removeAttribute(SUCESSO_CLIENTE);
+        }
     }
 }

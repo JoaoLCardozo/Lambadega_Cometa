@@ -34,6 +34,9 @@
         <c:if test="${not empty erro}">
             <div class="alert alert-error"><c:out value="${erro}"/></div>
         </c:if>
+        <c:if test="${not empty sucesso}">
+            <div class="alert alert-success"><c:out value="${sucesso}"/></div>
+        </c:if>
 
         <section class="card filter-card">
             <form class="filter-form" action="${pageContext.request.contextPath}/ClienteControlador" method="get" name="formulario">
