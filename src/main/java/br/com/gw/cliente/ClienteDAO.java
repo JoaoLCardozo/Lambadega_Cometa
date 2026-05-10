@@ -264,7 +264,8 @@ public class ClienteDAO {
         c.setComplemento(rs.getString("complemento"));
         c.setBairro(rs.getString("bairro"));
         c.setMunicipio(rs.getString("municipio"));
-        c.setUf(rs.getString("uf"));
+        String uf = normalizarTexto(rs.getString("uf"));
+        c.setUf(uf != null ? uf.toUpperCase() : null);
         c.setCep(rs.getString("cep"));
         c.setTelefone(rs.getString("telefone"));
         c.setEmail(rs.getString("email"));

@@ -3,11 +3,19 @@ package br.com.gw.cliente;
 import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class ClienteBO {
     private static final Logger logger = Logger.getLogger(ClienteBO.class.getName());
+    private static final Set<String> UFS_VALIDAS = new HashSet<>(Arrays.asList(
+        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
+        "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
+        "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+    ));
 
     private final ClienteDAO clienteDAO = new ClienteDAO();
 
@@ -93,13 +101,48 @@ public class ClienteBO {
         if (clienteDAO.existeDocumento(documento, idIgnorar)) {
             throw new CadastroException("Já existe um cliente cadastrado com este documento.");
         }
+        validarUf(c);
+        validarEmail(c);
         if (c.getStatus() == null) {
             c.setStatus(Cliente.Status.ATIVO);
         }
     }
 
+    private void validarUf(Cliente c) throws CadastroException {
+        String uf = normalizarTexto(c.getUf());
+        if (uf == null) {
+            c.setUf(null);
+            return;
+        }
+
+        uf = uf.toUpperCase();
+        if (!UFS_VALIDAS.contains(uf)) {
+            throw new CadastroException("A UF informada é inválida.");
+        }
+        c.setUf(uf);
+    }
+
+    private void validarEmail(Cliente c) throws CadastroException {
+        String email = normalizarTexto(c.getEmail());
+        if (email == null) {
+            c.setEmail(null);
+            return;
+        }
+
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new CadastroException("O e-mail informado é inválido.");
+        }
+        c.setEmail(email);
+    }
+
     private String somenteDigitos(String valor) {
         return valor != null ? valor.replaceAll("[^0-9]", "") : null;
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) return null;
+        String texto = valor.trim();
+        return texto.isEmpty() ? null : texto;
     }
 
     /**

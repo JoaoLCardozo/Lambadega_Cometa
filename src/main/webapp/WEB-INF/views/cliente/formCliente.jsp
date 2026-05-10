@@ -106,13 +106,41 @@
                     <input type="text" name="cep" id="cep" class="inputtexto"
                            size="10" maxlength="9" style="max-width: 150px;"
                            placeholder="00000-000"
+                           title="Digite o CEP para preencher o endereço automaticamente"
                            value="<c:out value='${cliente.cep}'/>"/>
                 </td>
                 <td class="CelulaZebra1">UF:</td>
                 <td class="CelulaZebra1">
-                    <input type="text" name="uf" class="inputtexto" size="3" maxlength="2"
-                           style="max-width: 72px;"
-                           value="<c:out value='${cliente.uf}'/>"/>
+                    <select name="uf" class="inputtexto" style="max-width: 180px;">
+                        <option value="">Selecione</option>
+                        <option value="AC" ${cliente.uf == 'AC' ? 'selected' : ''}>AC</option>
+                        <option value="AL" ${cliente.uf == 'AL' ? 'selected' : ''}>AL</option>
+                        <option value="AP" ${cliente.uf == 'AP' ? 'selected' : ''}>AP</option>
+                        <option value="AM" ${cliente.uf == 'AM' ? 'selected' : ''}>AM</option>
+                        <option value="BA" ${cliente.uf == 'BA' ? 'selected' : ''}>BA</option>
+                        <option value="CE" ${cliente.uf == 'CE' ? 'selected' : ''}>CE</option>
+                        <option value="DF" ${cliente.uf == 'DF' ? 'selected' : ''}>DF</option>
+                        <option value="ES" ${cliente.uf == 'ES' ? 'selected' : ''}>ES</option>
+                        <option value="GO" ${cliente.uf == 'GO' ? 'selected' : ''}>GO</option>
+                        <option value="MA" ${cliente.uf == 'MA' ? 'selected' : ''}>MA</option>
+                        <option value="MT" ${cliente.uf == 'MT' ? 'selected' : ''}>MT</option>
+                        <option value="MS" ${cliente.uf == 'MS' ? 'selected' : ''}>MS</option>
+                        <option value="MG" ${cliente.uf == 'MG' ? 'selected' : ''}>MG</option>
+                        <option value="PA" ${cliente.uf == 'PA' ? 'selected' : ''}>PA</option>
+                        <option value="PB" ${cliente.uf == 'PB' ? 'selected' : ''}>PB</option>
+                        <option value="PR" ${cliente.uf == 'PR' ? 'selected' : ''}>PR</option>
+                        <option value="PE" ${cliente.uf == 'PE' ? 'selected' : ''}>PE</option>
+                        <option value="PI" ${cliente.uf == 'PI' ? 'selected' : ''}>PI</option>
+                        <option value="RJ" ${cliente.uf == 'RJ' ? 'selected' : ''}>RJ</option>
+                        <option value="RN" ${cliente.uf == 'RN' ? 'selected' : ''}>RN</option>
+                        <option value="RS" ${cliente.uf == 'RS' ? 'selected' : ''}>RS</option>
+                        <option value="RO" ${cliente.uf == 'RO' ? 'selected' : ''}>RO</option>
+                        <option value="RR" ${cliente.uf == 'RR' ? 'selected' : ''}>RR</option>
+                        <option value="SC" ${cliente.uf == 'SC' ? 'selected' : ''}>SC</option>
+                        <option value="SP" ${cliente.uf == 'SP' ? 'selected' : ''}>SP</option>
+                        <option value="SE" ${cliente.uf == 'SE' ? 'selected' : ''}>SE</option>
+                        <option value="TO" ${cliente.uf == 'TO' ? 'selected' : ''}>TO</option>
+                    </select>
                 </td>
             </tr>
             <tr>
