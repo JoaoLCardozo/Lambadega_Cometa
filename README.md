@@ -1,45 +1,39 @@
 # Lambadega Cometa - Sistema de Gestão de Fretes
 
-Sistema Java Web para controle do ciclo de vida de fretes: autenticação, cadastros base, emissão de fretes, confirmação de saída, registro de ocorrências e acompanhamento de status.
+Sistema Java Web para gestão operacional de fretes. O projeto cobre autenticação, recuperação de senha, cadastros base, emissão de fretes, acompanhamento de status, ocorrências, relatórios e um monitor operacional para apoiar a tomada de decisão.
 
-O projeto foi desenvolvido para o projeto avaliativo **Sistema de Gestão de Fretes**, usando Java 8, JSP, Servlets, JDBC, PostgreSQL, Gradle/Gretty e JasperReports.
+Foi desenvolvido para avaliação prática usando Java 8, JSP, Servlets, JDBC, PostgreSQL, Gradle/Gretty, Tomcat 9 e JasperReports.
 
 ## Tecnologias Utilizadas
 
 - Java 8
-- JSP e JSTL
-- Servlets
+- JSP, JSTL e Servlets
 - JDBC
 - PostgreSQL
-- Gradle
-- Gretty com Tomcat 9
+- Gradle e Gretty
+- Tomcat 9
 - JasperReports
-- Git/GitHub
+- JavaMail
+- HTML, CSS e JavaScript
 
-## Pré-requisitos
+## Funcionalidades
 
-Antes de rodar o projeto, instale e configure:
+- Login com sessão e filtro de autenticação
+- Recuperação de senha por e-mail com código de verificação
+- Senhas armazenadas com hash PBKDF2
+- Cadastro, edição, listagem e exclusão controlada de clientes
+- Cadastro, edição, listagem e inativação controlada de motoristas
+- Cadastro, edição, listagem e exclusão controlada de veículos
+- Emissão, confirmação de saída, entrega, não entrega e cancelamento de fretes
+- Registro de ocorrências de frete
+- Monitor de Fretes com indicadores, alertas, fretes críticos e ranking dos 3 melhores motoristas
+- Relatórios PDF com JasperReports
+- Exportação CSV da listagem de fretes
+- Validações de negócio no backend
+- Máscaras e melhorias de UX nos formulários
+- Tratamento amigável para erros e páginas não encontradas
 
-- JDK 8
-- PostgreSQL
-- Git
-- Permissão de execução no Gradle Wrapper do projeto
-
-Verifique as versões:
-
-```bash
-java -version
-psql --version
-git --version
-```
-
-Se o `gradlew` não tiver permissão de execução:
-
-```bash
-chmod +x gradlew
-```
-
-## Estrutura do Projeto
+## Estrutura
 
 ```text
 .
@@ -47,23 +41,26 @@ chmod +x gradlew
 ├── gradlew
 ├── sql
 │   ├── 00_drop_database.sql
-│   └── 01_create_database.sql
+│   ├── 01_create_database.sql
+│   └── 02_popular_monitor_fretes.sql
 ├── src/main/java/br/com/gw
 │   ├── cliente
 │   ├── exception
 │   ├── filter
 │   ├── frete
+│   ├── monitorfretes
 │   ├── motorista
 │   ├── usuario
 │   ├── util
 │   └── veiculo
 ├── src/main/resources
-│   └── db.properties
+│   ├── db.properties
+│   ├── email.properties
+│   └── relatorios
 └── src/main/webapp
-    ├── WEB-INF
-    │   ├── web.xml
-    │   └── views
+    ├── WEB-INF/views
     ├── css
+    ├── js
     ├── erro.jsp
     └── index.jsp
 ```
@@ -76,252 +73,220 @@ O fluxo principal segue o padrão:
 JSP -> Controller/Servlet -> BO -> DAO -> PostgreSQL
 ```
 
-Responsabilidades:
+- **JSP:** telas, formulários, mensagens e listagens.
+- **Controller/Servlet:** recebe requisições, monta objetos e direciona o fluxo.
+- **BO:** concentra regras de negócio, validações e transações.
+- **DAO:** executa SQL parametrizado e mapeia resultados.
+- **PostgreSQL:** armazena usuários, clientes, motoristas, veículos, fretes e ocorrências.
 
-- **JSP:** renderiza telas, formulários, mensagens e dados recebidos do controller.
-- **Controller/Servlet:** recebe requisições HTTP, monta objetos a partir dos parâmetros, chama BOs e encaminha para JSPs.
-- **BO:** concentra regras de negócio, validações e transações JDBC.
-- **DAO:** executa SQL e mapeia dados do banco para objetos Java.
-- **PostgreSQL:** armazena os dados do sistema.
+## Pré-requisitos
 
-## Módulos Implementados
+- JDK 8
+- PostgreSQL
+- Git
+- Gradle Wrapper com permissão de execução
 
-- Login e autenticação por sessão
-- Filtro de autenticação para páginas protegidas
-- Cadastro de clientes
-- Cadastro de motoristas
-- Cadastro de veículos
-- Emissão e acompanhamento de fretes
-- Registro de ocorrências de frete
-- Relatório PDF de fretes em aberto com JasperReports
-- Romaneio PDF individual por frete com JasperReports
-- Exportação da listagem de fretes para CSV
-- Tratamento de exceções de negócio
-- Script SQL com estrutura e dados iniciais
+Verifique:
 
-## Relatórios JasperReports
-
-O sistema possui dois relatórios em PDF:
-
-- **Fretes em aberto**: disponível na listagem de fretes pelo botão **Imprimir fretes em aberto**. Considera fretes com status `EMITIDO`, `SAIDA_CONFIRMADA` e `EM_TRANSITO`.
-- **Romaneio de frete**: disponível no detalhe do frete pelo botão **Gerar romaneio PDF**.
-
-Os templates ficam em:
-
-```text
-src/main/resources/relatorios/fretes_abertos.jrxml
-src/main/resources/relatorios/romaneio_frete.jrxml
+```bash
+java -version
+psql --version
+git --version
 ```
 
-## Diferencial Escolhido
+Se necessário:
 
-O diferencial escolhido foi a **exportação da listagem de fretes para CSV**.
-
-A funcionalidade está integrada à tela de listagem de fretes:
-
-```text
-src/main/webapp/WEB-INF/views/frete/listarFrete.jsp
-src/main/java/br/com/gw/frete/FreteControlador.java
-src/main/java/br/com/gw/frete/FreteBO.java
-src/main/java/br/com/gw/frete/FreteDAO.java
+```bash
+chmod +x gradlew
 ```
 
-Na listagem de fretes existe o botão **Exportar CSV**. Ele respeita o filtro digitado na tela e gera um arquivo `.csv` com os fretes encontrados, incluindo número, status, datas, remetente, destinatário, motorista, veículo, origem, destino, carga e valores.
+## Banco de Dados
 
-Esse diferencial facilita a conferência operacional dos fretes fora do sistema, por exemplo em planilhas.
-
-## Configuração do Banco de Dados
-
-O projeto usa PostgreSQL. O banco padrão configurado no script é:
+O banco padrão do projeto é:
 
 ```text
 LambadegaCometa
 ```
 
-O script principal está em:
-
-```text
-sql/01_create_database.sql
-```
-
-Esse script:
-
-- remove o banco `LambadegaCometa`, se existir;
-- cria o banco novamente;
-- cria as tabelas principais;
-- cria constraints de integridade;
-- insere dados iniciais para teste.
-
-Tabelas principais:
-
-- `usuario`
-- `cliente`
-- `motorista`
-- `veiculo`
-- `frete`
-- `ocorrencia_frete`
-
-Dados iniciais incluídos:
-
-- 1 usuário administrador;
-- 3 clientes;
-- 3 motoristas;
-- 3 veículos;
-- 5 fretes em status diferentes;
-- ocorrências de exemplo.
-
-## Criando o Banco do Zero
-
-Entre na raiz do projeto:
-
-```bash
-cd /home/estagiario1/Documentos/Lambadega_Cometa
-```
-
-Execute o script como um usuário PostgreSQL com permissão para criar banco de dados:
+Crie o banco do zero com:
 
 ```bash
 psql -U postgres -f sql/01_create_database.sql
 ```
 
-Se o PostgreSQL estiver usando autenticação local por usuário do sistema, use:
+Se seu PostgreSQL usa autenticação local por usuário do sistema:
 
 ```bash
 sudo -u postgres psql -f sql/01_create_database.sql
 ```
 
-Atenção: o script contém `DROP DATABASE IF EXISTS LambadegaCometa`. Ele apaga e recria o banco. Não rode esse script em um banco com dados importantes.
+O script `sql/01_create_database.sql` recria o banco, então ele apaga dados existentes. Use apenas em ambiente local ou de demonstração.
 
-Para conferir se o banco foi criado:
+Dados iniciais incluídos:
+
+- 1 usuário de teste
+- Clientes, motoristas, veículos, fretes e ocorrências de exemplo
+- Tabela de recuperação de senha
+- Triggers de atualização de status de veículo vinculadas ao ciclo do frete
+
+Para popular uma base com mais dados para o Monitor de Fretes:
 
 ```bash
-psql -U postgres -d LambadegaCometa -c "\dt"
+psql -U postgres -d LambadegaCometa -f sql/02_popular_monitor_fretes.sql
 ```
 
-Para conferir os dados iniciais:
+## Configuração do Banco
 
-```bash
-psql -U postgres -d LambadegaCometa -c "SELECT COUNT(*) FROM cliente;"
-psql -U postgres -d LambadegaCometa -c "SELECT COUNT(*) FROM motorista;"
-psql -U postgres -d LambadegaCometa -c "SELECT COUNT(*) FROM veiculo;"
-psql -U postgres -d LambadegaCometa -c "SELECT status, COUNT(*) FROM frete GROUP BY status;"
-```
-
-## Configurando o `db.properties`
-
-A conexão com o banco é carregada pela classe:
-
-```text
-src/main/java/br/com/gw/util/ConnectionFactory.java
-```
-
-Ela procura o arquivo:
+Crie ou ajuste o arquivo:
 
 ```text
 src/main/resources/db.properties
 ```
 
-Crie esse arquivo com o seguinte conteúdo, ajustando usuário e senha conforme sua instalação local:
+Exemplo:
 
 ```properties
 db.url=jdbc:postgresql://localhost:5432/LambadegaCometa
 db.usuario=postgres
-db.senha=sua_senha_aqui
-```
-
-Exemplo para ambiente local:
-
-```properties
-db.url=jdbc:postgresql://localhost:5432/LambadegaCometa
-db.usuario=postgres
-db.senha=1234
-```
-
-Importante:
-
-- `db.properties` contém credenciais reais e não deve ser versionado.
-- O `.gitignore` do projeto deve conter `db.properties`.
-- Em uma entrega final, o ideal é manter apenas um `db.properties.example` com dados fictícios.
-
-Modelo recomendado para `db.properties.example`:
-
-```properties
-db.url=jdbc:postgresql://localhost:5432/LambadegaCometa
-db.usuario=seu_usuario
 db.senha=sua_senha
 ```
 
-## Compilando o Projeto
+Esse arquivo contém credenciais locais e não deve conter dados reais em commits públicos.
 
-Na raiz do projeto, execute:
+## Configuração de E-mail
+
+A recuperação de senha usa SMTP e lê as configurações em:
+
+```text
+src/main/resources/email.properties
+```
+
+Exemplo para Gmail com senha de app:
+
+```properties
+email.smtp.host=smtp.gmail.com
+email.smtp.port=587
+email.smtp.auth=true
+email.smtp.starttls.enable=true
+
+email.usuario=seuemail@gmail.com
+email.senha=sua_senha_de_app
+email.remetente=seuemail@gmail.com
+email.nomeRemetente=Lambadega Cometa
+```
+
+No Gmail, use uma senha de app, não a senha normal da conta. O `email.usuario` e o `email.remetente` devem ser o mesmo e-mail na configuração mais simples.
+
+## Executando
+
+Compile:
 
 ```bash
 ./gradlew clean build
 ```
 
-Se o build finalizar corretamente, o WAR será gerado em:
-
-```text
-build/libs/
-```
-
-## Rodando Localmente
-
-O projeto usa Gretty com Tomcat 9. Para subir a aplicação:
+Suba a aplicação:
 
 ```bash
 ./gradlew appRun
 ```
 
-Depois acesse:
+Acesse:
 
 ```text
 http://localhost:8080/SISTEMA-FRETES/LoginControlador
 ```
 
-Context path configurado:
+Usuário inicial:
 
 ```text
-/SISTEMA-FRETES
-```
-
-Configuração no Gradle:
-
-```groovy
-gretty {
-   servletContainer = 'tomcat9'
-   contextPath = '/SISTEMA-FRETES'
-}
-```
-
-## Usuário Inicial
-
-O script SQL cria um usuário administrador para teste:
-
-```text
-Usuário: admin
+Usuário: usuario
 Senha: 123456
 ```
 
-Essa senha é apenas para ambiente local e dados de demonstração.
+## Módulos
 
-## Fluxo Básico de Uso
+### Usuários e Login
 
-1. Acesse a tela de login.
-2. Entre com o usuário `admin`.
-3. Cadastre ou consulte clientes.
-4. Cadastre ou consulte motoristas.
-5. Cadastre ou consulte veículos.
-6. Emita um novo frete.
-7. Acompanhe o detalhe do frete.
-8. Exporte a listagem de fretes para CSV, se precisar conferir os dados em planilha.
-9. Confirme saída.
-10. Registre ocorrências.
-11. Finalize como entregue, não entregue ou cancelado, conforme o fluxo permitido.
+- Login por usuário e senha
+- Sessão protegida por filtro de autenticação
+- Cadastro e listagem de usuários
+- Recuperação de senha por e-mail com código temporário
+- Hash de senha com PBKDF2
+
+### Clientes
+
+- Cadastro de pessoa física e jurídica
+- Máscaras para CPF/CNPJ, CEP e telefone
+- Integração ViaCEP no formulário
+- Validação de e-mail e UF
+- Status ativo/inativo
+- Filtros por nome/razão social, documento, município, tipo e status
+- Clientes inativos não aparecem para novos fretes
+- Cliente vinculado a frete não pode ser excluído
+
+### Motoristas
+
+- Cadastro com CPF, telefone, CNH, categoria, validade e tipo de vínculo
+- Validação de CPF, CNH, idade mínima e CNH vencida
+- Bloqueio de CPF e CNH duplicados
+- Filtros por nome, CPF, status, tipo de vínculo e categoria CNH
+- Rótulos amigáveis na listagem
+- Alerta visual para CNH vencida
+- Motorista inativo não aparece para novos fretes
+- Motorista com frete ativo não pode ser inativado
+
+### Veículos
+
+- Cadastro com placa, RNTRC, ano, tipo, tara, capacidade, volume e status
+- Aceita placa antiga e Mercosul
+- Placa convertida para maiúscula automaticamente
+- Validações de ano, tara, capacidade, volume e RNTRC
+- Bloqueio de placa duplicada
+- Filtros por placa, tipo, status e ano
+- Status exibido com rótulo amigável
+- Veículo em viagem ou manutenção não aparece para novos fretes
+- Veículo vinculado a frete não pode ser excluído
+
+### Fretes
+
+- Emissão de fretes com remetente, destinatário, motorista e veículo
+- Cálculo de ICMS e valor total
+- Controle de status
+- Confirmação de saída
+- Registro de ocorrências
+- Finalização como entregue, não entregue ou cancelado
+- Uso de transações JDBC para operações que alteram frete e veículo
+- Exportação CSV da listagem
+
+### Monitor de Fretes
+
+O Monitor de Fretes reúne uma visão operacional do sistema:
+
+- Indicadores gerais
+- Distribuição por status
+- Alertas operacionais
+- Fretes atrasados ou críticos
+- Ranking dos 3 melhores motoristas do mês
+- Atalhos para clientes, frota e performance por motorista
+
+## Relatórios
+
+O sistema possui três relatórios PDF com JasperReports:
+
+- **Fretes em aberto:** considera fretes `EMITIDO`, `SAIDA_CONFIRMADA` e `EM_TRANSITO`.
+- **Romaneio de frete:** documento individual do frete.
+- **Performance de motoristas:** consulta por motorista e período.
+
+Templates:
+
+```text
+src/main/resources/relatorios/fretes_abertos.jrxml
+src/main/resources/relatorios/romaneio_frete.jrxml
+src/main/resources/relatorios/performance_motorista.jrxml
+```
 
 ## Status de Frete
-
-O sistema utiliza enum para status de frete:
 
 ```text
 EMITIDO
@@ -332,7 +297,7 @@ NAO_ENTREGUE
 CANCELADO
 ```
 
-Fluxo esperado:
+Fluxo principal:
 
 ```text
 EMITIDO -> SAIDA_CONFIRMADA -> EM_TRANSITO -> ENTREGUE
@@ -341,71 +306,16 @@ EMITIDO -> SAIDA_CONFIRMADA -> EM_TRANSITO -> ENTREGUE
 EMITIDO -> CANCELADO
 ```
 
-## Tipos de Ocorrência
+## Segurança e Validações
 
-O sistema utiliza enum para tipos de ocorrência:
-
-```text
-SAIDA_DO_PATIO
-EM_ROTA
-TENTATIVA_ENTREGA
-ENTREGA_REALIZADA
-AVARIA
-EXTRAVIO
-OUTROS
-```
-
-## Transações JDBC
-
-Operações que alteram mais de uma informação importante são feitas com transação JDBC manual no BO, usando:
-
-```java
-conn.setAutoCommit(false);
-conn.commit();
-conn.rollback();
-```
-
-Exemplos:
-
-- confirmar saída do frete;
-- atualizar status do veículo para `EM_VIAGEM`;
-- registrar entrega;
-- atualizar status do frete;
-- devolver veículo para `DISPONIVEL`;
-- registrar ocorrências.
-
-## Tratamento de Erros
-
-O projeto possui exceções próprias em:
-
-```text
-src/main/java/br/com/gw/exception
-```
-
-Principais exceções:
-
-- `NegocioException`
-- `CadastroException`
-- `FreteException`
-- `DAOException`
-- `AuthenticationException`
-- `ValidationException`
-
-As exceções de negócio são capturadas pelos controllers e enviadas para as JSPs como mensagens amigáveis.
-
-## Arquivos SQL
-
-```text
-sql/00_drop_database.sql
-```
-
-Script auxiliar para remover tabelas/banco em ambiente de desenvolvimento.
-
-```text
-sql/01_create_database.sql
-```
-
-Script principal para criar o banco, tabelas, constraints e dados iniciais.
+- SQL com `PreparedStatement`
+- Normalização de campos de texto
+- Bloqueio de entradas com HTML/script em campos sensíveis
+- Tratamento amigável para IDs inexistentes
+- Hash de senha com PBKDF2
+- Código de recuperação de senha salvo com hash e expiração
+- Cookies de sessão com `http-only`
+- Mensagens de erro e sucesso padronizadas
 
 ## Comandos Úteis
 
@@ -421,28 +331,22 @@ Rodar:
 ./gradlew appRun
 ```
 
-Parar o servidor Gretty:
-
-```bash
-Ctrl + C
-```
-
 Recriar banco:
 
 ```bash
 psql -U postgres -f sql/01_create_database.sql
 ```
 
-Entrar no banco:
+Popular Monitor de Fretes:
 
 ```bash
-psql -U postgres -d LambadegaCometa
+psql -U postgres -d LambadegaCometa -f sql/02_popular_monitor_fretes.sql
 ```
 
-Listar tabelas:
+Consultar tabelas:
 
-```sql
-\dt
+```bash
+psql -U postgres -d LambadegaCometa -c "\dt"
 ```
 
 Consultar fretes:
@@ -452,13 +356,6 @@ SELECT numero, status, data_emissao, data_previsao_entrega
 FROM frete
 ORDER BY id;
 ```
-
-## Observações de Segurança
-
-- Não commitar `db.properties` com senha real.
-- Não usar a senha `123456` em ambiente real.
-- Em produção, senhas de usuários devem ser armazenadas com hash.
-- O usuário do banco usado pela aplicação deve ter apenas as permissões necessárias.
 
 ## Solução de Problemas
 
@@ -470,18 +367,6 @@ Verifique se o PostgreSQL está rodando:
 sudo systemctl status postgresql
 ```
 
-Se necessário:
-
-```bash
-sudo systemctl start postgresql
-```
-
-Confira se o banco existe:
-
-```bash
-psql -U postgres -l
-```
-
 Confira o arquivo:
 
 ```text
@@ -490,23 +375,27 @@ src/main/resources/db.properties
 
 ### Porta 8080 ocupada
 
-Verifique o processo usando a porta:
+Verifique o processo:
 
 ```bash
 sudo lsof -i :8080
 ```
 
-Finalize o processo, se for seguro:
+Finalize apenas se tiver certeza:
 
 ```bash
 sudo kill -9 PID
 ```
 
-Depois rode novamente:
+### E-mail de recuperação não é enviado
 
-```bash
-./gradlew appRun
-```
+Confira:
+
+- `email.properties` está preenchido
+- SMTP, porta e TLS estão corretos
+- Gmail usa senha de app
+- `email.usuario` e `email.remetente` são compatíveis
+- O usuário informado possui e-mail cadastrado e está ativo
 
 ### Tela de login não abre
 
@@ -516,17 +405,7 @@ Use a URL do controller:
 http://localhost:8080/SISTEMA-FRETES/LoginControlador
 ```
 
-As JSPs internas ficam dentro de `WEB-INF/views` e não devem ser acessadas diretamente pelo navegador.
-
-### Alterei o SQL e nada mudou
-
-Rode novamente o script de criação:
-
-```bash
-psql -U postgres -f sql/01_create_database.sql
-```
-
-Lembre-se: esse comando recria o banco e apaga os dados anteriores.
+As JSPs ficam dentro de `WEB-INF/views` e não devem ser acessadas diretamente pelo navegador.
 
 ## Checklist Para Rodar do Zero
 
@@ -535,12 +414,14 @@ Lembre-se: esse comando recria o banco e apaga os dados anteriores.
 3. Clonar o repositório.
 4. Entrar na pasta do projeto.
 5. Criar `src/main/resources/db.properties`.
-6. Ajustar usuário e senha do banco no `db.properties`.
-7. Rodar `psql -U postgres -f sql/01_create_database.sql`.
-8. Rodar `./gradlew clean build`.
-9. Rodar `./gradlew appRun`.
-10. Acessar `http://localhost:8080/SISTEMA-FRETES/LoginControlador`.
-11. Entrar com `admin` / `123456`.
+6. Ajustar conexão no `db.properties`.
+7. Configurar `src/main/resources/email.properties`, se for testar recuperação de senha.
+8. Rodar `psql -U postgres -f sql/01_create_database.sql`.
+9. Opcionalmente rodar `psql -U postgres -d LambadegaCometa -f sql/02_popular_monitor_fretes.sql`.
+10. Rodar `./gradlew clean build`.
+11. Rodar `./gradlew appRun`.
+12. Acessar `http://localhost:8080/SISTEMA-FRETES/LoginControlador`.
+13. Entrar com `usuario` / `123456`.
 
 ## Autor
 
