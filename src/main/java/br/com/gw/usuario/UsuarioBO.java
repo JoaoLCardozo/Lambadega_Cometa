@@ -7,6 +7,7 @@ import br.com.gw.exception.RecursoNaoEncontradoException;
 import br.com.gw.exception.ValidationException;
 import br.com.gw.util.EmailService;
 import br.com.gw.util.SegurancaUtils;
+import br.com.gw.util.SenhaUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -57,15 +58,22 @@ public class UsuarioBO {
                 throw new ValidationException("Senha deve ter pelo menos 4 caracteres");
             }
             
-            // Autenticar
-            Usuario usuarioAutenticado = usuarioDAO.autenticar(usuario, senha);
+            String usuarioNormalizado = usuario.trim();
+            String senhaNormalizada = senha.trim();
+            Usuario usuarioAutenticado = usuarioDAO.autenticar(usuarioNormalizado);
             
-            if (usuarioAutenticado == null) {
+            if (usuarioAutenticado == null
+                    || !SenhaUtils.verificar(senhaNormalizada, usuarioAutenticado.getSenha())) {
                 throw new AuthenticationException("Usuário ou senha incorretos");
             }
             
             if (!usuarioAutenticado.getAtivo()) {
                 throw new AuthenticationException("Usuário inativo");
+            }
+
+            if (!SenhaUtils.ehHash(usuarioAutenticado.getSenha())) {
+                usuarioDAO.atualizarSenha(
+                    usuarioAutenticado.getId(), SenhaUtils.gerarHash(senhaNormalizada));
             }
             
             return usuarioAutenticado;
@@ -149,6 +157,7 @@ public class UsuarioBO {
     public void inserir(Usuario usuario) throws ValidationException, NegocioException {
         try {
             validarUsuario(usuario);
+            usuario.setSenha(SenhaUtils.gerarHash(usuario.getSenha().trim()));
             
             // Verificar se o usuário já existe
             if (usuarioDAO.buscarPorUsuario(usuario.getUsuario()) != null) {
@@ -175,6 +184,7 @@ public class UsuarioBO {
             }
             
             validarUsuario(usuario);
+            usuario.setSenha(SenhaUtils.gerarHash(usuario.getSenha().trim()));
             usuarioDAO.atualizar(usuario);
             
         } catch (DAOException e) {
@@ -251,7 +261,7 @@ public class UsuarioBO {
                 throw new ValidationException("Código inválido ou expirado.");
             }
 
-            usuarioDAO.atualizarSenha(idUsuario, senhaNormalizada);
+            usuarioDAO.atualizarSenha(idUsuario, SenhaUtils.gerarHash(senhaNormalizada));
             usuarioDAO.marcarCodigosRecuperacaoComoUsados(idUsuario);
         } catch (DAOException e) {
             throw new NegocioException("Erro ao redefinir senha", e);

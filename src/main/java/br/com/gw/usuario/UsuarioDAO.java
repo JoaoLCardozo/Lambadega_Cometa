@@ -19,21 +19,19 @@ import java.util.List;
 public class UsuarioDAO {
 
     /**
-     * Autentica um usuário com base em usuário e senha.
+     * Busca um usuário ativo pelo login para autenticação.
      * @param usuario nome do usuário
-     * @param senha senha do usuário
-     * @return objeto Usuario se autenticado com sucesso, null caso contrário
+     * @return objeto Usuario ativo se encontrado, null caso contrário
      * @throws DAOException em caso de erro na operação
      */
-    public Usuario autenticar(String usuario, String senha) throws DAOException {
+    public Usuario autenticar(String usuario) throws DAOException {
         String sql = "SELECT id, nome, email, usuario, senha, ativo, data_criacao, data_atualizacao " +
-                     "FROM usuario WHERE usuario = ? AND senha = ? AND ativo = true";
+                     "FROM usuario WHERE usuario = ? AND ativo = true";
         
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setString(1, usuario);
-            ps.setString(2, senha);
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
