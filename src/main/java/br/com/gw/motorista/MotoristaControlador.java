@@ -69,12 +69,22 @@ public class MotoristaControlador extends HttpServlet {
 
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
-        String filtro    = req.getParameter("filtro");
-        int pagina       = parsePagina(req.getParameter("pagina"));
-        List<Motorista> lista  = motoristaBO.listar(filtro, pagina, LIMITE);
-        int totalPaginas       = motoristaBO.contarPaginas(filtro, LIMITE);
+        String filtro       = req.getParameter("filtro");
+        String cpf          = req.getParameter("cpf");
+        String status       = req.getParameter("status");
+        String tipoVinculo  = req.getParameter("tipoVinculo");
+        String cnhCategoria = req.getParameter("cnhCategoria");
+        int pagina          = parsePagina(req.getParameter("pagina"));
+        List<Motorista> lista  = motoristaBO.listar(
+            filtro, cpf, status, tipoVinculo, cnhCategoria, pagina, LIMITE);
+        int totalPaginas       = motoristaBO.contarPaginas(
+            filtro, cpf, status, tipoVinculo, cnhCategoria, LIMITE);
         req.setAttribute("listaMotoristas", lista);
         req.setAttribute("filtro",          filtro);
+        req.setAttribute("cpf",             cpf);
+        req.setAttribute("status",          status);
+        req.setAttribute("tipoVinculo",     tipoVinculo);
+        req.setAttribute("cnhCategoria",    cnhCategoria);
         req.setAttribute("paginaAtual",     pagina);
         req.setAttribute("totalPaginas",    totalPaginas);
         carregarMensagemSucesso(req);

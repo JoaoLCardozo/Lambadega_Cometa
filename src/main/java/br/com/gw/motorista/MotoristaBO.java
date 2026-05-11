@@ -11,13 +11,26 @@ public class MotoristaBO {
     private final MotoristaDAO motoristaDAO = new MotoristaDAO();
 
     public List<Motorista> listar(String filtro, int pagina, int limite) throws NegocioException {
+        return listar(filtro, null, null, null, null, pagina, limite);
+    }
+
+    public List<Motorista> listar(String filtro, String cpf, String status,
+                                  String tipoVinculo, String cnhCategoria,
+                                  int pagina, int limite) throws NegocioException {
         if (pagina < 1) pagina = 1;
         if (limite < 1) limite = 10;
-        return motoristaDAO.listar(filtro, pagina, limite);
+        return motoristaDAO.listar(filtro, cpf, status, tipoVinculo, cnhCategoria, pagina, limite);
     }
 
     public int contarPaginas(String filtro, int limite) throws NegocioException {
-        int total = motoristaDAO.contarTotal(filtro);
+        return contarPaginas(filtro, null, null, null, null, limite);
+    }
+
+    public int contarPaginas(String filtro, String cpf, String status,
+                             String tipoVinculo, String cnhCategoria,
+                             int limite) throws NegocioException {
+        if (limite < 1) limite = 10;
+        int total = motoristaDAO.contarTotal(filtro, cpf, status, tipoVinculo, cnhCategoria);
         return (int) Math.ceil((double) total / limite);
     }
 

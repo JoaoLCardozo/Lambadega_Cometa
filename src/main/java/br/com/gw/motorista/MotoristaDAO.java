@@ -6,23 +6,37 @@ import br.com.gw.util.ConnectionFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public class MotoristaDAO {
     private static final Logger logger = Logger.getLogger(MotoristaDAO.class.getName());
 
     public List<Motorista> listar(String filtro, int pagina, int limite) throws NegocioException {
+        return listar(filtro, null, null, null, null, pagina, limite);
+    }
+
+    public List<Motorista> listar(String filtro, String cpf, String status,
+                                  String tipoVinculo, String cnhCategoria,
+                                  int pagina, int limite) throws NegocioException {
         List<Motorista> lista = new ArrayList<>();
         int offset = (pagina - 1) * limite;
-        String sql = "SELECT id, nome, cpf, data_nascimento, telefone, cnh_numero, " +
-                     "cnh_categoria, cnh_validade, tipo_vinculo, status " +
-                     "FROM motorista WHERE nome ILIKE ? ORDER BY nome LIMIT ? OFFSET ?";
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT id, nome, cpf, data_nascimento, telefone, cnh_numero, " +
+            "cnh_categoria, cnh_validade, tipo_vinculo, status " +
+            "FROM motorista WHERE 1=1");
+        List<String> parametros = new ArrayList<>();
+        adicionarFiltros(sql, parametros, filtro, cpf, status, tipoVinculo, cnhCategoria);
+        sql.append(" ORDER BY nome LIMIT ? OFFSET ?");
 
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + (filtro != null ? filtro : "") + "%");
-            stmt.setInt(2, limite);
-            stmt.setInt(3, offset);
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int indice = preencherParametros(stmt, parametros);
+            stmt.setInt(indice++, limite);
+            stmt.setInt(indice, offset);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) lista.add(mapear(rs));
             }
@@ -34,10 +48,20 @@ public class MotoristaDAO {
     }
 
     public int contarTotal(String filtro) throws NegocioException {
-        String sql = "SELECT COUNT(*) FROM motorista WHERE nome ILIKE ?";
+        return contarTotal(filtro, null, null, null, null);
+    }
+
+    public int contarTotal(String filtro, String cpf, String status,
+                           String tipoVinculo, String cnhCategoria) throws NegocioException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM motorista WHERE 1=1");
+        List<String> parametros = new ArrayList<>();
+        adicionarFiltros(sql, parametros, filtro, cpf, status, tipoVinculo, cnhCategoria);
+
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + (filtro != null ? filtro : "") + "%");
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            preencherParametros(stmt, parametros);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
@@ -45,6 +69,63 @@ public class MotoristaDAO {
             throw new NegocioException("Erro ao contar motoristas.", e);
         }
         return 0;
+    }
+
+    private void adicionarFiltros(StringBuilder sql, List<String> parametros, String filtro,
+                                  String cpf, String status, String tipoVinculo,
+                                  String cnhCategoria) {
+        String filtroNome = normalizarTexto(filtro);
+        if (filtroNome != null) {
+            sql.append(" AND nome ILIKE ?");
+            parametros.add("%" + filtroNome + "%");
+        }
+
+        String filtroCpf = somenteDigitos(cpf);
+        if (filtroCpf != null && !filtroCpf.isEmpty()) {
+            sql.append(" AND cpf LIKE ?");
+            parametros.add("%" + filtroCpf + "%");
+        }
+
+        String filtroStatus = normalizarEnum(status);
+        if (filtroStatus != null) {
+            sql.append(" AND status = ?");
+            parametros.add(filtroStatus);
+        }
+
+        String filtroTipoVinculo = normalizarEnum(tipoVinculo);
+        if (filtroTipoVinculo != null) {
+            sql.append(" AND tipo_vinculo = ?");
+            parametros.add(filtroTipoVinculo);
+        }
+
+        String filtroCnhCategoria = normalizarEnum(cnhCategoria);
+        if (filtroCnhCategoria != null) {
+            sql.append(" AND cnh_categoria = ?");
+            parametros.add(filtroCnhCategoria);
+        }
+    }
+
+    private int preencherParametros(PreparedStatement stmt, List<String> parametros) throws SQLException {
+        int indice = 1;
+        for (String parametro : parametros) {
+            stmt.setString(indice++, parametro);
+        }
+        return indice;
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) return null;
+        String texto = valor.trim();
+        return texto.isEmpty() ? null : texto;
+    }
+
+    private String normalizarEnum(String valor) {
+        String texto = normalizarTexto(valor);
+        return texto != null ? texto.toUpperCase(Locale.ROOT) : null;
+    }
+
+    private String somenteDigitos(String valor) {
+        return valor != null ? valor.replaceAll("[^0-9]", "") : null;
     }
 
     public Motorista buscarPorId(int id) throws NegocioException {

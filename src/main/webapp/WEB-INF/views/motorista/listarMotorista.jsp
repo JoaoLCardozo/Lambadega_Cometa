@@ -39,15 +39,50 @@
         </c:if>
 
         <section class="card filter-card">
-            <form class="filter-form" action="${pageContext.request.contextPath}/MotoristaControlador" method="get">
+            <form class="filter-form motorista-filter-form" action="${pageContext.request.contextPath}/MotoristaControlador" method="get">
                 <input type="hidden" name="acao" value="listar">
                 <div class="form-field">
                     <label for="filtro">Nome do motorista</label>
                     <input type="text" name="filtro" id="filtro" class="inputtexto"
                            value="<c:out value='${filtro}'/>"/>
                 </div>
+                <div class="form-field">
+                    <label for="cpf">CPF</label>
+                    <input type="text" name="cpf" id="cpf" class="inputtexto"
+                           value="<c:out value='${cpf}'/>"/>
+                </div>
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="inputtexto">
+                        <option value="">Todos</option>
+                        <option value="ATIVO" ${status == 'ATIVO' ? 'selected' : ''}>Ativo</option>
+                        <option value="INATIVO" ${status == 'INATIVO' ? 'selected' : ''}>Inativo</option>
+                        <option value="SUSPENSO" ${status == 'SUSPENSO' ? 'selected' : ''}>Suspenso</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="tipoVinculo">Tipo de vínculo</label>
+                    <select name="tipoVinculo" id="tipoVinculo" class="inputtexto">
+                        <option value="">Todos</option>
+                        <option value="FUNCIONARIO" ${tipoVinculo == 'FUNCIONARIO' ? 'selected' : ''}>Funcionário</option>
+                        <option value="AGREGADO" ${tipoVinculo == 'AGREGADO' ? 'selected' : ''}>Agregado</option>
+                        <option value="TERCEIRO" ${tipoVinculo == 'TERCEIRO' ? 'selected' : ''}>Terceiro</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="cnhCategoria">Categoria CNH</label>
+                    <select name="cnhCategoria" id="cnhCategoria" class="inputtexto">
+                        <option value="">Todas</option>
+                        <option value="A" ${cnhCategoria == 'A' ? 'selected' : ''}>A</option>
+                        <option value="B" ${cnhCategoria == 'B' ? 'selected' : ''}>B</option>
+                        <option value="C" ${cnhCategoria == 'C' ? 'selected' : ''}>C</option>
+                        <option value="D" ${cnhCategoria == 'D' ? 'selected' : ''}>D</option>
+                        <option value="E" ${cnhCategoria == 'E' ? 'selected' : ''}>E</option>
+                    </select>
+                </div>
                 <div class="app-actions">
                     <input type="submit" class="inputbotao" value="Pesquisar"/>
+                    <a class="link-button" href="${pageContext.request.contextPath}/MotoristaControlador?acao=listar">Limpar</a>
                 </div>
             </form>
         </section>
@@ -80,8 +115,8 @@
                                 <span class="status-SUSPENSO">Vencida</span>
                             </c:if>
                         </td>
-                        <td><span class="status-${m.tipoVinculo}"><c:out value="${m.tipoVinculo}"/></span></td>
-                        <td><span class="status-${m.status}"><c:out value="${m.status}"/></span></td>
+                        <td><span class="status-${m.tipoVinculo}"><c:out value="${m.tipoVinculoRotulo}"/></span></td>
+                        <td><span class="status-${m.status}"><c:out value="${m.statusRotulo}"/></span></td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty listaMotoristas}">
@@ -98,6 +133,10 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual - 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:param name="cpf" value="${cpf}"/>
+                        <c:param name="status" value="${status}"/>
+                        <c:param name="tipoVinculo" value="${tipoVinculo}"/>
+                        <c:param name="cnhCategoria" value="${cnhCategoria}"/>
                     </c:url>
                     <a class="link-button" href="${motoristaAnteriorUrl}">Anterior</a>
                 </c:if>
@@ -106,6 +145,10 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual + 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:param name="cpf" value="${cpf}"/>
+                        <c:param name="status" value="${status}"/>
+                        <c:param name="tipoVinculo" value="${tipoVinculo}"/>
+                        <c:param name="cnhCategoria" value="${cnhCategoria}"/>
                     </c:url>
                     <a class="link-button" href="${motoristaProximoUrl}">Próximo</a>
                 </c:if>

@@ -67,8 +67,36 @@ public class Motorista implements Serializable {
     public TipoVinculo getTipoVinculo() { return tipoVinculo; }
     public void setTipoVinculo(TipoVinculo tipoVinculo) { this.tipoVinculo = tipoVinculo; }
 
+    public String getTipoVinculoRotulo() {
+        if (tipoVinculo == null) return "";
+        switch (tipoVinculo) {
+            case FUNCIONARIO:
+                return "Funcionário";
+            case AGREGADO:
+                return "Agregado";
+            case TERCEIRO:
+                return "Terceiro";
+            default:
+                return tipoVinculo.name();
+        }
+    }
+
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
+
+    public String getStatusRotulo() {
+        if (status == null) return "";
+        switch (status) {
+            case ATIVO:
+                return "Ativo";
+            case INATIVO:
+                return "Inativo";
+            case SUSPENSO:
+                return "Suspenso";
+            default:
+                return status.name();
+        }
+    }
 
     public boolean isCnhVencida() {
         return cnhValidade != null && cnhValidade.isBefore(LocalDate.now());
