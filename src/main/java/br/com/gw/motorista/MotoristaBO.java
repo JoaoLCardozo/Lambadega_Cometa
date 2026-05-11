@@ -3,6 +3,7 @@ package br.com.gw.motorista;
 import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -75,9 +76,14 @@ public class MotoristaBO {
     }
 
     private void validar(Motorista m, int idIgnorar) throws NegocioException {
-        if (m.getNome() == null || m.getNome().trim().isEmpty()) {
+        String nome = m.getNome() != null ? m.getNome().trim() : "";
+        if (nome.isEmpty()) {
             throw new CadastroException("O campo Nome é obrigatório.");
         }
+        if (nome.length() < 5) {
+            throw new CadastroException("O Nome Completo deve ter pelo menos 5 caracteres.");
+        }
+        m.setNome(nome);
         if (m.getCpf() == null || m.getCpf().trim().isEmpty()) {
             throw new CadastroException("O campo CPF é obrigatório.");
         }
@@ -87,14 +93,24 @@ public class MotoristaBO {
         if (motoristaDAO.existeCpf(m.getCpf(), idIgnorar)) {
             throw new CadastroException("Já existe um motorista cadastrado com este CPF.");
         }
+        if (m.getDataNascimento() != null
+                && m.getDataNascimento().isAfter(LocalDate.now().minusYears(18))) {
+            throw new CadastroException("O motorista deve ter pelo menos 18 anos.");
+        }
         if (m.getCnhNumero() == null || m.getCnhNumero().trim().isEmpty()) {
             throw new CadastroException("O campo Número da CNH é obrigatório.");
+        }
+        if (!m.getCnhNumero().matches("\\d{11}")) {
+            throw new CadastroException("O Número da CNH deve conter exatamente 11 dígitos numéricos.");
         }
         if (m.getCnhCategoria() == null) {
             throw new CadastroException("O campo Categoria da CNH é obrigatório.");
         }
         if (m.getCnhValidade() == null) {
             throw new CadastroException("O campo Validade da CNH é obrigatório.");
+        }
+        if (idIgnorar == 0 && m.getCnhValidade().isBefore(LocalDate.now())) {
+            throw new CadastroException("A Validade da CNH não pode estar no passado ao cadastrar.");
         }
         if (m.getTipoVinculo() == null) {
             throw new CadastroException("O campo Tipo de Vínculo é obrigatório.");

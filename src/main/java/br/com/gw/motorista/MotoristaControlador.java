@@ -1,5 +1,6 @@
 package br.com.gw.motorista;
 
+import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
 
 import javax.servlet.ServletException;
@@ -7,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -113,6 +115,7 @@ public class MotoristaControlador extends HttpServlet {
 
     private void salvar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
+        validarCamposDaRequisicao(req);
         motoristaBO.salvar(montarMotoristaDaRequisicao(req));
         req.getSession().setAttribute(SUCESSO_MOTORISTA, "Motorista cadastrado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/MotoristaControlador?acao=listar");
@@ -120,6 +123,7 @@ public class MotoristaControlador extends HttpServlet {
 
     private void atualizar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
+        validarCamposDaRequisicao(req);
         Motorista m = montarMotoristaDaRequisicao(req);
         m.setId(Integer.parseInt(req.getParameter("id")));
         motoristaBO.atualizar(m);
@@ -134,19 +138,52 @@ public class MotoristaControlador extends HttpServlet {
         m.setNome(req.getParameter("nome"));
         m.setCpf(somenteDigitos(req.getParameter("cpf")));
         String dn = req.getParameter("dataNascimento");
-        if (dn != null && !dn.isEmpty()) m.setDataNascimento(LocalDate.parse(dn));
+        if (dn != null && !dn.isEmpty()) m.setDataNascimento(parseDataOpcional(dn));
         m.setTelefone(somenteDigitos(req.getParameter("telefone")));
         m.setCnhNumero(somenteDigitos(req.getParameter("cnhNumero")));
         String cat = req.getParameter("cnhCategoria");
         if (cat != null && !cat.isEmpty()) m.setCnhCategoria(Motorista.CnhCategoria.valueOf(cat));
         String val = req.getParameter("cnhValidade");
-        if (val != null && !val.isEmpty()) m.setCnhValidade(LocalDate.parse(val));
+        if (val != null && !val.isEmpty()) m.setCnhValidade(parseDataOpcional(val));
         String tv = req.getParameter("tipoVinculo");
         if (tv != null && !tv.isEmpty()) m.setTipoVinculo(Motorista.TipoVinculo.valueOf(tv));
         String st = req.getParameter("status");
         m.setStatus(st != null && !st.isEmpty()
             ? Motorista.Status.valueOf(st) : Motorista.Status.ATIVO);
         return m;
+    }
+
+    private void validarCamposDaRequisicao(HttpServletRequest req) throws CadastroException {
+        validarDataOpcional(req.getParameter("dataNascimento"), "Data de Nascimento");
+        validarDataOpcional(req.getParameter("cnhValidade"), "Validade da CNH");
+
+        String cnhNumero = req.getParameter("cnhNumero");
+        if (cnhNumero != null && !cnhNumero.trim().isEmpty()
+                && !cnhNumero.trim().matches("\\d{11}")) {
+            throw new CadastroException("O Número da CNH deve conter exatamente 11 dígitos numéricos.");
+        }
+    }
+
+    private void validarDataOpcional(String valor, String nomeCampo) throws CadastroException {
+        String data = valor != null ? valor.trim() : "";
+        if (data.isEmpty()) return;
+
+        try {
+            LocalDate.parse(data);
+        } catch (DateTimeParseException e) {
+            throw new CadastroException("O campo " + nomeCampo + " possui uma data inválida.");
+        }
+    }
+
+    private LocalDate parseDataOpcional(String valor) {
+        String data = valor != null ? valor.trim() : "";
+        if (data.isEmpty()) return null;
+
+        try {
+            return LocalDate.parse(data);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     private String somenteDigitos(String valor) {
