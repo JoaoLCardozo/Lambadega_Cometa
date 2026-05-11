@@ -51,6 +51,10 @@ public class MotoristaBO {
     public void atualizar(Motorista m) throws NegocioException {
         if (m.getId() <= 0) throw new CadastroException("ID de motorista inválido para atualização.");
         validar(m, m.getId());
+        if (m.getStatus() == Motorista.Status.INATIVO && motoristaDAO.possuiFretesAtivos(m.getId())) {
+            throw new CadastroException(
+                "Não é permitido inativar um motorista com fretes em andamento.");
+        }
         motoristaDAO.atualizar(m);
         logger.info("Motorista atualizado: " + m.getNome());
     }
