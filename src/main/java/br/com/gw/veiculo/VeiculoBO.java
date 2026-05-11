@@ -2,6 +2,7 @@ package br.com.gw.veiculo;
 
 import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,7 +45,7 @@ public class VeiculoBO {
     public Veiculo buscarPorId(int id) throws NegocioException {
         if (id <= 0) throw new CadastroException("ID de veículo inválido.");
         Veiculo v = veiculoDAO.buscarPorId(id);
-        if (v == null) throw new CadastroException("Veículo não encontrado.");
+        if (v == null) throw new RecursoNaoEncontradoException("Veículo não encontrado.");
         return v;
     }
 

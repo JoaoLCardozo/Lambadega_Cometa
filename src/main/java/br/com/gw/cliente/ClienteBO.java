@@ -2,6 +2,8 @@ package br.com.gw.cliente;
 
 import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
+import br.com.gw.util.SegurancaUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -46,7 +48,7 @@ public class ClienteBO {
     public Cliente buscarPorId(int id) throws NegocioException {
         if (id <= 0) throw new CadastroException("ID de cliente inválido.");
         Cliente c = clienteDAO.buscarPorId(id);
-        if (c == null) throw new CadastroException("Cliente não encontrado.");
+        if (c == null) throw new RecursoNaoEncontradoException("Cliente não encontrado.");
         return c;
     }
 
@@ -76,6 +78,19 @@ public class ClienteBO {
         if (c.getTipoPessoa() == null) {
             throw new CadastroException("O tipo de pessoa (F/J) é obrigatório.");
         }
+        c.setNomeRazaoSocial(SegurancaUtils.normalizarTextoSemHtml(
+            c.getNomeRazaoSocial(), "Nome/Razão Social"));
+        c.setNomeFantasia(SegurancaUtils.normalizarTextoSemHtml(
+            c.getNomeFantasia(), "Nome Fantasia"));
+        c.setInscricaoEstadual(SegurancaUtils.normalizarTextoSemHtml(
+            c.getInscricaoEstadual(), "Inscrição Estadual"));
+        c.setLogradouro(SegurancaUtils.normalizarTextoSemHtml(c.getLogradouro(), "Logradouro"));
+        c.setNumero(SegurancaUtils.normalizarTextoSemHtml(c.getNumero(), "Número"));
+        c.setComplemento(SegurancaUtils.normalizarTextoSemHtml(c.getComplemento(), "Complemento"));
+        c.setBairro(SegurancaUtils.normalizarTextoSemHtml(c.getBairro(), "Bairro"));
+        c.setMunicipio(SegurancaUtils.normalizarTextoSemHtml(c.getMunicipio(), "Município"));
+        c.setEmail(SegurancaUtils.normalizarTextoSemHtml(c.getEmail(), "E-mail"));
+
         if (c.getNomeRazaoSocial() == null || c.getNomeRazaoSocial().trim().isEmpty()) {
             throw new CadastroException("O campo Nome/Razão Social é obrigatório.");
         }

@@ -3,6 +3,7 @@ package br.com.gw.frete;
 import br.com.gw.cliente.Cliente;
 import br.com.gw.cliente.ClienteBO;
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
 import br.com.gw.motorista.Motorista;
 import br.com.gw.motorista.MotoristaBO;
 import br.com.gw.veiculo.Veiculo;
@@ -56,6 +57,8 @@ public class FreteControlador extends HttpServlet {
                 case "novaOcorrencia": novaOcorrencia(req, resp); break;
                 default:               listar(req, resp);
             }
+        } catch (RecursoNaoEncontradoException e) {
+            responderNaoEncontrado(req, resp, e.getMessage());
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             try { listar(req, resp); } catch (NegocioException ex) {
@@ -84,6 +87,8 @@ public class FreteControlador extends HttpServlet {
                 default:
                     resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=listar");
             }
+        } catch (RecursoNaoEncontradoException e) {
+            responderNaoEncontrado(req, resp, e.getMessage());
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             String idFrete = req.getParameter("idFrete");
@@ -328,5 +333,13 @@ public class FreteControlador extends HttpServlet {
         } catch (Exception e) {
             throw new NegocioException(campo + " inválida para gerar o relatório.");
         }
+    }
+
+    private void responderNaoEncontrado(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws ServletException, IOException {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        req.setAttribute("tituloErro", "Registro não encontrado");
+        req.setAttribute("mensagemErro", mensagem);
+        req.getRequestDispatcher("/erro.jsp").forward(req, resp);
     }
 }

@@ -2,6 +2,8 @@ package br.com.gw.motorista;
 
 import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
+import br.com.gw.util.SegurancaUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,7 +40,7 @@ public class MotoristaBO {
     public Motorista buscarPorId(int id) throws NegocioException {
         if (id <= 0) throw new CadastroException("ID de motorista inválido.");
         Motorista m = motoristaDAO.buscarPorId(id);
-        if (m == null) throw new CadastroException("Motorista não encontrado.");
+        if (m == null) throw new RecursoNaoEncontradoException("Motorista não encontrado.");
         return m;
     }
 
@@ -80,8 +82,8 @@ public class MotoristaBO {
     }
 
     private void validar(Motorista m, int idIgnorar) throws NegocioException {
-        String nome = m.getNome() != null ? m.getNome().trim() : "";
-        if (nome.isEmpty()) {
+        String nome = SegurancaUtils.normalizarTextoSemHtml(m.getNome(), "Nome Completo");
+        if (nome == null) {
             throw new CadastroException("O campo Nome é obrigatório.");
         }
         if (nome.length() < 5) {

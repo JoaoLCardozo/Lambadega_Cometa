@@ -1,6 +1,7 @@
 package br.com.gw.cliente;
 
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -36,6 +37,8 @@ public class ClienteControlador extends HttpServlet {
                 case "excluir": excluir(req, resp);  break;
                 default:        listar(req, resp);
             }
+        } catch (RecursoNaoEncontradoException e) {
+            responderNaoEncontrado(req, resp, e.getMessage());
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             try { listar(req, resp); } catch (NegocioException ex) {
@@ -184,5 +187,13 @@ public class ClienteControlador extends HttpServlet {
             req.setAttribute("sucesso", sucesso);
             session.removeAttribute(SUCESSO_CLIENTE);
         }
+    }
+
+    private void responderNaoEncontrado(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws ServletException, IOException {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        req.setAttribute("tituloErro", "Registro não encontrado");
+        req.setAttribute("mensagemErro", mensagem);
+        req.getRequestDispatcher("/erro.jsp").forward(req, resp);
     }
 }

@@ -4,8 +4,10 @@ import br.com.gw.cliente.Cliente;
 import br.com.gw.cliente.ClienteDAO;
 import br.com.gw.exception.FreteException;
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
 import br.com.gw.motorista.Motorista;
 import br.com.gw.motorista.MotoristaDAO;
+import br.com.gw.util.SegurancaUtils;
 import br.com.gw.veiculo.Veiculo;
 import br.com.gw.veiculo.VeiculoDAO;
 import br.com.gw.util.ConnectionFactory;
@@ -91,7 +93,7 @@ public class FreteBO {
 
     public Frete buscarPorId(int id) throws NegocioException {
         Frete f = freteDAO.buscarPorId(id);
-        if (f == null) throw new FreteException("Frete não encontrado.");
+        if (f == null) throw new RecursoNaoEncontradoException("Frete não encontrado.");
         f.setOcorrencias(freteDAO.listarOcorrencias(id));
         return f;
     }
@@ -255,10 +257,14 @@ public class FreteBO {
         if (frete.getStatus() != Frete.Status.EM_TRANSITO) {
             throw new FreteException("Somente fretes EM TRÂNSITO podem ser entregues.");
         }
-        if (ocorrencia.getNomeRecebedor() == null || ocorrencia.getNomeRecebedor().trim().isEmpty()) {
+        ocorrencia.setNomeRecebedor(SegurancaUtils.normalizarTextoSemHtml(
+            ocorrencia.getNomeRecebedor(), "Nome do recebedor"));
+        ocorrencia.setDocumentoRecebedor(SegurancaUtils.normalizarTextoSemHtml(
+            ocorrencia.getDocumentoRecebedor(), "Documento do recebedor"));
+        if (ocorrencia.getNomeRecebedor() == null) {
             throw new FreteException("O nome do recebedor é obrigatório para registrar entrega.");
         }
-        if (ocorrencia.getDocumentoRecebedor() == null || ocorrencia.getDocumentoRecebedor().trim().isEmpty()) {
+        if (ocorrencia.getDocumentoRecebedor() == null) {
             throw new FreteException("O documento do recebedor é obrigatório para registrar entrega.");
         }
         validarOcorrencia(ocorrencia, frete);
@@ -297,7 +303,9 @@ public class FreteBO {
         if (frete.getStatus() != Frete.Status.EM_TRANSITO) {
             throw new FreteException("Somente fretes EM TRÂNSITO podem ter não entrega registrada.");
         }
-        if (ocorrencia.getDescricao() == null || ocorrencia.getDescricao().trim().isEmpty()) {
+        ocorrencia.setDescricao(SegurancaUtils.normalizarTextoSemHtml(
+            ocorrencia.getDescricao(), "Descrição"));
+        if (ocorrencia.getDescricao() == null) {
             throw new FreteException("O motivo é obrigatório para registrar não entrega.");
         }
         validarOcorrencia(ocorrencia, frete);
@@ -400,13 +408,21 @@ public class FreteBO {
             throw new FreteException("Motorista é obrigatório.");
         if (f.getVeiculo() == null || f.getVeiculo().getId() <= 0)
             throw new FreteException("Veículo é obrigatório.");
-        if (f.getMunicipioOrigem() == null || f.getMunicipioOrigem().trim().isEmpty())
+        f.setMunicipioOrigem(SegurancaUtils.normalizarTextoSemHtml(
+            f.getMunicipioOrigem(), "Município de origem"));
+        f.setUfOrigem(SegurancaUtils.normalizarTextoSemHtml(f.getUfOrigem(), "UF de origem"));
+        f.setMunicipioDestino(SegurancaUtils.normalizarTextoSemHtml(
+            f.getMunicipioDestino(), "Município de destino"));
+        f.setUfDestino(SegurancaUtils.normalizarTextoSemHtml(f.getUfDestino(), "UF de destino"));
+        f.setDescricaoCarga(SegurancaUtils.normalizarTextoSemHtml(
+            f.getDescricaoCarga(), "Descrição da carga"));
+        if (f.getMunicipioOrigem() == null)
             throw new FreteException("Município de origem é obrigatório.");
-        if (f.getUfOrigem() == null || f.getUfOrigem().trim().isEmpty())
+        if (f.getUfOrigem() == null)
             throw new FreteException("UF de origem é obrigatória.");
-        if (f.getMunicipioDestino() == null || f.getMunicipioDestino().trim().isEmpty())
+        if (f.getMunicipioDestino() == null)
             throw new FreteException("Município de destino é obrigatório.");
-        if (f.getUfDestino() == null || f.getUfDestino().trim().isEmpty())
+        if (f.getUfDestino() == null)
             throw new FreteException("UF de destino é obrigatória.");
         if (f.getDataPrevisaoEntrega() == null)
             throw new FreteException("Data prevista de entrega é obrigatória.");
@@ -444,11 +460,18 @@ public class FreteBO {
     }
 
     private void validarOcorrencia(OcorrenciaFrete oc, Frete frete) throws NegocioException {
+        oc.setMunicipio(SegurancaUtils.normalizarTextoSemHtml(oc.getMunicipio(), "Município"));
+        oc.setUf(SegurancaUtils.normalizarTextoSemHtml(oc.getUf(), "UF"));
+        oc.setDescricao(SegurancaUtils.normalizarTextoSemHtml(oc.getDescricao(), "Descrição"));
+        oc.setNomeRecebedor(SegurancaUtils.normalizarTextoSemHtml(
+            oc.getNomeRecebedor(), "Nome do recebedor"));
+        oc.setDocumentoRecebedor(SegurancaUtils.normalizarTextoSemHtml(
+            oc.getDocumentoRecebedor(), "Documento do recebedor"));
         if (oc.getDataHora() == null)
             throw new FreteException("Data/hora da ocorrência é obrigatória.");
-        if (oc.getMunicipio() == null || oc.getMunicipio().trim().isEmpty())
+        if (oc.getMunicipio() == null)
             throw new FreteException("Município da ocorrência é obrigatório.");
-        if (oc.getUf() == null || oc.getUf().trim().isEmpty())
+        if (oc.getUf() == null)
             throw new FreteException("UF da ocorrência é obrigatória.");
 
         LocalDateTime ultima = freteDAO.buscarDataHoraUltimaOcorrencia(frete.getId());
@@ -458,7 +481,7 @@ public class FreteBO {
         if (oc.getTipo() == OcorrenciaFrete.Tipo.AVARIA
                 || oc.getTipo() == OcorrenciaFrete.Tipo.EXTRAVIO
                 || oc.getTipo() == OcorrenciaFrete.Tipo.OUTROS) {
-            if (oc.getDescricao() == null || oc.getDescricao().trim().isEmpty())
+            if (oc.getDescricao() == null)
                 throw new FreteException("Descrição é obrigatória para o tipo: " + oc.getTipo());
         }
     }

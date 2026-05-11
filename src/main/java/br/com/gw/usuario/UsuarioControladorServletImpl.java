@@ -2,6 +2,7 @@ package br.com.gw.usuario;
 
 import br.com.gw.exception.ValidationException;
 import br.com.gw.exception.NegocioException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -180,6 +181,8 @@ public class UsuarioControladorServletImpl extends HttpServlet {
             request.setAttribute("usuario", usuario);
             request.getRequestDispatcher("/WEB-INF/views/usuario/formUsuario.jsp").forward(request, response);
 
+        } catch (RecursoNaoEncontradoException e) {
+            responderNaoEncontrado(request, response, e.getMessage());
         } catch (ValidationException | NegocioException e) {
             logger.warning("Erro ao editar usuário: " + e.getMessage());
 
@@ -286,5 +289,13 @@ public class UsuarioControladorServletImpl extends HttpServlet {
             request.setAttribute("erro", "Erro inesperado ao deletar usuário.");
             request.getRequestDispatcher("/WEB-INF/views/usuario/listarUsuario.jsp").forward(request, response);
         }
+    }
+
+    private void responderNaoEncontrado(HttpServletRequest request, HttpServletResponse response, String mensagem)
+            throws ServletException, IOException {
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        request.setAttribute("tituloErro", "Registro não encontrado");
+        request.setAttribute("mensagemErro", mensagem);
+        request.getRequestDispatcher("/erro.jsp").forward(request, response);
     }
 }

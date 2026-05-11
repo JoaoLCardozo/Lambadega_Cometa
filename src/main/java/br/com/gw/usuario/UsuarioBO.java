@@ -3,7 +3,9 @@ package br.com.gw.usuario;
 import br.com.gw.exception.AuthenticationException;
 import br.com.gw.exception.NegocioException;
 import br.com.gw.exception.DAOException;
+import br.com.gw.exception.RecursoNaoEncontradoException;
 import br.com.gw.exception.ValidationException;
+import br.com.gw.util.SegurancaUtils;
 
 import java.util.List;
 
@@ -79,7 +81,7 @@ public class UsuarioBO {
             Usuario usuario = usuarioDAO.buscarPorId(id);
             
             if (usuario == null) {
-                throw new ValidationException("Usuário não encontrado");
+                throw new RecursoNaoEncontradoException("Usuário não encontrado");
             }
             
             return usuario;
@@ -196,12 +198,15 @@ public class UsuarioBO {
         if (usuario == null) {
             throw new ValidationException("Usuário não pode ser nulo");
         }
+        usuario.setNome(normalizarTextoSemHtml(usuario.getNome(), "Nome"));
+        usuario.setEmail(normalizarTextoSemHtml(usuario.getEmail(), "Email"));
+        usuario.setUsuario(normalizarTextoSemHtml(usuario.getUsuario(), "Usuário"));
         
-        if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
+        if (usuario.getNome() == null) {
             throw new ValidationException("Nome não pode ser vazio");
         }
         
-        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+        if (usuario.getEmail() == null) {
             throw new ValidationException("Email não pode ser vazio");
         }
         
@@ -209,7 +214,7 @@ public class UsuarioBO {
             throw new ValidationException("Email inválido");
         }
         
-        if (usuario.getUsuario() == null || usuario.getUsuario().trim().isEmpty()) {
+        if (usuario.getUsuario() == null) {
             throw new ValidationException("Usuário não pode ser vazio");
         }
         
@@ -224,5 +229,13 @@ public class UsuarioBO {
         if (usuario.getSenha().trim().length() < 4) {
             throw new ValidationException("Senha deve ter pelo menos 4 caracteres");
         }
+    }
+
+    private String normalizarTextoSemHtml(String valor, String nomeCampo) throws ValidationException {
+        String texto = SegurancaUtils.normalizarTexto(valor);
+        if (SegurancaUtils.contemHtml(texto)) {
+            throw new ValidationException("O campo " + nomeCampo + " não permite HTML ou scripts.");
+        }
+        return texto;
     }
 }
