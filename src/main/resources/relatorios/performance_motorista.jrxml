@@ -24,8 +24,22 @@
                    COALESCE(SUM(f.peso_kg), 0) AS total_transportado_kg,
                    COALESCE(SUM(f.valor_total), 0) AS valor_total_fretes
               FROM motorista m
-              LEFT JOIN frete f ON f.id_motorista = m.id
-                   AND f.data_emissao::date BETWEEN $P{DATA_INICIO} AND $P{DATA_FIM}
+              LEFT JOIN (
+                    SELECT f.*,
+                           COALESCE(
+                               CASE WHEN f.status = 'ENTREGUE' THEN f.data_entrega::date END,
+                               CASE WHEN f.status = 'NAO_ENTREGUE' THEN (
+                                   SELECT MAX(oc.data_hora)::date
+                                     FROM ocorrencia_frete oc
+                                    WHERE oc.id_frete = f.id
+                                      AND oc.tipo = 'TENTATIVA_ENTREGA'
+                               ) END,
+                               f.data_emissao::date
+                           ) AS data_referencia
+                      FROM frete f
+                     WHERE f.status <> 'CANCELADO'
+              ) f ON f.id_motorista = m.id
+                   AND f.data_referencia BETWEEN $P{DATA_INICIO} AND $P{DATA_FIM}
              WHERE m.id = $P{ID_MOTORISTA}
              GROUP BY m.id, m.nome, m.cpf, m.tipo_vinculo
         ]]>
