@@ -44,7 +44,8 @@
                 </td>
                 <td class="CelulaZebra1">RNTRC:</td>
                 <td class="CelulaZebra1">
-                    <input type="text" name="rntrc" class="inputtexto" size="20" maxlength="20"
+                    <input type="text" name="rntrc" id="rntrc" class="inputtexto" size="20" maxlength="8"
+                           placeholder="00000000"
                            value="<c:out value='${veiculo.rntrc}'/>"/>
                 </td>
             </tr>
@@ -123,6 +124,14 @@
         }
 
         aplicarMascaraPlaca();
+
+        var rntrc = document.getElementById('rntrc');
+        if (rntrc) {
+            rntrc.value = rntrc.value.replace(/\D/g, '').substring(0, 8);
+            rntrc.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').substring(0, 8);
+            });
+        }
     </script>
 </body>
 </html>

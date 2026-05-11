@@ -83,8 +83,16 @@ public class VeiculoBO {
         }
         v.setPlaca(placa);
         if (veiculoDAO.existePlaca(placa, idIgnorar)) {
-            throw new CadastroException("Já existe um veículo cadastrado com esta placa.");
+            throw new CadastroException("Placa já cadastrada.");
         }
+        String rntrc = normalizarTexto(v.getRntrc());
+        if (rntrc != null) {
+            rntrc = rntrc.replaceAll("[^0-9]", "");
+            if (!rntrc.matches("\\d{8}")) {
+                throw new CadastroException("O RNTRC deve conter 8 dígitos numéricos.");
+            }
+        }
+        v.setRntrc(rntrc);
         if (v.getTipo() == null) {
             throw new CadastroException("O campo Tipo é obrigatório.");
         }
@@ -108,5 +116,11 @@ public class VeiculoBO {
         if (v.getStatus() == null) {
             v.setStatus(Veiculo.Status.DISPONIVEL);
         }
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) return null;
+        String texto = valor.trim();
+        return texto.isEmpty() ? null : texto;
     }
 }
