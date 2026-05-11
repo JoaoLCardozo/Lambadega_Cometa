@@ -168,7 +168,7 @@ public class FreteControlador extends HttpServlet {
     private void novo(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
         // Controller chama BO — não DAO
-        req.setAttribute("listaClientes",   clienteBO.listar(null, 1, 999));
+        req.setAttribute("listaClientes",   clienteBO.listar(null, null, null, null, "ATIVO", 1, 999));
         req.setAttribute("listaMotoristas", motoristaBO.listar(null, 1, 999));
         req.setAttribute("listaVeiculos",   veiculoBO.listar(null, 1, 999));
         req.setAttribute("frete", new Frete());
@@ -212,7 +212,7 @@ public class FreteControlador extends HttpServlet {
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             req.setAttribute("frete", f);
-            req.setAttribute("listaClientes",   clienteBO.listar(null, 1, 999));
+            req.setAttribute("listaClientes",   clienteBO.listar(null, null, null, null, "ATIVO", 1, 999));
             req.setAttribute("listaMotoristas", motoristaBO.listar(null, 1, 999));
             req.setAttribute("listaVeiculos",   veiculoBO.listar(null, 1, 999));
             req.getRequestDispatcher("/WEB-INF/views/frete/formFrete.jsp").forward(req, resp);

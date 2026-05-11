@@ -87,12 +87,12 @@
                 </td>
             </tr>
             <tr>
-                <td class="CelulaZebra1">Status:</td>
+                <td class="CelulaZebra1">Cliente ativo:</td>
                 <td class="CelulaZebra1">
-                    <select name="status" class="inputtexto">
-                        <option value="ATIVO"   ${cliente.status == 'ATIVO'   || empty cliente.status ? 'selected' : ''}>Ativo</option>
-                        <option value="INATIVO" ${cliente.status == 'INATIVO' ? 'selected' : ''}>Inativo</option>
-                    </select>
+                    <input type="hidden" name="status" value="INATIVO"/>
+                    <input type="checkbox" name="status" id="statusAtivo" value="ATIVO"
+                           ${cliente.status == 'ATIVO' || empty cliente.status ? 'checked' : ''}/>
+                    <label for="statusAtivo">Ativo</label>
                 </td>
                 <td class="CelulaZebra1" colspan="2"></td>
             </tr>

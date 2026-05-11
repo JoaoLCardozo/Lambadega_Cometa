@@ -1,5 +1,7 @@
 package br.com.gw.frete;
 
+import br.com.gw.cliente.Cliente;
+import br.com.gw.cliente.ClienteDAO;
 import br.com.gw.exception.FreteException;
 import br.com.gw.exception.NegocioException;
 import br.com.gw.motorista.Motorista;
@@ -30,6 +32,7 @@ public class FreteBO {
     private static final Logger logger = Logger.getLogger(FreteBO.class.getName());
 
     private final FreteDAO    freteDAO    = new FreteDAO();
+    private final ClienteDAO  clienteDAO  = new ClienteDAO();
     private final MotoristaDAO motoristaDAO = new MotoristaDAO();
     private final VeiculoDAO  veiculoDAO  = new VeiculoDAO();
 
@@ -409,6 +412,14 @@ public class FreteBO {
             throw new FreteException("Data prevista de entrega é obrigatória.");
         if (!f.getDataPrevisaoEntrega().isAfter(LocalDate.now()))
             throw new FreteException("A data prevista de entrega deve ser posterior à data de hoje.");
+
+        Cliente remetente = clienteDAO.buscarPorId(f.getRemetente().getId());
+        if (remetente == null || remetente.getStatus() != Cliente.Status.ATIVO)
+            throw new FreteException("O remetente não está ativo.");
+
+        Cliente destinatario = clienteDAO.buscarPorId(f.getDestinatario().getId());
+        if (destinatario == null || destinatario.getStatus() != Cliente.Status.ATIVO)
+            throw new FreteException("O destinatário não está ativo.");
 
         Veiculo veiculo = veiculoDAO.buscarPorId(f.getVeiculo().getId());
         if (veiculo.getStatus() != Veiculo.Status.DISPONIVEL)

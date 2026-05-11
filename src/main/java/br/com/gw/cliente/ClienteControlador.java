@@ -152,11 +152,22 @@ public class ClienteControlador extends HttpServlet {
         c.setCep(req.getParameter("cep"));
         c.setTelefone(req.getParameter("telefone"));
         c.setEmail(req.getParameter("email"));
-        String status = req.getParameter("status");
-        c.setStatus(status != null && !status.isEmpty()
-            ? Cliente.Status.valueOf(status)
-            : Cliente.Status.ATIVO);
+        c.setStatus(montarStatusDaRequisicao(req));
         return c;
+    }
+
+    private Cliente.Status montarStatusDaRequisicao(HttpServletRequest req) {
+        String[] valores = req.getParameterValues("status");
+        if (valores == null || valores.length == 0) {
+            return Cliente.Status.ATIVO;
+        }
+
+        for (String valor : valores) {
+            if (Cliente.Status.ATIVO.name().equals(valor)) {
+                return Cliente.Status.ATIVO;
+            }
+        }
+        return Cliente.Status.INATIVO;
     }
 
     private int parsePagina(String valor) {
