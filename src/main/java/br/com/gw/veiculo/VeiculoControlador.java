@@ -16,6 +16,7 @@ public class VeiculoControlador extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(VeiculoControlador.class.getName());
     private static final int LIMITE = 10;
+    private static final String SUCESSO_VEICULO = "veiculoSucesso";
 
     private final VeiculoBO veiculoBO = new VeiculoBO();
 
@@ -85,6 +86,7 @@ public class VeiculoControlador extends HttpServlet {
         req.setAttribute("anoFabricacao",  anoFabricacao);
         req.setAttribute("paginaAtual",    pagina);
         req.setAttribute("totalPaginas",   totalPaginas);
+        carregarMensagemSucesso(req);
         req.getRequestDispatcher("/WEB-INF/views/veiculo/listarVeiculo.jsp").forward(req, resp);
     }
 
@@ -105,6 +107,7 @@ public class VeiculoControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         veiculoBO.excluir(id);
+        req.getSession().setAttribute(SUCESSO_VEICULO, "Veículo excluído com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/VeiculoControlador?acao=listar");
     }
 
@@ -112,6 +115,7 @@ public class VeiculoControlador extends HttpServlet {
             throws IOException, NegocioException {
         validarCamposNumericosDaRequisicao(req);
         veiculoBO.salvar(montarVeiculoDaRequisicao(req));
+        req.getSession().setAttribute(SUCESSO_VEICULO, "Veículo cadastrado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/VeiculoControlador?acao=listar");
     }
 
@@ -121,6 +125,7 @@ public class VeiculoControlador extends HttpServlet {
         Veiculo v = montarVeiculoDaRequisicao(req);
         v.setId(Integer.parseInt(req.getParameter("id")));
         veiculoBO.atualizar(v);
+        req.getSession().setAttribute(SUCESSO_VEICULO, "Veículo atualizado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/VeiculoControlador?acao=listar");
     }
 
@@ -222,6 +227,17 @@ public class VeiculoControlador extends HttpServlet {
     private int parsePagina(String valor) {
         try { return Math.max(1, Integer.parseInt(valor)); }
         catch (Exception e) { return 1; }
+    }
+
+    private void carregarMensagemSucesso(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return;
+
+        Object sucesso = session.getAttribute(SUCESSO_VEICULO);
+        if (sucesso != null) {
+            req.setAttribute("sucesso", sucesso);
+            session.removeAttribute(SUCESSO_VEICULO);
+        }
     }
 
     private void responderNaoEncontrado(HttpServletRequest req, HttpServletResponse resp, String mensagem)

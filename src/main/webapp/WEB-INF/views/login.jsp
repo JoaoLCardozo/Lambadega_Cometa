@@ -21,13 +21,13 @@
         </section>
 
         <c:if test="${not empty erro}">
-            <div class="alert alert-error"><c:out value="${erro}"/></div>
+            <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
         </c:if>
         <c:if test="${not empty sucesso}">
-            <div class="alert alert-success"><c:out value="${sucesso}"/></div>
+            <div class="alert alert-success" role="alert"><c:out value="${sucesso}"/></div>
         </c:if>
         <c:if test="${not empty aviso}">
-            <div class="alert alert-warning"><c:out value="${aviso}"/></div>
+            <div class="alert alert-warning" role="alert"><c:out value="${aviso}"/></div>
         </c:if>
 
         <section class="card login-card">
@@ -39,23 +39,25 @@
                         <h2 class="app-title">Acesso ao sistema</h2>
                     </div>
                     <div class="form-field">
-                        <label for="usuario">Usuário</label>
+                        <label for="usuario">Usuário <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="text"
                                name="usuario"
                                id="usuario"
                                class="inputtexto"
                                maxlength="50"
                                value="<c:out value='${usuario}'/>"
-                               autofocus/>
+                               autofocus
+                               required/>
                     </div>
                     <div class="form-field">
-                        <label for="senha">Senha</label>
+                        <label for="senha">Senha <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <div class="password-field">
                             <input type="password"
                                    name="senha"
                                    id="senha"
                                    class="inputtexto"
-                                   maxlength="50"/>
+                                   maxlength="50"
+                                   required/>
                             <button type="button"
                                     class="password-toggle"
                                     id="toggleSenha"

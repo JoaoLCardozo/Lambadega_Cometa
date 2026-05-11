@@ -22,7 +22,7 @@
         </tr>
     </table><br>
     <c:if test="${not empty erro}">
-        <div class="alert alert-error"><c:out value="${erro}"/></div>
+        <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
     </c:if>
     <form action="${pageContext.request.contextPath}/MotoristaControlador" method="post">
         <c:choose>
@@ -36,14 +36,14 @@
         </c:choose>
         <table class="bordaFina" width="85%" align="center" cellpadding="2" cellspacing="1">
             <tr>
-                <td class="CelulaZebra1" width="20%">Nome: *</td>
+                <td class="CelulaZebra1" width="20%">Nome: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1" colspan="3">
                     <input type="text" name="nome" class="inputtexto" size="50" maxlength="100"
                            value="<c:out value='${motorista.nome}'/>"/>
                 </td>
             </tr>
             <tr>
-                <td class="CelulaZebra2">CPF: *</td>
+                <td class="CelulaZebra2">CPF: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra2">
                     <input type="text" name="cpf" id="cpf" class="inputtexto" size="15" maxlength="14"
                            inputmode="numeric" autocomplete="off"
@@ -64,7 +64,7 @@
                            placeholder="(00) 00000-0000"
                            value="<c:out value='${motorista.telefone}'/>"/>
                 </td>
-                <td class="CelulaZebra1">Tipo Vínculo: *</td>
+                <td class="CelulaZebra1">Tipo Vínculo: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1">
                     <select name="tipoVinculo" class="inputtexto">
                         <option value="">Selecione...</option>
@@ -76,14 +76,14 @@
             </tr>
             <tr><td colspan="4" class="tabela"><b>CNH</b></td></tr>
             <tr>
-                <td class="CelulaZebra1">Número CNH: *</td>
+                <td class="CelulaZebra1">Número CNH: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1">
                     <input type="text" name="cnhNumero" id="cnhNumero" class="inputtexto" size="20" maxlength="11"
                            inputmode="numeric" pattern="[0-9]*" autocomplete="off"
                            placeholder="Somente numeros"
                            value="<c:out value='${motorista.cnhNumero}'/>"/>
                 </td>
-                <td class="CelulaZebra1">Categoria: *</td>
+                <td class="CelulaZebra1">Categoria: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1">
                     <select name="cnhCategoria" class="inputtexto">
                         <option value="">Selecione...</option>
@@ -94,7 +94,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="CelulaZebra2">Validade CNH: *</td>
+                <td class="CelulaZebra2">Validade CNH: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra2">
                     <input type="date" name="cnhValidade" class="inputtexto"
                            value="<c:out value='${motorista.cnhValidade}'/>"/>

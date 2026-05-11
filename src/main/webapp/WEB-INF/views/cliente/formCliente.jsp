@@ -25,7 +25,7 @@
     <br>
 
     <c:if test="${not empty erro}">
-        <div class="alert alert-error"><c:out value="${erro}"/></div>
+        <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
     </c:if>
 
     <form action="${pageContext.request.contextPath}/ClienteControlador" method="post" name="formulario">
@@ -43,7 +43,7 @@
             <tr><td colspan="4" class="tabela"><b>Dados Cadastrais</b></td></tr>
 
             <tr>
-                <td class="CelulaZebra1" width="20%">Tipo Pessoa: *</td>
+                <td class="CelulaZebra1" width="20%">Tipo Pessoa: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1" colspan="3">
                     <input type="radio" name="tipoPessoa" id="tipoPF" value="F"
                            onchange="adaptarFormulario('F')"
@@ -57,7 +57,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="CelulaZebra2" id="labelNome">Nome: *</td>
+                <td class="CelulaZebra2" id="labelNome">Nome: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra2" colspan="3">
                     <input type="text" name="nomeRazaoSocial" id="nomeRazaoSocial"
                            class="inputtexto" size="60" maxlength="150"
@@ -72,7 +72,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="CelulaZebra2" id="labelDocumento">CPF: *</td>
+                <td class="CelulaZebra2" id="labelDocumento">CPF: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra2">
                     <input type="text" name="documento" id="documento"
                            class="inputtexto" size="20" maxlength="18"
@@ -211,14 +211,24 @@
     <script>
         function adaptarFormulario(tipo) {
             var isPJ = tipo === 'J';
-            document.getElementById('labelNome').textContent      = isPJ ? 'Razão Social: *' : 'Nome: *';
-            document.getElementById('labelDocumento').textContent = isPJ ? 'CNPJ: *'         : 'CPF: *';
+            marcarObrigatorio('labelNome', isPJ ? 'Razão Social' : 'Nome');
+            marcarObrigatorio('labelDocumento', isPJ ? 'CNPJ' : 'CPF');
             document.getElementById('documento').maxLength        = isPJ ? 18 : 14;
             document.getElementById('documento').placeholder      = isPJ ? '00.000.000/0000-00' : '000.000.000-00';
             document.getElementById('trNomeFantasia').style.display = isPJ ? '' : 'none';
             document.getElementById('labelIE').style.display        = isPJ ? '' : 'none';
             document.getElementById('tdIE').style.display           = isPJ ? '' : 'none';
             document.getElementById('documento').value = '';
+        }
+
+        function marcarObrigatorio(id, texto) {
+            var elemento = document.getElementById(id);
+            elemento.textContent = texto + ': ';
+            var marcador = document.createElement('span');
+            marcador.className = 'required-marker';
+            marcador.setAttribute('aria-label', 'obrigatório');
+            marcador.textContent = '*';
+            elemento.appendChild(marcador);
         }
 
         function mascaraCpf(v) {
@@ -328,8 +338,8 @@
         window.addEventListener('load', function() {
             var tipo = document.querySelector('input[name="tipoPessoa"]:checked').value;
             var isPJ = tipo === 'J';
-            document.getElementById('labelNome').textContent      = isPJ ? 'Razão Social: *' : 'Nome: *';
-            document.getElementById('labelDocumento').textContent = isPJ ? 'CNPJ: *'         : 'CPF: *';
+            marcarObrigatorio('labelNome', isPJ ? 'Razão Social' : 'Nome');
+            marcarObrigatorio('labelDocumento', isPJ ? 'CNPJ' : 'CPF');
             document.getElementById('documento').maxLength        = isPJ ? 18 : 14;
             document.getElementById('documento').placeholder      = isPJ ? '00.000.000/0000-00' : '000.000.000-00';
             document.getElementById('trNomeFantasia').style.display = isPJ ? '' : 'none';

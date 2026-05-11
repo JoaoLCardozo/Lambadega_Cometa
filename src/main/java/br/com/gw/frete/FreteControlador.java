@@ -24,6 +24,7 @@ public class FreteControlador extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(FreteControlador.class.getName());
     private static final int LIMITE = 10;
+    private static final String SUCESSO_FRETE = "freteSucesso";
 
     // Apenas BOs — sem DAOs diretamente
     private final FreteBO    freteBO    = new FreteBO();
@@ -115,6 +116,7 @@ public class FreteControlador extends HttpServlet {
         req.setAttribute("filtro",       filtro);
         req.setAttribute("paginaAtual",  pagina);
         req.setAttribute("totalPaginas", totalPaginas);
+        carregarMensagemSucesso(req);
         req.getRequestDispatcher("/WEB-INF/views/frete/listarFrete.jsp").forward(req, resp);
     }
 
@@ -184,6 +186,7 @@ public class FreteControlador extends HttpServlet {
             throws ServletException, IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         req.setAttribute("frete", freteBO.buscarPorId(id));
+        carregarMensagemSucesso(req);
         req.getRequestDispatcher("/WEB-INF/views/frete/detalharFrete.jsp").forward(req, resp);
     }
 
@@ -191,6 +194,7 @@ public class FreteControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         freteBO.confirmarSaida(id);
+        req.getSession().setAttribute(SUCESSO_FRETE, "Saída confirmada com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -198,6 +202,7 @@ public class FreteControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("id"));
         freteBO.cancelar(id);
+        req.getSession().setAttribute(SUCESSO_FRETE, "Frete cancelado com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=listar");
     }
 
@@ -213,6 +218,7 @@ public class FreteControlador extends HttpServlet {
         Frete f = montarFreteDaRequisicao(req);
         try {
             freteBO.emitir(f);
+            req.getSession().setAttribute(SUCESSO_FRETE, "Frete emitido com sucesso!");
             resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=listar");
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
@@ -228,6 +234,7 @@ public class FreteControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
         freteBO.registrarEmTransito(id, montarOcorrenciaDaRequisicao(req));
+        req.getSession().setAttribute(SUCESSO_FRETE, "Frete marcado em trânsito com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -235,6 +242,7 @@ public class FreteControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
         freteBO.registrarEntrega(id, montarOcorrenciaDaRequisicao(req));
+        req.getSession().setAttribute(SUCESSO_FRETE, "Entrega registrada com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -242,6 +250,7 @@ public class FreteControlador extends HttpServlet {
             throws IOException, NegocioException {
         int id = Integer.parseInt(req.getParameter("idFrete"));
         freteBO.registrarNaoEntrega(id, montarOcorrenciaDaRequisicao(req));
+        req.getSession().setAttribute(SUCESSO_FRETE, "Tentativa de entrega registrada com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -256,6 +265,7 @@ public class FreteControlador extends HttpServlet {
         } else {
             freteBO.registrarOcorrencia(id, oc);
         }
+        req.getSession().setAttribute(SUCESSO_FRETE, "Ocorrência registrada com sucesso!");
         resp.sendRedirect(req.getContextPath() + "/FreteControlador?acao=detalhe&id=" + id);
     }
 
@@ -312,6 +322,17 @@ public class FreteControlador extends HttpServlet {
     private int parsePagina(String valor) {
         try { return Math.max(1, Integer.parseInt(valor)); }
         catch (Exception e) { return 1; }
+    }
+
+    private void carregarMensagemSucesso(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return;
+
+        Object sucesso = session.getAttribute(SUCESSO_FRETE);
+        if (sucesso != null) {
+            req.setAttribute("sucesso", sucesso);
+            session.removeAttribute(SUCESSO_FRETE);
+        }
     }
 
     private int parseIdMotorista(String valor) throws NegocioException {

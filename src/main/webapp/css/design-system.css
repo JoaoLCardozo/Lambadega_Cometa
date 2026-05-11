@@ -285,6 +285,12 @@ tr.CelulaZebra2:hover {
     font-weight: 800;
 }
 
+.required-marker {
+    margin-left: 3px;
+    color: var(--lc-danger);
+    font-weight: 900;
+}
+
 .section-title {
     grid-column: 1 / -1;
     margin: 4px -18px 0;

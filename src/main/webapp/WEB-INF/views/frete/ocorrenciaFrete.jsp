@@ -28,7 +28,7 @@
         </section>
 
         <c:if test="${not empty erro}">
-            <div class="alert alert-error"><c:out value="${erro}"/></div>
+            <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
         </c:if>
 
         <section class="card">
@@ -49,7 +49,7 @@
                         <h3 class="app-title">Dados da ocorrência</h3>
                     </div>
                     <div class="form-field">
-                        <label for="tipoOcorrencia">Tipo *</label>
+                        <label for="tipoOcorrencia">Tipo <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="tipo" class="inputtexto" id="tipoOcorrencia" onchange="toggleCampos(this.value)">
                             <option value="">Selecione...</option>
                             <c:if test="${frete.status == 'SAIDA_CONFIRMADA'}">
@@ -66,7 +66,7 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="dataHora">Data/Hora *</label>
+                        <label for="dataHora">Data/Hora <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="datetime-local" name="dataHora" id="dataHora" class="inputtexto"/>
                     </div>
                     <div class="form-field">
@@ -86,11 +86,11 @@
                         <textarea name="descricao" id="descricao" class="inputtexto" rows="3"></textarea>
                     </div>
                     <div class="form-field" id="camposRecebedor" style="display:none">
-                        <label for="nomeRecebedor">Nome recebedor *</label>
+                        <label for="nomeRecebedor">Nome recebedor <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="text" name="nomeRecebedor" id="nomeRecebedor" class="inputtexto"/>
                     </div>
                     <div class="form-field" id="camposDocumento" style="display:none">
-                        <label for="documentoRecebedor">Documento recebedor *</label>
+                        <label for="documentoRecebedor">Documento recebedor <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="text" name="documentoRecebedor" id="documentoRecebedor" class="inputtexto"/>
                     </div>
                     <div class="form-actions full">

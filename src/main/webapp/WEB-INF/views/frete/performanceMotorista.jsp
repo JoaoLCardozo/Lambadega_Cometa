@@ -54,14 +54,14 @@
         </section>
 
         <c:if test="${not empty erro}">
-            <div class="alert alert-error"><c:out value="${erro}"/></div>
+            <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
         </c:if>
 
         <section class="card">
             <form action="${pageContext.request.contextPath}/FreteControlador" method="get">
                 <div class="form-grid">
                     <div class="form-field full">
-                        <label for="idMotorista">Motorista</label>
+                        <label for="idMotorista">Motorista <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="idMotorista" id="idMotorista" class="inputtexto" required>
                             <option value="">Selecione</option>
                             <c:forEach var="m" items="${listaMotoristas}">
@@ -70,11 +70,11 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="dataInicio">Data inicial</label>
+                        <label for="dataInicio">Data inicial <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="date" name="dataInicio" id="dataInicio" class="inputtexto" required>
                     </div>
                     <div class="form-field">
-                        <label for="dataFim">Data final</label>
+                        <label for="dataFim">Data final <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="date" name="dataFim" id="dataFim" class="inputtexto" required>
                     </div>
                 </div>

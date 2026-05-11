@@ -28,7 +28,7 @@
         </section>
 
         <c:if test="${not empty erro}">
-            <div class="alert alert-error"><c:out value="${erro}"/></div>
+            <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
         </c:if>
 
         <section class="card">
@@ -37,7 +37,7 @@
                 <div class="form-grid">
                     <div class="section-title">Partes envolvidas</div>
                     <div class="form-field">
-                        <label for="idRemetente">Remetente *</label>
+                        <label for="idRemetente">Remetente <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="idRemetente" id="idRemetente" class="inputtexto">
                             <option value="">Selecione...</option>
                             <c:forEach var="c" items="${listaClientes}">
@@ -46,7 +46,7 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="idDestinatario">Destinatário *</label>
+                        <label for="idDestinatario">Destinatário <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="idDestinatario" id="idDestinatario" class="inputtexto">
                             <option value="">Selecione...</option>
                             <c:forEach var="c" items="${listaClientes}">
@@ -55,7 +55,7 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="idMotorista">Motorista *</label>
+                        <label for="idMotorista">Motorista <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="idMotorista" id="idMotorista" class="inputtexto">
                             <option value="">Selecione...</option>
                             <c:forEach var="m" items="${listaMotoristas}">
@@ -64,7 +64,7 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="idVeiculo">Veículo *</label>
+                        <label for="idVeiculo">Veículo <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="idVeiculo" id="idVeiculo" class="inputtexto">
                             <option value="">Selecione...</option>
                             <c:forEach var="v" items="${listaVeiculos}">
@@ -75,28 +75,28 @@
 
                     <div class="section-title">Origem e destino</div>
                     <div class="form-field">
-                        <label for="ufOrigem">UF origem *</label>
+                        <label for="ufOrigem">UF origem <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="ufOrigem" id="ufOrigem" class="inputtexto"
                                 data-selected="<c:out value='${frete.ufOrigem}'/>">
                             <option value="">Carregando UFs...</option>
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="municipioOrigem">Município origem *</label>
+                        <label for="municipioOrigem">Município origem <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="municipioOrigem" id="municipioOrigem" class="inputtexto"
                                 data-selected="<c:out value='${frete.municipioOrigem}'/>" disabled>
                             <option value="">Selecione a UF origem</option>
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="ufDestino">UF destino *</label>
+                        <label for="ufDestino">UF destino <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="ufDestino" id="ufDestino" class="inputtexto"
                                 data-selected="<c:out value='${frete.ufDestino}'/>">
                             <option value="">Carregando UFs...</option>
                         </select>
                     </div>
                     <div class="form-field">
-                        <label for="municipioDestino">Município destino *</label>
+                        <label for="municipioDestino">Município destino <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <select name="municipioDestino" id="municipioDestino" class="inputtexto"
                                 data-selected="<c:out value='${frete.municipioDestino}'/>" disabled>
                             <option value="">Selecione a UF destino</option>
@@ -136,7 +136,7 @@
                                value="<c:out value='${frete.aliquotaIcms}'/>"/>
                     </div>
                     <div class="form-field">
-                        <label for="dataPrevisaoEntrega">Previsão de entrega *</label>
+                        <label for="dataPrevisaoEntrega">Previsão de entrega <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="date" name="dataPrevisaoEntrega" id="dataPrevisaoEntrega" class="inputtexto"
                                value="<c:out value='${frete.dataPrevisaoEntrega}'/>"/>
                     </div>

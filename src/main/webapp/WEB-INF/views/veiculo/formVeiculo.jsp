@@ -22,7 +22,7 @@
         </tr>
     </table><br>
     <c:if test="${not empty erro}">
-        <div class="alert alert-error"><c:out value="${erro}"/></div>
+        <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
     </c:if>
     <form action="${pageContext.request.contextPath}/VeiculoControlador" method="post">
         <c:choose>
@@ -36,7 +36,7 @@
         </c:choose>
         <table class="bordaFina" width="85%" align="center" cellpadding="2" cellspacing="1">
             <tr>
-                <td class="CelulaZebra1" width="25%">Placa: *</td>
+                <td class="CelulaZebra1" width="25%">Placa: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1">
                     <input type="text" name="placa" id="placa" class="inputtexto" size="10" maxlength="8"
                            autocapitalize="characters" autocomplete="off"
@@ -52,7 +52,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="CelulaZebra2">Tipo: *</td>
+                <td class="CelulaZebra2">Tipo: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra2">
                     <select name="tipo" class="inputtexto">
                         <option value="">Selecione...</option>
@@ -62,7 +62,7 @@
                         <option value="UTILITARIO"${veiculo.tipo == 'UTILITARIO'? 'selected' : ''}>Utilitário</option>
                     </select>
                 </td>
-                <td class="CelulaZebra2">Ano Fabricação: *</td>
+                <td class="CelulaZebra2">Ano Fabricação: <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra2">
                     <input type="text" name="anoFabricacao" id="anoFabricacao" class="inputtexto"
                            size="6" maxlength="4" inputmode="numeric" pattern="[0-9]*"
@@ -76,7 +76,7 @@
                            inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                            value="<c:out value='${veiculo.taraKg}'/>"/>
                 </td>
-                <td class="CelulaZebra1">Capacidade (kg): *</td>
+                <td class="CelulaZebra1">Capacidade (kg): <span class="required-marker" aria-label="obrigatório">*</span></td>
                 <td class="CelulaZebra1">
                     <input type="text" name="capacidadeKg" id="capacidadeKg" class="inputtexto" size="12"
                            inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"

@@ -21,7 +21,7 @@
         </section>
 
         <c:if test="${not empty erro}">
-            <div class="alert alert-error"><c:out value="${erro}"/></div>
+            <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
         </c:if>
 
         <section class="card auth-card">
@@ -33,23 +33,23 @@
                         <h2 class="app-title">Dados de acesso</h2>
                     </div>
                     <div class="form-field">
-                        <label for="nome">Nome</label>
+                        <label for="nome">Nome <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="text" name="nome" id="nome" class="inputtexto" maxlength="100" value="<c:out value='${nome}'/>" required>
                     </div>
                     <div class="form-field">
-                        <label for="email">Email</label>
+                        <label for="email">Email <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="email" name="email" id="email" class="inputtexto" maxlength="100" value="<c:out value='${email}'/>" required>
                     </div>
                     <div class="form-field">
-                        <label for="usuario">Usuário</label>
+                        <label for="usuario">Usuário <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="text" name="usuario" id="usuario" class="inputtexto" maxlength="50" value="<c:out value='${usuario}'/>" required>
                     </div>
                     <div class="form-field">
-                        <label for="senha">Senha</label>
+                        <label for="senha">Senha <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="password" name="senha" id="senha" class="inputtexto" maxlength="50" required>
                     </div>
                     <div class="form-field">
-                        <label for="confirmaSenha">Confirmar senha</label>
+                        <label for="confirmaSenha">Confirmar senha <span class="required-marker" aria-label="obrigatório">*</span></label>
                         <input type="password" name="confirmaSenha" id="confirmaSenha" class="inputtexto" maxlength="50" required>
                     </div>
                     <div class="form-actions">

@@ -39,10 +39,10 @@
         </section>
 
         <c:if test="${not empty erro}">
-            <div class="alert alert-error"><c:out value="${erro}"/></div>
+            <div class="alert alert-error" role="alert"><c:out value="${erro}"/></div>
         </c:if>
         <c:if test="${not empty sucesso}">
-            <div class="alert alert-success"><c:out value="${sucesso}"/></div>
+            <div class="alert alert-success" role="alert"><c:out value="${sucesso}"/></div>
         </c:if>
 
         <section class="card filter-card">
