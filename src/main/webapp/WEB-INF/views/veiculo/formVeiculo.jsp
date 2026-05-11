@@ -38,7 +38,8 @@
             <tr>
                 <td class="CelulaZebra1" width="25%">Placa: *</td>
                 <td class="CelulaZebra1">
-                    <input type="text" name="placa" class="inputtexto" size="10" maxlength="8"
+                    <input type="text" name="placa" id="placa" class="inputtexto" size="10" maxlength="8"
+                           placeholder="ABC-1234 ou ABC1D23"
                            value="<c:out value='${veiculo.placa}'/>" style="text-transform:uppercase"/>
                 </td>
                 <td class="CelulaZebra1">RNTRC:</td>
@@ -60,26 +61,26 @@
                 </td>
                 <td class="CelulaZebra2">Ano Fabricação:</td>
                 <td class="CelulaZebra2">
-                    <input type="number" name="anoFabricacao" class="inputtexto" size="6" maxlength="4"
+                    <input type="number" name="anoFabricacao" class="inputtexto" size="6" maxlength="4" min="1950"
                            value="<c:out value='${veiculo.anoFabricacao}'/>"/>
                 </td>
             </tr>
             <tr>
                 <td class="CelulaZebra1">Tara (kg):</td>
                 <td class="CelulaZebra1">
-                    <input type="number" step="0.01" name="taraKg" class="inputtexto" size="12"
+                    <input type="number" step="0.01" min="0" max="50000" name="taraKg" class="inputtexto" size="12"
                            value="<c:out value='${veiculo.taraKg}'/>"/>
                 </td>
                 <td class="CelulaZebra1">Capacidade (kg): *</td>
                 <td class="CelulaZebra1">
-                    <input type="number" step="0.01" name="capacidadeKg" class="inputtexto" size="12"
+                    <input type="number" step="0.01" min="0.01" name="capacidadeKg" class="inputtexto" size="12"
                            value="<c:out value='${veiculo.capacidadeKg}'/>"/>
                 </td>
             </tr>
             <tr>
                 <td class="CelulaZebra2">Volume (m³):</td>
                 <td class="CelulaZebra2">
-                    <input type="number" step="0.01" name="volumeM3" class="inputtexto" size="10"
+                    <input type="number" step="0.01" min="0" name="volumeM3" class="inputtexto" size="10"
                            value="<c:out value='${veiculo.volumeM3}'/>"/>
                 </td>
                 <td class="CelulaZebra2">Status:</td>
@@ -102,5 +103,26 @@
             </tr>
         </table>
     </form>
+    <script>
+        function aplicarMascaraPlaca() {
+            var campo = document.getElementById('placa');
+            if (!campo) return;
+
+            function formatar(valor) {
+                var placa = valor.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 7);
+                if (/^[A-Z]{3}\d{1,4}$/.test(placa)) {
+                    return placa.replace(/^([A-Z]{3})(\d{1,4})$/, '$1-$2');
+                }
+                return placa;
+            }
+
+            campo.value = formatar(campo.value);
+            campo.addEventListener('input', function() {
+                this.value = formatar(this.value);
+            });
+        }
+
+        aplicarMascaraPlaca();
+    </script>
 </body>
 </html>

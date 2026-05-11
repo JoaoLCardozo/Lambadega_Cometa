@@ -1,5 +1,6 @@
 package br.com.gw.veiculo;
 
+import br.com.gw.exception.CadastroException;
 import br.com.gw.exception.NegocioException;
 
 import javax.servlet.ServletException;
@@ -56,7 +57,7 @@ public class VeiculoControlador extends HttpServlet {
             }
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
-            req.setAttribute("veiculo", montarVeiculoDaRequisicao(req));
+            req.setAttribute("veiculo", montarVeiculoParaRetorno(req));
             req.getRequestDispatcher("/WEB-INF/views/veiculo/formVeiculo.jsp").forward(req, resp);
         } catch (Exception e) {
             logger.severe("Erro inesperado POST: " + e.getMessage());
@@ -106,12 +107,14 @@ public class VeiculoControlador extends HttpServlet {
 
     private void salvar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
+        validarCamposNumericosDaRequisicao(req);
         veiculoBO.salvar(montarVeiculoDaRequisicao(req));
         resp.sendRedirect(req.getContextPath() + "/VeiculoControlador?acao=listar");
     }
 
     private void atualizar(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, NegocioException {
+        validarCamposNumericosDaRequisicao(req);
         Veiculo v = montarVeiculoDaRequisicao(req);
         v.setId(Integer.parseInt(req.getParameter("id")));
         veiculoBO.atualizar(v);
@@ -127,15 +130,85 @@ public class VeiculoControlador extends HttpServlet {
         String tipo = req.getParameter("tipo");
         if (tipo != null && !tipo.isEmpty()) v.setTipo(Veiculo.Tipo.valueOf(tipo));
         String tara = req.getParameter("taraKg");
-        if (tara != null && !tara.isEmpty()) v.setTaraKg(Double.parseDouble(tara));
+        if (tara != null && !tara.isEmpty()) v.setTaraKg(parseDoubleSeguro(tara));
         String cap = req.getParameter("capacidadeKg");
-        if (cap != null && !cap.isEmpty()) v.setCapacidadeKg(Double.parseDouble(cap));
+        if (cap != null && !cap.isEmpty()) v.setCapacidadeKg(parseDoubleSeguro(cap));
         String vol = req.getParameter("volumeM3");
-        if (vol != null && !vol.isEmpty()) v.setVolumeM3(Double.parseDouble(vol));
+        if (vol != null && !vol.isEmpty()) v.setVolumeM3(parseDoubleSeguro(vol));
         String st = req.getParameter("status");
         v.setStatus(st != null && !st.isEmpty()
             ? Veiculo.Status.valueOf(st) : Veiculo.Status.DISPONIVEL);
         return v;
+    }
+
+    private Veiculo montarVeiculoParaRetorno(HttpServletRequest req) {
+        Veiculo v = new Veiculo();
+        v.setPlaca(req.getParameter("placa"));
+        v.setRntrc(req.getParameter("rntrc"));
+
+        String id = req.getParameter("id");
+        if (id != null && id.matches("\\d+")) v.setId(Integer.parseInt(id));
+
+        String ano = req.getParameter("anoFabricacao");
+        if (ano != null && ano.matches("\\d+")) v.setAnoFabricacao(Integer.parseInt(ano));
+
+        String tipo = req.getParameter("tipo");
+        if (tipo != null && !tipo.isEmpty()) v.setTipo(Veiculo.Tipo.valueOf(tipo));
+
+        v.setTaraKg(parseDoubleSeguro(req.getParameter("taraKg")));
+        v.setCapacidadeKg(parseDoubleSeguro(req.getParameter("capacidadeKg")));
+        v.setVolumeM3(parseDoubleSeguro(req.getParameter("volumeM3")));
+
+        String st = req.getParameter("status");
+        v.setStatus(st != null && !st.isEmpty()
+            ? Veiculo.Status.valueOf(st) : Veiculo.Status.DISPONIVEL);
+        return v;
+    }
+
+    private void validarCamposNumericosDaRequisicao(HttpServletRequest req) throws CadastroException {
+        validarInteiro(req.getParameter("anoFabricacao"), "Ano de Fabricação");
+        validarDecimal(req.getParameter("taraKg"), "Tara");
+        validarDecimal(req.getParameter("capacidadeKg"), "Capacidade de Carga");
+        validarDecimal(req.getParameter("volumeM3"), "Volume");
+    }
+
+    private void validarInteiro(String valor, String nomeCampo) throws CadastroException {
+        String texto = normalizarTexto(valor);
+        if (texto == null) return;
+        if (!texto.matches("\\d+")) {
+            throw new CadastroException("O campo " + nomeCampo + " deve conter somente números.");
+        }
+    }
+
+    private void validarDecimal(String valor, String nomeCampo) throws CadastroException {
+        String texto = normalizarTexto(valor);
+        if (texto == null) return;
+
+        try {
+            double numero = Double.parseDouble(texto.replace(',', '.'));
+            if (Double.isNaN(numero) || Double.isInfinite(numero)) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            throw new CadastroException("O campo " + nomeCampo + " deve conter um número válido.");
+        }
+    }
+
+    private double parseDoubleSeguro(String valor) {
+        String texto = normalizarTexto(valor);
+        if (texto == null) return 0;
+
+        try {
+            return Double.parseDouble(texto.replace(',', '.'));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) return null;
+        String texto = valor.trim();
+        return texto.isEmpty() ? null : texto;
     }
 
     private int parsePagina(String valor) {
