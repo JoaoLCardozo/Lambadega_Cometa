@@ -17,7 +17,14 @@
                     <p class="brand-subtitle">Cadastro comercial e operacional</p>
                 </div>
             </div>
-            <a class="link-button" href="${pageContext.request.contextPath}/index.jsp">Início</a>
+            <c:choose>
+                <c:when test="${param.origem == 'monitorFretes'}">
+                    <a class="link-button" href="${pageContext.request.contextPath}/MonitorFretesControlador">Monitor de Fretes</a>
+                </c:when>
+                <c:otherwise>
+                    <a class="link-button" href="${pageContext.request.contextPath}/index.jsp">Início</a>
+                </c:otherwise>
+            </c:choose>
         </section>
 
         <section class="app-header">
@@ -41,6 +48,9 @@
         <section class="card filter-card">
             <form class="filter-form cliente-filter-form" action="${pageContext.request.contextPath}/ClienteControlador" method="get" name="formulario">
                 <input type="hidden" name="acao" value="listar">
+                <c:if test="${param.origem == 'monitorFretes'}">
+                    <input type="hidden" name="origem" value="monitorFretes">
+                </c:if>
                 <div class="form-field">
                     <label for="filtro">Nome ou razão social</label>
                     <input type="text" name="filtro" id="filtro" class="inputtexto"
@@ -130,6 +140,9 @@
                         <c:param name="municipio" value="${municipio}"/>
                         <c:param name="tipoPessoa" value="${tipoPessoa}"/>
                         <c:param name="status" value="${status}"/>
+                        <c:if test="${param.origem == 'monitorFretes'}">
+                            <c:param name="origem" value="monitorFretes"/>
+                        </c:if>
                     </c:url>
                     <a class="link-button" href="${clienteAnteriorUrl}">Anterior</a>
                 </c:if>
@@ -142,6 +155,9 @@
                         <c:param name="municipio" value="${municipio}"/>
                         <c:param name="tipoPessoa" value="${tipoPessoa}"/>
                         <c:param name="status" value="${status}"/>
+                        <c:if test="${param.origem == 'monitorFretes'}">
+                            <c:param name="origem" value="monitorFretes"/>
+                        </c:if>
                     </c:url>
                     <a class="link-button" href="${clienteProximoUrl}">Próximo</a>
                 </c:if>

@@ -51,6 +51,7 @@
         <url-pattern>/ClienteControlador</url-pattern>
         <url-pattern>/MotoristaControlador</url-pattern>
         <url-pattern>/VeiculoControlador</url-pattern>
+        <url-pattern>/MonitorFretesControlador</url-pattern>
     </filter-mapping>
 
     <session-config>

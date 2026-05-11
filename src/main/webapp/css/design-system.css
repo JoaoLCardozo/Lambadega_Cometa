@@ -625,7 +625,7 @@ button:hover {
 
 .nav-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 14px;
 }
 
@@ -667,6 +667,188 @@ button:hover {
     font-weight: 700;
 }
 
+.monitor-fretes-hero {
+    align-items: center;
+}
+
+.monitor-fretes-metrics {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(150px, 1fr));
+    gap: 12px;
+    max-width: 1180px;
+    margin: 0 auto 18px;
+}
+
+.metric-card {
+    min-height: 126px;
+    padding: 16px;
+    background: var(--lc-surface);
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-lg);
+    box-shadow: var(--lc-shadow-sm);
+}
+
+.metric-card.metric-danger {
+    border-color: #ffc9c9;
+    background: #fff8f8;
+}
+
+.metric-card.metric-warning {
+    border-color: #ffe2a8;
+    background: #fffaf0;
+}
+
+.metric-label,
+.metric-help {
+    display: block;
+    color: var(--lc-muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.metric-value {
+    display: block;
+    margin: 8px 0 6px;
+    color: var(--lc-ink);
+    font-size: 32px;
+    line-height: 1;
+}
+
+.metric-value.currency {
+    font-size: 23px;
+    line-height: 1.15;
+}
+
+.monitor-fretes-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.8fr);
+    gap: 16px;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.monitor-fretes-main,
+.monitor-fretes-side {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+}
+
+.monitor-fretes-panel {
+    padding: 16px;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.panel-title {
+    margin: 2px 0 0;
+    color: var(--lc-ink);
+    font-size: 18px;
+}
+
+.alert-list,
+.ranking-list,
+.status-stack,
+.quick-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.operation-alert,
+.ranking-row,
+.status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--lc-border);
+    border-radius: var(--lc-radius-md);
+    background: var(--lc-surface-soft);
+}
+
+.operation-alert strong,
+.operation-alert span,
+.ranking-row strong,
+.ranking-info span {
+    display: block;
+}
+
+.operation-alert span,
+.ranking-info span {
+    margin-top: 3px;
+    color: var(--lc-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.operation-alert.alert-critico {
+    border-color: #ffc9c9;
+    background: #fff5f5;
+}
+
+.operation-alert.alert-atencao {
+    border-color: #ffe2a8;
+    background: #fff9ed;
+}
+
+.operation-alert.alert-ok {
+    border-color: #bfe9cc;
+    background: #f3fbf6;
+}
+
+.compact-table .bordaFina {
+    margin-bottom: 0;
+}
+
+.compact-table .data-table {
+    min-width: 720px;
+}
+
+.rank-position {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    color: #172033;
+    background: #edf2f7;
+    border: 1px solid #d7e0ea;
+    border-radius: var(--lc-radius-md);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.rank-1 {
+    color: #664700;
+    background: #fff4cc;
+    border-color: #ffd76a;
+}
+
+.rank-2 {
+    color: #344256;
+    background: #eef2f7;
+    border-color: #cfd8e3;
+}
+
+.rank-3 {
+    color: #6d3c12;
+    background: #fff0df;
+    border-color: #f0bd86;
+}
+
+.ranking-info {
+    min-width: 0;
+}
+
 .radio-group {
     display: flex;
     flex-wrap: wrap;
@@ -706,6 +888,8 @@ button:hover {
 
     .filter-form,
     .form-grid,
+    .monitor-fretes-metrics,
+    .monitor-fretes-layout,
     .details-grid,
     .nav-grid {
         grid-template-columns: 1fr;
@@ -735,8 +919,16 @@ button:hover {
     .app-brand,
     .app-header,
     .filter-card,
+    .monitor-fretes-panel,
     .form-grid {
         padding: 14px;
+    }
+
+    .operation-alert,
+    .ranking-row,
+    .status-row {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .brand-title {

@@ -34,6 +34,11 @@
         </section>
 
         <nav class="nav-grid" aria-label="Módulos do sistema">
+            <a class="nav-card" href="${pageContext.request.contextPath}/MonitorFretesControlador">
+                <span class="nav-icon">MF</span>
+                <span class="nav-label">Monitor de Fretes</span>
+                <span class="nav-help">Alertas, indicadores e prioridades da operação</span>
+            </a>
             <a class="nav-card" href="${pageContext.request.contextPath}/ClienteControlador?acao=listar">
                 <span class="nav-icon">CL</span>
                 <span class="nav-label">Clientes</span>

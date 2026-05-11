@@ -36,7 +36,14 @@
                     <p class="brand-subtitle">Indicadores operacionais por motorista</p>
                 </div>
             </div>
-            <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=listar">Voltar</a>
+            <c:choose>
+                <c:when test="${param.origem == 'monitorFretes'}">
+                    <a class="link-button" href="${pageContext.request.contextPath}/MonitorFretesControlador">Monitor de Fretes</a>
+                </c:when>
+                <c:otherwise>
+                    <a class="link-button" href="${pageContext.request.contextPath}/FreteControlador?acao=listar">Voltar</a>
+                </c:otherwise>
+            </c:choose>
         </section>
 
         <section class="app-header">
@@ -75,9 +82,18 @@
                     <input type="button" class="inputbotao"
                            value="Localizar"
                            onclick="abrirJanelaPerformanceMotorista(this.form)">
-                    <input type="button" class="inputbotao secondary"
-                           value="Cancelar"
-                           onclick="window.location='${pageContext.request.contextPath}/FreteControlador?acao=listar'">
+                    <c:choose>
+                        <c:when test="${param.origem == 'monitorFretes'}">
+                            <input type="button" class="inputbotao secondary"
+                                   value="Cancelar"
+                                   onclick="window.location='${pageContext.request.contextPath}/MonitorFretesControlador'">
+                        </c:when>
+                        <c:otherwise>
+                            <input type="button" class="inputbotao secondary"
+                                   value="Cancelar"
+                                   onclick="window.location='${pageContext.request.contextPath}/FreteControlador?acao=listar'">
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </form>
         </section>

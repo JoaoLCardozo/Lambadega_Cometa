@@ -17,7 +17,14 @@
                     <p class="brand-subtitle">Frota, capacidade e disponibilidade</p>
                 </div>
             </div>
-            <a class="link-button" href="${pageContext.request.contextPath}/index.jsp">Início</a>
+            <c:choose>
+                <c:when test="${param.origem == 'monitorFretes'}">
+                    <a class="link-button" href="${pageContext.request.contextPath}/MonitorFretesControlador">Monitor de Fretes</a>
+                </c:when>
+                <c:otherwise>
+                    <a class="link-button" href="${pageContext.request.contextPath}/index.jsp">Início</a>
+                </c:otherwise>
+            </c:choose>
         </section>
 
         <section class="app-header">
@@ -38,6 +45,9 @@
         <section class="card filter-card">
             <form class="filter-form" action="${pageContext.request.contextPath}/VeiculoControlador" method="get">
                 <input type="hidden" name="acao" value="listar">
+                <c:if test="${param.origem == 'monitorFretes'}">
+                    <input type="hidden" name="origem" value="monitorFretes">
+                </c:if>
                 <div class="form-field">
                     <label for="filtro">Placa</label>
                     <input type="text" name="filtro" id="filtro" class="inputtexto"
@@ -92,6 +102,9 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual - 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:if test="${param.origem == 'monitorFretes'}">
+                            <c:param name="origem" value="monitorFretes"/>
+                        </c:if>
                     </c:url>
                     <a class="link-button" href="${veiculoAnteriorUrl}">Anterior</a>
                 </c:if>
@@ -100,6 +113,9 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual + 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:if test="${param.origem == 'monitorFretes'}">
+                            <c:param name="origem" value="monitorFretes"/>
+                        </c:if>
                     </c:url>
                     <a class="link-button" href="${veiculoProximoUrl}">Próximo</a>
                 </c:if>
