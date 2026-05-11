@@ -135,13 +135,12 @@ public class UsuarioControladorServletImpl extends HttpServlet {
     }
 
     /**
-     * Lista todos os usuários (apenas para administradores).
+     * Lista todos os usuários cadastrados.
      */
     private void listarUsuarios(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         try {
-            // TODO: Verificar permissão de administrador
             java.util.List<Usuario> usuarios = usuarioBO.listarTodos();
 
             request.setAttribute("usuarios", usuarios);
