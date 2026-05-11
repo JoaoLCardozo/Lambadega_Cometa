@@ -67,12 +67,18 @@ public class VeiculoControlador extends HttpServlet {
 
     private void listar(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, NegocioException {
-        String filtro  = req.getParameter("filtro");
-        int pagina     = parsePagina(req.getParameter("pagina"));
-        List<Veiculo> lista  = veiculoBO.listar(filtro, pagina, LIMITE);
-        int totalPaginas     = veiculoBO.contarPaginas(filtro, LIMITE);
+        String filtro        = req.getParameter("filtro");
+        String tipo          = req.getParameter("tipo");
+        String status        = req.getParameter("status");
+        String anoFabricacao = req.getParameter("anoFabricacao");
+        int pagina           = parsePagina(req.getParameter("pagina"));
+        List<Veiculo> lista  = veiculoBO.listar(filtro, tipo, status, anoFabricacao, pagina, LIMITE);
+        int totalPaginas     = veiculoBO.contarPaginas(filtro, tipo, status, anoFabricacao, LIMITE);
         req.setAttribute("listaVeiculos",  lista);
         req.setAttribute("filtro",         filtro);
+        req.setAttribute("tipo",           tipo);
+        req.setAttribute("status",         status);
+        req.setAttribute("anoFabricacao",  anoFabricacao);
         req.setAttribute("paginaAtual",    pagina);
         req.setAttribute("totalPaginas",   totalPaginas);
         req.getRequestDispatcher("/WEB-INF/views/veiculo/listarVeiculo.jsp").forward(req, resp);

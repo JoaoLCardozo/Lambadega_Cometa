@@ -249,6 +249,10 @@ tr.CelulaZebra2:hover {
     grid-template-columns: minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(150px, 1fr) minmax(120px, 0.75fr) minmax(120px, 0.75fr) auto;
 }
 
+.veiculo-filter-form {
+    grid-template-columns: minmax(160px, 1.2fr) minmax(130px, 0.85fr) minmax(150px, 1fr) minmax(110px, 0.75fr) auto;
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(220px, 1fr));
@@ -560,7 +564,8 @@ button:hover {
 }
 
 .status-INATIVO,
-.status-CANCELADO {
+.status-CANCELADO,
+.status-RESERVADO {
     color: #667085 !important;
     background: #eef2f6;
 }

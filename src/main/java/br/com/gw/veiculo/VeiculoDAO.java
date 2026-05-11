@@ -6,22 +6,36 @@ import br.com.gw.util.ConnectionFactory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public class VeiculoDAO {
     private static final Logger logger = Logger.getLogger(VeiculoDAO.class.getName());
 
     public List<Veiculo> listar(String filtro, int pagina, int limite) throws NegocioException {
+        return listar(filtro, null, null, null, pagina, limite);
+    }
+
+    public List<Veiculo> listar(String filtro, String tipo, String status,
+                                String anoFabricacao, int pagina, int limite)
+            throws NegocioException {
         List<Veiculo> lista = new ArrayList<>();
         int offset = (pagina - 1) * limite;
-        String sql = "SELECT id, placa, rntrc, ano_fabricacao, tipo, tara_kg, " +
-                     "capacidade_kg, volume_m3, status FROM veiculo " +
-                     "WHERE placa ILIKE ? ORDER BY placa LIMIT ? OFFSET ?";
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT id, placa, rntrc, ano_fabricacao, tipo, tara_kg, " +
+            "capacidade_kg, volume_m3, status FROM veiculo WHERE 1=1");
+        List<Object> parametros = new ArrayList<>();
+        adicionarFiltros(sql, parametros, filtro, tipo, status, anoFabricacao);
+        sql.append(" ORDER BY placa LIMIT ? OFFSET ?");
+
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + (filtro != null ? filtro : "") + "%");
-            stmt.setInt(2, limite);
-            stmt.setInt(3, offset);
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int indice = preencherParametros(stmt, parametros);
+            stmt.setInt(indice++, limite);
+            stmt.setInt(indice, offset);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) lista.add(mapear(rs));
             }
@@ -33,10 +47,20 @@ public class VeiculoDAO {
     }
 
     public int contarTotal(String filtro) throws NegocioException {
-        String sql = "SELECT COUNT(*) FROM veiculo WHERE placa ILIKE ?";
+        return contarTotal(filtro, null, null, null);
+    }
+
+    public int contarTotal(String filtro, String tipo, String status,
+                           String anoFabricacao) throws NegocioException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM veiculo WHERE 1=1");
+        List<Object> parametros = new ArrayList<>();
+        adicionarFiltros(sql, parametros, filtro, tipo, status, anoFabricacao);
+
         try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + (filtro != null ? filtro : "") + "%");
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            preencherParametros(stmt, parametros);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
@@ -44,6 +68,60 @@ public class VeiculoDAO {
             throw new NegocioException("Erro ao contar veículos.", e);
         }
         return 0;
+    }
+
+    private void adicionarFiltros(StringBuilder sql, List<Object> parametros, String filtro,
+                                  String tipo, String status, String anoFabricacao) {
+        String filtroPlaca = somenteLetrasNumeros(filtro);
+        if (filtroPlaca != null && !filtroPlaca.isEmpty()) {
+            sql.append(" AND placa ILIKE ?");
+            parametros.add("%" + filtroPlaca + "%");
+        }
+
+        String filtroTipo = normalizarEnum(tipo);
+        if (filtroTipo != null) {
+            sql.append(" AND tipo = ?");
+            parametros.add(filtroTipo);
+        }
+
+        String filtroStatus = normalizarEnum(status);
+        if (filtroStatus != null) {
+            sql.append(" AND status = ?");
+            parametros.add(filtroStatus);
+        }
+
+        String filtroAno = normalizarTexto(anoFabricacao);
+        if (filtroAno != null && filtroAno.matches("\\d{4}")) {
+            sql.append(" AND ano_fabricacao = ?");
+            parametros.add(Integer.parseInt(filtroAno));
+        }
+    }
+
+    private int preencherParametros(PreparedStatement stmt, List<Object> parametros) throws SQLException {
+        int indice = 1;
+        for (Object parametro : parametros) {
+            if (parametro instanceof Integer) {
+                stmt.setInt(indice++, (Integer) parametro);
+            } else {
+                stmt.setString(indice++, parametro.toString());
+            }
+        }
+        return indice;
+    }
+
+    private String normalizarTexto(String valor) {
+        if (valor == null) return null;
+        String texto = valor.trim();
+        return texto.isEmpty() ? null : texto;
+    }
+
+    private String normalizarEnum(String valor) {
+        String texto = normalizarTexto(valor);
+        return texto != null ? texto.toUpperCase(Locale.ROOT) : null;
+    }
+
+    private String somenteLetrasNumeros(String valor) {
+        return valor != null ? valor.replaceAll("[^A-Za-z0-9]", "").toUpperCase(Locale.ROOT) : null;
     }
 
     public Veiculo buscarPorId(int id) throws NegocioException {

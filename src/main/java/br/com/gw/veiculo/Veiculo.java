@@ -47,6 +47,22 @@ public class Veiculo implements Serializable {
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
 
+    public String getStatusRotulo() {
+        if (status == null) return "";
+        switch (status) {
+            case DISPONIVEL:
+                return "Disponível";
+            case RESERVADO:
+                return "Reservado";
+            case EM_VIAGEM:
+                return "Em Viagem";
+            case EM_MANUTENCAO:
+                return "Manutenção";
+            default:
+                return status.name();
+        }
+    }
+
     public double getPesoUtil() { return capacidadeKg - taraKg; }
 
     @Override

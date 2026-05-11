@@ -16,13 +16,25 @@ public class VeiculoBO {
         "^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$");
 
     public List<Veiculo> listar(String filtro, int pagina, int limite) throws NegocioException {
+        return listar(filtro, null, null, null, pagina, limite);
+    }
+
+    public List<Veiculo> listar(String filtro, String tipo, String status,
+                                String anoFabricacao, int pagina, int limite)
+            throws NegocioException {
         if (pagina < 1) pagina = 1;
         if (limite < 1) limite = 10;
-        return veiculoDAO.listar(filtro, pagina, limite);
+        return veiculoDAO.listar(filtro, tipo, status, anoFabricacao, pagina, limite);
     }
 
     public int contarPaginas(String filtro, int limite) throws NegocioException {
-        int total = veiculoDAO.contarTotal(filtro);
+        return contarPaginas(filtro, null, null, null, limite);
+    }
+
+    public int contarPaginas(String filtro, String tipo, String status,
+                             String anoFabricacao, int limite) throws NegocioException {
+        if (limite < 1) limite = 10;
+        int total = veiculoDAO.contarTotal(filtro, tipo, status, anoFabricacao);
         return (int) Math.ceil((double) total / limite);
     }
 

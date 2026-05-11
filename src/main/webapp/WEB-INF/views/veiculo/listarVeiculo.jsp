@@ -43,7 +43,7 @@
         </c:if>
 
         <section class="card filter-card">
-            <form class="filter-form" action="${pageContext.request.contextPath}/VeiculoControlador" method="get">
+            <form class="filter-form veiculo-filter-form" action="${pageContext.request.contextPath}/VeiculoControlador" method="get">
                 <input type="hidden" name="acao" value="listar">
                 <c:if test="${param.origem == 'monitorFretes'}">
                     <input type="hidden" name="origem" value="monitorFretes">
@@ -53,8 +53,40 @@
                     <input type="text" name="filtro" id="filtro" class="inputtexto"
                            value="<c:out value='${filtro}'/>"/>
                 </div>
+                <div class="form-field">
+                    <label for="tipo">Tipo</label>
+                    <select name="tipo" id="tipo" class="inputtexto">
+                        <option value="">Todos</option>
+                        <option value="TRUCK" ${tipo == 'TRUCK' ? 'selected' : ''}>Truck</option>
+                        <option value="CARRETA" ${tipo == 'CARRETA' ? 'selected' : ''}>Carreta</option>
+                        <option value="VAN" ${tipo == 'VAN' ? 'selected' : ''}>Van</option>
+                        <option value="UTILITARIO" ${tipo == 'UTILITARIO' ? 'selected' : ''}>Utilitário</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="inputtexto">
+                        <option value="">Todos</option>
+                        <option value="DISPONIVEL" ${status == 'DISPONIVEL' ? 'selected' : ''}>Disponível</option>
+                        <option value="RESERVADO" ${status == 'RESERVADO' ? 'selected' : ''}>Reservado</option>
+                        <option value="EM_VIAGEM" ${status == 'EM_VIAGEM' ? 'selected' : ''}>Em Viagem</option>
+                        <option value="EM_MANUTENCAO" ${status == 'EM_MANUTENCAO' ? 'selected' : ''}>Manutenção</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="anoFabricacao">Ano</label>
+                    <input type="number" name="anoFabricacao" id="anoFabricacao" class="inputtexto"
+                           min="1900" max="2100" value="<c:out value='${anoFabricacao}'/>"/>
+                </div>
                 <div class="app-actions">
                     <input type="submit" class="inputbotao" value="Pesquisar"/>
+                    <c:url var="limparVeiculosUrl" value="/VeiculoControlador">
+                        <c:param name="acao" value="listar"/>
+                        <c:if test="${param.origem == 'monitorFretes'}">
+                            <c:param name="origem" value="monitorFretes"/>
+                        </c:if>
+                    </c:url>
+                    <a class="link-button" href="${limparVeiculosUrl}">Limpar</a>
                 </div>
             </form>
         </section>
@@ -85,7 +117,7 @@
                         <td><c:out value="${v.taraKg}"/></td>
                         <td><c:out value="${v.capacidadeKg}"/></td>
                         <td><c:out value="${v.volumeM3}"/></td>
-                        <td><span class="status-${v.status}"><c:out value="${v.status}"/></span></td>
+                        <td><span class="status-${v.status}"><c:out value="${v.statusRotulo}"/></span></td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty listaVeiculos}">
@@ -102,6 +134,9 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual - 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:param name="tipo" value="${tipo}"/>
+                        <c:param name="status" value="${status}"/>
+                        <c:param name="anoFabricacao" value="${anoFabricacao}"/>
                         <c:if test="${param.origem == 'monitorFretes'}">
                             <c:param name="origem" value="monitorFretes"/>
                         </c:if>
@@ -113,6 +148,9 @@
                         <c:param name="acao" value="listar"/>
                         <c:param name="pagina" value="${paginaAtual + 1}"/>
                         <c:param name="filtro" value="${filtro}"/>
+                        <c:param name="tipo" value="${tipo}"/>
+                        <c:param name="status" value="${status}"/>
+                        <c:param name="anoFabricacao" value="${anoFabricacao}"/>
                         <c:if test="${param.origem == 'monitorFretes'}">
                             <c:param name="origem" value="monitorFretes"/>
                         </c:if>
