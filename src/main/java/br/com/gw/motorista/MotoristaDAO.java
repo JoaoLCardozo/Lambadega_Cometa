@@ -159,6 +159,21 @@ public class MotoristaDAO {
         return false;
     }
 
+    public boolean existeCnhNumero(String cnhNumero, int idIgnorar) throws NegocioException {
+        String sql = "SELECT COUNT(*) FROM motorista WHERE cnh_numero = ? AND id <> ?";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, cnhNumero);
+            stmt.setInt(2, idIgnorar);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new NegocioException("Erro ao verificar CNH.", e);
+        }
+        return false;
+    }
+
     public boolean possuiFretesAtivos(int id) throws NegocioException {
         String sql = "SELECT COUNT(*) FROM frete WHERE id_motorista = ? " +
                      "AND status IN ('EMITIDO','SAIDA_CONFIRMADA','EM_TRANSITO')";

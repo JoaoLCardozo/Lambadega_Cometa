@@ -103,6 +103,9 @@ public class MotoristaBO {
         if (!m.getCnhNumero().matches("\\d{11}")) {
             throw new CadastroException("O Número da CNH deve conter exatamente 11 dígitos numéricos.");
         }
+        if (motoristaDAO.existeCnhNumero(m.getCnhNumero(), idIgnorar)) {
+            throw new CadastroException("CNH já cadastrada.");
+        }
         if (m.getCnhCategoria() == null) {
             throw new CadastroException("O campo Categoria da CNH é obrigatório.");
         }
