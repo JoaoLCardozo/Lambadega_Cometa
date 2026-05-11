@@ -227,9 +227,17 @@ public class VeiculoDAO {
         stmt.setString(2, v.getRntrc());
         stmt.setInt(3, v.getAnoFabricacao());
         stmt.setString(4, v.getTipo() != null ? v.getTipo().name() : null);
-        stmt.setDouble(5, v.getTaraKg());
+        if (v.getTaraKg() != null) {
+            stmt.setDouble(5, v.getTaraKg());
+        } else {
+            stmt.setNull(5, Types.NUMERIC);
+        }
         stmt.setDouble(6, v.getCapacidadeKg());
-        stmt.setDouble(7, v.getVolumeM3());
+        if (v.getVolumeM3() != null) {
+            stmt.setDouble(7, v.getVolumeM3());
+        } else {
+            stmt.setNull(7, Types.NUMERIC);
+        }
         stmt.setString(8, v.getStatus() != null ? v.getStatus().name() : "DISPONIVEL");
     }
 
@@ -238,11 +246,14 @@ public class VeiculoDAO {
         v.setId(rs.getInt("id"));
         v.setPlaca(rs.getString("placa"));
         v.setRntrc(rs.getString("rntrc"));
-        v.setAnoFabricacao(rs.getInt("ano_fabricacao"));
+        int anoFabricacao = rs.getInt("ano_fabricacao");
+        v.setAnoFabricacao(rs.wasNull() ? null : anoFabricacao);
         v.setTipo(Veiculo.Tipo.valueOf(rs.getString("tipo")));
-        v.setTaraKg(rs.getDouble("tara_kg"));
+        double taraKg = rs.getDouble("tara_kg");
+        v.setTaraKg(rs.wasNull() ? null : taraKg);
         v.setCapacidadeKg(rs.getDouble("capacidade_kg"));
-        v.setVolumeM3(rs.getDouble("volume_m3"));
+        double volumeM3 = rs.getDouble("volume_m3");
+        v.setVolumeM3(rs.wasNull() ? null : volumeM3);
         v.setStatus(Veiculo.Status.valueOf(rs.getString("status")));
         return v;
     }

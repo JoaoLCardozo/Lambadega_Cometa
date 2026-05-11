@@ -76,6 +76,7 @@
                 <td class="CelulaZebra2">
                     <input type="text" name="documento" id="documento"
                            class="inputtexto" size="20" maxlength="18"
+                           inputmode="numeric" autocomplete="off"
                            placeholder="000.000.000-00"
                            value="<c:out value='${cliente.documentoFormatado}'/>"/>
                 </td>
@@ -105,6 +106,7 @@
                     <%-- maxlength=9 alinhado com VARCHAR(9) no banco --%>
                     <input type="text" name="cep" id="cep" class="inputtexto"
                            size="10" maxlength="9" style="max-width: 150px;"
+                           inputmode="numeric" autocomplete="postal-code"
                            placeholder="00000-000"
                            title="Digite o CEP para preencher o endereço automaticamente"
                            value="<c:out value='${cliente.cep}'/>"/>
@@ -183,12 +185,14 @@
                 <td class="CelulaZebra1">
                     <input type="text" name="telefone" id="telefone" class="inputtexto"
                            size="20" maxlength="15"
+                           inputmode="tel" autocomplete="tel"
                            placeholder="(00) 00000-0000"
                            value="<c:out value='${cliente.telefone}'/>"/>
                 </td>
                 <td class="CelulaZebra1">E-mail:</td>
                 <td class="CelulaZebra1">
-                    <input type="text" name="email" class="inputtexto" size="40" maxlength="100"
+                    <input type="email" name="email" class="inputtexto" size="40" maxlength="100"
+                           inputmode="email" autocomplete="email"
                            value="<c:out value='${cliente.email}'/>"/>
                 </td>
             </tr>

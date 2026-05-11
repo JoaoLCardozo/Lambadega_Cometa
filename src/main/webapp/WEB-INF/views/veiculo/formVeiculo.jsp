@@ -39,12 +39,14 @@
                 <td class="CelulaZebra1" width="25%">Placa: *</td>
                 <td class="CelulaZebra1">
                     <input type="text" name="placa" id="placa" class="inputtexto" size="10" maxlength="8"
+                           autocapitalize="characters" autocomplete="off"
                            placeholder="ABC-1234 ou ABC1D23"
                            value="<c:out value='${veiculo.placa}'/>" style="text-transform:uppercase"/>
                 </td>
                 <td class="CelulaZebra1">RNTRC:</td>
                 <td class="CelulaZebra1">
                     <input type="text" name="rntrc" id="rntrc" class="inputtexto" size="20" maxlength="8"
+                           inputmode="numeric" pattern="[0-9]*" autocomplete="off"
                            placeholder="00000000"
                            value="<c:out value='${veiculo.rntrc}'/>"/>
                 </td>
@@ -60,28 +62,32 @@
                         <option value="UTILITARIO"${veiculo.tipo == 'UTILITARIO'? 'selected' : ''}>Utilitário</option>
                     </select>
                 </td>
-                <td class="CelulaZebra2">Ano Fabricação:</td>
+                <td class="CelulaZebra2">Ano Fabricação: *</td>
                 <td class="CelulaZebra2">
-                    <input type="number" name="anoFabricacao" class="inputtexto" size="6" maxlength="4" min="1950"
+                    <input type="text" name="anoFabricacao" id="anoFabricacao" class="inputtexto"
+                           size="6" maxlength="4" inputmode="numeric" pattern="[0-9]*"
                            value="<c:out value='${veiculo.anoFabricacao}'/>"/>
                 </td>
             </tr>
             <tr>
                 <td class="CelulaZebra1">Tara (kg):</td>
                 <td class="CelulaZebra1">
-                    <input type="number" step="0.01" min="0" max="50000" name="taraKg" class="inputtexto" size="12"
+                    <input type="text" name="taraKg" id="taraKg" class="inputtexto" size="12"
+                           inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                            value="<c:out value='${veiculo.taraKg}'/>"/>
                 </td>
                 <td class="CelulaZebra1">Capacidade (kg): *</td>
                 <td class="CelulaZebra1">
-                    <input type="number" step="0.01" min="0.01" name="capacidadeKg" class="inputtexto" size="12"
+                    <input type="text" name="capacidadeKg" id="capacidadeKg" class="inputtexto" size="12"
+                           inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                            value="<c:out value='${veiculo.capacidadeKg}'/>"/>
                 </td>
             </tr>
             <tr>
                 <td class="CelulaZebra2">Volume (m³):</td>
                 <td class="CelulaZebra2">
-                    <input type="number" step="0.01" min="0" name="volumeM3" class="inputtexto" size="10"
+                    <input type="text" name="volumeM3" id="volumeM3" class="inputtexto" size="10"
+                           inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                            value="<c:out value='${veiculo.volumeM3}'/>"/>
                 </td>
                 <td class="CelulaZebra2">Status:</td>
@@ -125,13 +131,32 @@
 
         aplicarMascaraPlaca();
 
-        var rntrc = document.getElementById('rntrc');
-        if (rntrc) {
-            rntrc.value = rntrc.value.replace(/\D/g, '').substring(0, 8);
-            rntrc.addEventListener('input', function() {
-                this.value = this.value.replace(/\D/g, '').substring(0, 8);
+        function somenteDigitos(valor, tamanho) {
+            return valor.replace(/\D/g, '').substring(0, tamanho);
+        }
+
+        function somenteDecimal(valor) {
+            var normalizado = valor.replace(',', '.').replace(/[^0-9.]/g, '');
+            var partes = normalizado.split('.');
+            var inteiro = partes.shift();
+            var decimal = partes.join('').substring(0, 2);
+            return decimal ? inteiro + '.' + decimal : inteiro;
+        }
+
+        function aplicarMascara(id, formatar) {
+            var campo = document.getElementById(id);
+            if (!campo) return;
+            campo.value = formatar(campo.value);
+            campo.addEventListener('input', function() {
+                this.value = formatar(this.value);
             });
         }
+
+        aplicarMascara('rntrc', function(valor) { return somenteDigitos(valor, 8); });
+        aplicarMascara('anoFabricacao', function(valor) { return somenteDigitos(valor, 4); });
+        aplicarMascara('taraKg', somenteDecimal);
+        aplicarMascara('capacidadeKg', somenteDecimal);
+        aplicarMascara('volumeM3', somenteDecimal);
     </script>
 </body>
 </html>

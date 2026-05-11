@@ -100,21 +100,27 @@ public class VeiculoBO {
         if (v.getTipo() == null) {
             throw new CadastroException("O campo Tipo é obrigatório.");
         }
+        Integer anoFabricacao = v.getAnoFabricacao();
+        if (anoFabricacao == null) {
+            throw new CadastroException("O campo Ano de Fabricação é obrigatório.");
+        }
         int anoMaximo = LocalDate.now().getYear() + 1;
-        if (v.getAnoFabricacao() < ANO_MINIMO || v.getAnoFabricacao() > anoMaximo) {
+        if (anoFabricacao < ANO_MINIMO || anoFabricacao > anoMaximo) {
             throw new CadastroException(
                 "O Ano de Fabricação deve estar entre " + ANO_MINIMO + " e " + anoMaximo + ".");
         }
-        if (v.getTaraKg() < 0 || v.getTaraKg() > TARA_MAXIMA_KG) {
+        Double taraKg = v.getTaraKg();
+        if (taraKg != null && (taraKg < 0 || taraKg > TARA_MAXIMA_KG)) {
             throw new CadastroException("A Tara deve estar entre 0 e 50.000 kg.");
         }
         if (v.getCapacidadeKg() <= 0) {
             throw new CadastroException("A capacidade de carga deve ser maior que zero.");
         }
-        if (v.getVolumeM3() < 0) {
+        Double volumeM3 = v.getVolumeM3();
+        if (volumeM3 != null && volumeM3 < 0) {
             throw new CadastroException("O Volume deve ser maior ou igual a zero.");
         }
-        if (v.getTaraKg() >= v.getCapacidadeKg()) {
+        if (taraKg != null && taraKg >= v.getCapacidadeKg()) {
             throw new CadastroException("A tara não pode ser maior ou igual à capacidade de carga.");
         }
         if (v.getStatus() == null) {

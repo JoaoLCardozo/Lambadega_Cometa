@@ -128,16 +128,16 @@ public class VeiculoControlador extends HttpServlet {
         Veiculo v = new Veiculo();
         v.setPlaca(req.getParameter("placa"));
         v.setRntrc(req.getParameter("rntrc"));
-        String ano = req.getParameter("anoFabricacao");
-        if (ano != null && !ano.isEmpty()) v.setAnoFabricacao(Integer.parseInt(ano));
+        String ano = normalizarTexto(req.getParameter("anoFabricacao"));
+        if (ano != null) v.setAnoFabricacao(Integer.parseInt(ano));
         String tipo = req.getParameter("tipo");
         if (tipo != null && !tipo.isEmpty()) v.setTipo(Veiculo.Tipo.valueOf(tipo));
-        String tara = req.getParameter("taraKg");
-        if (tara != null && !tara.isEmpty()) v.setTaraKg(parseDoubleSeguro(tara));
-        String cap = req.getParameter("capacidadeKg");
-        if (cap != null && !cap.isEmpty()) v.setCapacidadeKg(parseDoubleSeguro(cap));
-        String vol = req.getParameter("volumeM3");
-        if (vol != null && !vol.isEmpty()) v.setVolumeM3(parseDoubleSeguro(vol));
+        String tara = normalizarTexto(req.getParameter("taraKg"));
+        if (tara != null) v.setTaraKg(parseDoubleSeguro(tara));
+        String cap = normalizarTexto(req.getParameter("capacidadeKg"));
+        if (cap != null) v.setCapacidadeKg(parseDoubleSeguro(cap));
+        String vol = normalizarTexto(req.getParameter("volumeM3"));
+        if (vol != null) v.setVolumeM3(parseDoubleSeguro(vol));
         String st = req.getParameter("status");
         v.setStatus(st != null && !st.isEmpty()
             ? Veiculo.Status.valueOf(st) : Veiculo.Status.DISPONIVEL);
@@ -158,9 +158,14 @@ public class VeiculoControlador extends HttpServlet {
         String tipo = req.getParameter("tipo");
         if (tipo != null && !tipo.isEmpty()) v.setTipo(Veiculo.Tipo.valueOf(tipo));
 
-        v.setTaraKg(parseDoubleSeguro(req.getParameter("taraKg")));
-        v.setCapacidadeKg(parseDoubleSeguro(req.getParameter("capacidadeKg")));
-        v.setVolumeM3(parseDoubleSeguro(req.getParameter("volumeM3")));
+        String tara = normalizarTexto(req.getParameter("taraKg"));
+        if (tara != null) v.setTaraKg(parseDoubleSeguro(tara));
+
+        String capacidade = normalizarTexto(req.getParameter("capacidadeKg"));
+        if (capacidade != null) v.setCapacidadeKg(parseDoubleSeguro(capacidade));
+
+        String volume = normalizarTexto(req.getParameter("volumeM3"));
+        if (volume != null) v.setVolumeM3(parseDoubleSeguro(volume));
 
         String st = req.getParameter("status");
         v.setStatus(st != null && !st.isEmpty()

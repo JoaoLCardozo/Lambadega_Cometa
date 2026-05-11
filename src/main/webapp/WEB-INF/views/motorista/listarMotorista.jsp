@@ -49,6 +49,7 @@
                 <div class="form-field">
                     <label for="cpf">CPF</label>
                     <input type="text" name="cpf" id="cpf" class="inputtexto"
+                           inputmode="numeric" autocomplete="off"
                            value="<c:out value='${cpf}'/>"/>
                 </div>
                 <div class="form-field">
@@ -155,5 +156,21 @@
             </div>
         </section>
     </main>
+    <script>
+        function mascaraCpfFiltro(valor) {
+            return valor.replace(/\D/g, '').substring(0, 11)
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+
+        var filtroCpf = document.getElementById('cpf');
+        if (filtroCpf) {
+            filtroCpf.value = mascaraCpfFiltro(filtroCpf.value);
+            filtroCpf.addEventListener('input', function() {
+                this.value = mascaraCpfFiltro(this.value);
+            });
+        }
+    </script>
 </body>
 </html>

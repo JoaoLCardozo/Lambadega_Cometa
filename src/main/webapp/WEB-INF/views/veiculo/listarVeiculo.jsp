@@ -75,8 +75,9 @@
                 </div>
                 <div class="form-field">
                     <label for="anoFabricacao">Ano</label>
-                    <input type="number" name="anoFabricacao" id="anoFabricacao" class="inputtexto"
-                           min="1900" max="2100" value="<c:out value='${anoFabricacao}'/>"/>
+                    <input type="text" name="anoFabricacao" id="anoFabricacao" class="inputtexto"
+                           inputmode="numeric" pattern="[0-9]*" maxlength="4"
+                           value="<c:out value='${anoFabricacao}'/>"/>
                 </div>
                 <div class="app-actions">
                     <input type="submit" class="inputbotao" value="Pesquisar"/>
@@ -160,5 +161,20 @@
             </div>
         </section>
     </main>
+    <script>
+        var filtroPlaca = document.getElementById('filtro');
+        if (filtroPlaca) {
+            filtroPlaca.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+
+        var filtroAno = document.getElementById('anoFabricacao');
+        if (filtroAno) {
+            filtroAno.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').substring(0, 4);
+            });
+        }
+    </script>
 </body>
 </html>

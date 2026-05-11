@@ -11,11 +11,11 @@ public class Veiculo implements Serializable {
     private int    id;
     private String placa;
     private String rntrc;
-    private int    anoFabricacao;
+    private Integer anoFabricacao;
     private Tipo   tipo;
-    private double taraKg;
+    private Double taraKg;
     private double capacidadeKg;
-    private double volumeM3;
+    private Double volumeM3;
     private Status status;
 
     public Veiculo() {}
@@ -29,20 +29,20 @@ public class Veiculo implements Serializable {
     public String getRntrc() { return rntrc; }
     public void setRntrc(String rntrc) { this.rntrc = rntrc; }
 
-    public int getAnoFabricacao() { return anoFabricacao; }
-    public void setAnoFabricacao(int anoFabricacao) { this.anoFabricacao = anoFabricacao; }
+    public Integer getAnoFabricacao() { return anoFabricacao; }
+    public void setAnoFabricacao(Integer anoFabricacao) { this.anoFabricacao = anoFabricacao; }
 
     public Tipo getTipo() { return tipo; }
     public void setTipo(Tipo tipo) { this.tipo = tipo; }
 
-    public double getTaraKg() { return taraKg; }
-    public void setTaraKg(double taraKg) { this.taraKg = taraKg; }
+    public Double getTaraKg() { return taraKg; }
+    public void setTaraKg(Double taraKg) { this.taraKg = taraKg; }
 
     public double getCapacidadeKg() { return capacidadeKg; }
     public void setCapacidadeKg(double capacidadeKg) { this.capacidadeKg = capacidadeKg; }
 
-    public double getVolumeM3() { return volumeM3; }
-    public void setVolumeM3(double volumeM3) { this.volumeM3 = volumeM3; }
+    public Double getVolumeM3() { return volumeM3; }
+    public void setVolumeM3(Double volumeM3) { this.volumeM3 = volumeM3; }
 
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
@@ -63,7 +63,9 @@ public class Veiculo implements Serializable {
         }
     }
 
-    public double getPesoUtil() { return capacidadeKg - taraKg; }
+    public double getPesoUtil() {
+        return capacidadeKg - (taraKg != null ? taraKg : 0.0);
+    }
 
     @Override
     public String toString() {

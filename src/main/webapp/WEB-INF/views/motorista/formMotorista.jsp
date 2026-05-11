@@ -46,6 +46,7 @@
                 <td class="CelulaZebra2">CPF: *</td>
                 <td class="CelulaZebra2">
                     <input type="text" name="cpf" id="cpf" class="inputtexto" size="15" maxlength="14"
+                           inputmode="numeric" autocomplete="off"
                            placeholder="000.000.000-00"
                            value="<c:out value='${motorista.cpf}'/>"/>
                 </td>
@@ -59,6 +60,7 @@
                 <td class="CelulaZebra1">Telefone:</td>
                 <td class="CelulaZebra1">
                     <input type="text" name="telefone" id="telefone" class="inputtexto" size="20" maxlength="15"
+                           inputmode="tel" autocomplete="tel"
                            placeholder="(00) 00000-0000"
                            value="<c:out value='${motorista.telefone}'/>"/>
                 </td>
@@ -77,6 +79,7 @@
                 <td class="CelulaZebra1">Número CNH: *</td>
                 <td class="CelulaZebra1">
                     <input type="text" name="cnhNumero" id="cnhNumero" class="inputtexto" size="20" maxlength="11"
+                           inputmode="numeric" pattern="[0-9]*" autocomplete="off"
                            placeholder="Somente numeros"
                            value="<c:out value='${motorista.cnhNumero}'/>"/>
                 </td>

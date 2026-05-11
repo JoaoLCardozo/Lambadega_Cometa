@@ -59,6 +59,7 @@
                 <div class="form-field">
                     <label for="documento">CPF / CNPJ</label>
                     <input type="text" name="documento" id="documento" class="inputtexto"
+                           inputmode="numeric" autocomplete="off"
                            value="<c:out value='${documento}'/>"/>
                 </div>
                 <div class="form-field">
@@ -164,5 +165,29 @@
             </div>
         </section>
     </main>
+    <script>
+        function mascaraDocumentoFiltro(valor) {
+            var digitos = valor.replace(/\D/g, '').substring(0, 14);
+            if (digitos.length > 11) {
+                return digitos
+                    .replace(/^(\d{2})(\d)/, '$1.$2')
+                    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+                    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+                    .replace(/(\d{4})(\d)/, '$1-$2');
+            }
+            return digitos
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+
+        var filtroDocumento = document.getElementById('documento');
+        if (filtroDocumento) {
+            filtroDocumento.value = mascaraDocumentoFiltro(filtroDocumento.value);
+            filtroDocumento.addEventListener('input', function() {
+                this.value = mascaraDocumentoFiltro(this.value);
+            });
+        }
+    </script>
 </body>
 </html>

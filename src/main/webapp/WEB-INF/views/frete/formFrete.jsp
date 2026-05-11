@@ -111,24 +111,28 @@
                     </div>
                     <div class="form-field">
                         <label for="pesoKg">Peso (kg)</label>
-                        <input type="number" step="0.01" name="pesoKg" id="pesoKg" class="inputtexto"
+                        <input type="text" name="pesoKg" id="pesoKg" class="inputtexto"
+                               inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                                value="<c:out value='${frete.pesoKg}'/>"/>
                     </div>
                     <div class="form-field">
                         <label for="volumes">Volumes</label>
-                        <input type="number" name="volumes" id="volumes" class="inputtexto"
+                        <input type="text" name="volumes" id="volumes" class="inputtexto"
+                               inputmode="numeric" pattern="[0-9]*"
                                value="<c:out value='${frete.volumes}'/>"/>
                     </div>
 
                     <div class="section-title">Financeiro</div>
                     <div class="form-field">
                         <label for="valorFrete">Valor frete (R$)</label>
-                        <input type="number" step="0.01" name="valorFrete" id="valorFrete" class="inputtexto"
+                        <input type="text" name="valorFrete" id="valorFrete" class="inputtexto"
+                               inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                                value="<c:out value='${frete.valorFrete}'/>"/>
                     </div>
                     <div class="form-field">
                         <label for="aliquotaIcms">Alíquota ICMS (%)</label>
-                        <input type="number" step="0.01" name="aliquotaIcms" id="aliquotaIcms" class="inputtexto"
+                        <input type="text" name="aliquotaIcms" id="aliquotaIcms" class="inputtexto"
+                               inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?"
                                value="<c:out value='${frete.aliquotaIcms}'/>"/>
                     </div>
                     <div class="form-field">
@@ -159,6 +163,32 @@
                 municipioSemUf: 'Selecione a UF destino'
             }
         ]);
+
+        function somenteDigitos(valor) {
+            return valor.replace(/\D/g, '');
+        }
+
+        function somenteDecimal(valor) {
+            var normalizado = valor.replace(',', '.').replace(/[^0-9.]/g, '');
+            var partes = normalizado.split('.');
+            var inteiro = partes.shift();
+            var decimal = partes.join('').substring(0, 2);
+            return decimal ? inteiro + '.' + decimal : inteiro;
+        }
+
+        function aplicarMascaraNumerica(id, formatar) {
+            var campo = document.getElementById(id);
+            if (!campo) return;
+            campo.value = formatar(campo.value);
+            campo.addEventListener('input', function() {
+                this.value = formatar(this.value);
+            });
+        }
+
+        aplicarMascaraNumerica('pesoKg', somenteDecimal);
+        aplicarMascaraNumerica('volumes', somenteDigitos);
+        aplicarMascaraNumerica('valorFrete', somenteDecimal);
+        aplicarMascaraNumerica('aliquotaIcms', somenteDecimal);
     </script>
 </body>
 </html>
