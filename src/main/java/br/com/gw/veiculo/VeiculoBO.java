@@ -68,6 +68,9 @@ public class VeiculoBO {
 
     public void excluir(int id) throws NegocioException {
         if (id <= 0) throw new CadastroException("ID de veículo inválido.");
+        if (veiculoDAO.possuiFretes(id)) {
+            throw new CadastroException("Não é permitido excluir um veículo vinculado a frete.");
+        }
         veiculoDAO.excluir(id);
         logger.info("Veiculo excluido: id=" + id);
     }

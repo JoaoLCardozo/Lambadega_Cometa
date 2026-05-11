@@ -169,6 +169,20 @@ public class VeiculoDAO {
         return false;
     }
 
+    public boolean possuiFretes(int id) throws NegocioException {
+        String sql = "SELECT COUNT(*) FROM frete WHERE id_veiculo = ?";
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new NegocioException("Erro ao verificar fretes do veículo.", e);
+        }
+        return false;
+    }
+
     public void salvar(Veiculo v) throws NegocioException {
         String sql = "INSERT INTO veiculo (placa, rntrc, ano_fabricacao, tipo, tara_kg, " +
                      "capacidade_kg, volume_m3, status) VALUES (?,?,?,?,?,?,?,?)";
