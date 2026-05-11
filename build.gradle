@@ -24,6 +24,7 @@ dependencies {
     implementation 'net.sf.jasperreports:jasperreports:6.20.6'
     implementation 'org.apache.commons:commons-dbcp2:2.9.0'
     implementation 'javax.servlet:jstl:1.2'
+    implementation 'com.sun.mail:javax.mail:1.6.2'
 }
 
 

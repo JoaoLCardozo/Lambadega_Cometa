@@ -79,6 +79,10 @@
                     </div>
                     <div class="form-actions">
                         <input type="submit" class="inputbotao" value="Entrar"/>
+                        <a class="link-button"
+                           href="${pageContext.request.contextPath}/LoginControlador?acao=esqueciSenha">
+                            Esqueci minha senha
+                        </a>
                     </div>
                 </div>
             </form>

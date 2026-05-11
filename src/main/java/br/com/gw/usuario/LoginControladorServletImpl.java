@@ -13,6 +13,7 @@ public class LoginControladorServletImpl extends HttpServlet {
     private static final Logger logger = Logger.getLogger(LoginControladorServletImpl.class.getName());
 
     private LoginControlador loginControlador = new LoginControlador();
+    private UsuarioBO usuarioBO = new UsuarioBO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,12 +43,29 @@ public class LoginControladorServletImpl extends HttpServlet {
             return;
         }
 
+        if ("esqueciSenha".equals(acao)) {
+            request.getRequestDispatcher("/WEB-INF/views/usuario/recuperarSenha.jsp").forward(request, response);
+            return;
+        }
+
         request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String acao = request.getParameter("acao");
+
+        if ("solicitarRecuperacaoSenha".equals(acao)) {
+            solicitarRecuperacaoSenha(request, response);
+            return;
+        }
+
+        if ("redefinirSenha".equals(acao)) {
+            redefinirSenha(request, response);
+            return;
+        }
 
         autenticar(request, response);
     }
@@ -82,6 +100,55 @@ public class LoginControladorServletImpl extends HttpServlet {
 
             request.setAttribute("erro", "Erro inesperado ao realizar login.");
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+        }
+    }
+
+    private void solicitarRecuperacaoSenha(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String email = request.getParameter("email");
+
+        try {
+            usuarioBO.solicitarRecuperacaoSenha(email);
+            request.setAttribute("email", email);
+            request.setAttribute("sucesso",
+                "Código enviado para o e-mail cadastrado. Informe o código para criar uma nova senha.");
+            request.getRequestDispatcher("/WEB-INF/views/usuario/redefinirSenha.jsp").forward(request, response);
+        } catch (ApplicationException e) {
+            request.setAttribute("erro", e.getMessage());
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/WEB-INF/views/usuario/recuperarSenha.jsp").forward(request, response);
+        } catch (Exception e) {
+            logger.severe("Erro inesperado ao solicitar recuperação de senha: " + e.getMessage());
+            request.setAttribute("erro", "Erro inesperado ao solicitar recuperação de senha.");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/WEB-INF/views/usuario/recuperarSenha.jsp").forward(request, response);
+        }
+    }
+
+    private void redefinirSenha(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String codigo = request.getParameter("codigo");
+        String novaSenha = request.getParameter("novaSenha");
+        String confirmaSenha = request.getParameter("confirmaSenha");
+
+        try {
+            if (novaSenha == null || !novaSenha.equals(confirmaSenha)) {
+                throw new ApplicationException("As senhas não coincidem.");
+            }
+
+            usuarioBO.redefinirSenhaComCodigo(email, codigo, novaSenha);
+            request.setAttribute("sucesso", "Senha alterada com sucesso. Faça login com a nova senha.");
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+        } catch (ApplicationException e) {
+            request.setAttribute("erro", e.getMessage());
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/WEB-INF/views/usuario/redefinirSenha.jsp").forward(request, response);
+        } catch (Exception e) {
+            logger.severe("Erro inesperado ao redefinir senha: " + e.getMessage());
+            request.setAttribute("erro", "Erro inesperado ao redefinir senha.");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/WEB-INF/views/usuario/redefinirSenha.jsp").forward(request, response);
         }
     }
     

@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +101,27 @@ public class UsuarioDAO {
         return null;
     }
 
+    public Usuario buscarPorEmailAtivo(String email) throws DAOException {
+        String sql = "SELECT id, nome, email, usuario, senha, ativo, data_criacao, data_atualizacao " +
+                     "FROM usuario WHERE LOWER(email) = LOWER(?) AND ativo = true";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return extrairUsuario(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao buscar usuário por e-mail", e);
+        }
+
+        return null;
+    }
+
     /**
      * Lista todos os usuários.
      * @return lista de usuários
@@ -170,6 +192,88 @@ public class UsuarioDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Erro ao atualizar usuário: " + usuario.getId(), e);
+        }
+    }
+
+    public void atualizarSenha(Integer id, String senha) throws DAOException {
+        String sql = "UPDATE usuario SET senha = ?, data_atualizacao = NOW() WHERE id = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, senha);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao atualizar senha do usuário: " + id, e);
+        }
+    }
+
+    public void salvarCodigoRecuperacao(Integer idUsuario, String codigoHash,
+                                        LocalDateTime dataExpiracao) throws DAOException {
+        String invalidarSql = "UPDATE recuperacao_senha SET usado = true " +
+                              "WHERE id_usuario = ? AND usado = false";
+        String inserirSql = "INSERT INTO recuperacao_senha " +
+                            "(id_usuario, codigo_hash, data_expiracao) VALUES (?, ?, ?)";
+
+        try (Connection conn = ConnectionFactory.getConnection()) {
+            try (PreparedStatement invalidar = conn.prepareStatement(invalidarSql)) {
+                invalidar.setInt(1, idUsuario);
+                invalidar.executeUpdate();
+            }
+
+            try (PreparedStatement inserir = conn.prepareStatement(inserirSql)) {
+                inserir.setInt(1, idUsuario);
+                inserir.setString(2, codigoHash);
+                inserir.setTimestamp(3, Timestamp.valueOf(dataExpiracao));
+                inserir.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao salvar código de recuperação", e);
+        }
+    }
+
+    public Integer buscarUsuarioPorCodigoRecuperacao(String email, String codigoHash)
+            throws DAOException {
+        String sql = "SELECT r.id_usuario " +
+                     "FROM recuperacao_senha r " +
+                     "JOIN usuario u ON u.id = r.id_usuario " +
+                     "WHERE LOWER(u.email) = LOWER(?) " +
+                     "AND r.codigo_hash = ? " +
+                     "AND r.usado = false " +
+                     "AND r.data_expiracao >= NOW() " +
+                     "AND u.ativo = true " +
+                     "ORDER BY r.data_criacao DESC LIMIT 1";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ps.setString(2, codigoHash);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_usuario");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao validar código de recuperação", e);
+        }
+
+        return null;
+    }
+
+    public void marcarCodigosRecuperacaoComoUsados(Integer idUsuario) throws DAOException {
+        String sql = "UPDATE recuperacao_senha SET usado = true " +
+                     "WHERE id_usuario = ? AND usado = false";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idUsuario);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao invalidar códigos de recuperação", e);
         }
     }
 

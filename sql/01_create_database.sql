@@ -24,6 +24,21 @@ CREATE TABLE usuario (
     data_atualizacao TIMESTAMP
 );
 
+CREATE TABLE recuperacao_senha (
+    id              SERIAL PRIMARY KEY,
+    id_usuario      INTEGER     NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
+    codigo_hash     VARCHAR(64) NOT NULL,
+    data_criacao    TIMESTAMP   NOT NULL DEFAULT NOW(),
+    data_expiracao  TIMESTAMP   NOT NULL,
+    usado           BOOLEAN     NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX idx_recuperacao_senha_usuario
+    ON recuperacao_senha (id_usuario);
+
+CREATE INDEX idx_recuperacao_senha_codigo
+    ON recuperacao_senha (codigo_hash, usado, data_expiracao);
+
 -- ============================================================
 -- CLIENTE
 -- ============================================================

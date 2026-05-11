@@ -5,8 +5,14 @@ import br.com.gw.exception.NegocioException;
 import br.com.gw.exception.DAOException;
 import br.com.gw.exception.RecursoNaoEncontradoException;
 import br.com.gw.exception.ValidationException;
+import br.com.gw.util.EmailService;
 import br.com.gw.util.SegurancaUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -15,7 +21,11 @@ import java.util.List;
  */
 public class UsuarioBO {
     
+    private static final int MINUTOS_VALIDADE_CODIGO = 15;
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private EmailService emailService = new EmailService();
 
     /**
      * Autentica um usuário com validações.
@@ -191,6 +201,63 @@ public class UsuarioBO {
         }
     }
 
+    public void solicitarRecuperacaoSenha(String email)
+            throws ValidationException, NegocioException {
+        try {
+            String emailNormalizado = normalizarTextoSemHtml(email, "Email");
+            validarEmail(emailNormalizado);
+
+            Usuario usuario = usuarioDAO.buscarPorEmailAtivo(emailNormalizado);
+            if (usuario == null) {
+                throw new ValidationException("E-mail não encontrado ou usuário inativo.");
+            }
+
+            String codigo = gerarCodigoVerificacao();
+            usuarioDAO.salvarCodigoRecuperacao(
+                usuario.getId(),
+                hashCodigo(codigo),
+                LocalDateTime.now().plusMinutes(MINUTOS_VALIDADE_CODIGO));
+
+            emailService.enviarCodigoRecuperacao(
+                usuario.getEmail(), usuario.getNome(), codigo);
+        } catch (DAOException e) {
+            throw new NegocioException("Erro ao solicitar recuperação de senha", e);
+        }
+    }
+
+    public void redefinirSenhaComCodigo(String email, String codigo, String novaSenha)
+            throws ValidationException, NegocioException {
+        try {
+            String emailNormalizado = normalizarTextoSemHtml(email, "Email");
+            validarEmail(emailNormalizado);
+
+            String codigoNormalizado = codigo != null ? codigo.replaceAll("[^0-9]", "") : "";
+            if (!codigoNormalizado.matches("\\d{6}")) {
+                throw new ValidationException("O código de verificação deve conter 6 dígitos.");
+            }
+
+            if (novaSenha == null || novaSenha.trim().isEmpty()) {
+                throw new ValidationException("Nova senha não pode ser vazia");
+            }
+
+            String senhaNormalizada = novaSenha.trim();
+            if (senhaNormalizada.length() < 4) {
+                throw new ValidationException("Nova senha deve ter pelo menos 4 caracteres");
+            }
+
+            Integer idUsuario = usuarioDAO.buscarUsuarioPorCodigoRecuperacao(
+                emailNormalizado, hashCodigo(codigoNormalizado));
+            if (idUsuario == null) {
+                throw new ValidationException("Código inválido ou expirado.");
+            }
+
+            usuarioDAO.atualizarSenha(idUsuario, senhaNormalizada);
+            usuarioDAO.marcarCodigosRecuperacaoComoUsados(idUsuario);
+        } catch (DAOException e) {
+            throw new NegocioException("Erro ao redefinir senha", e);
+        }
+    }
+
     /**
      * Valida os dados do usuário.
      */
@@ -210,9 +277,7 @@ public class UsuarioBO {
             throw new ValidationException("Email não pode ser vazio");
         }
         
-        if (!usuario.getEmail().contains("@")) {
-            throw new ValidationException("Email inválido");
-        }
+        validarEmail(usuario.getEmail());
         
         if (usuario.getUsuario() == null) {
             throw new ValidationException("Usuário não pode ser vazio");
@@ -237,5 +302,34 @@ public class UsuarioBO {
             throw new ValidationException("O campo " + nomeCampo + " não permite HTML ou scripts.");
         }
         return texto;
+    }
+
+    private void validarEmail(String email) throws ValidationException {
+        if (email == null) {
+            throw new ValidationException("Email não pode ser vazio");
+        }
+
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new ValidationException("Email inválido");
+        }
+    }
+
+    private String gerarCodigoVerificacao() {
+        int codigo = 100000 + RANDOM.nextInt(900000);
+        return String.valueOf(codigo);
+    }
+
+    private String hashCodigo(String codigo) throws NegocioException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(codigo.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new NegocioException("Erro ao proteger código de recuperação", e);
+        }
     }
 }
