@@ -16,24 +16,49 @@ public class ConnectionFactory {
     private static final String SENHA;
 
     static {
-        Properties props = new Properties();
-        InputStream is = ConnectionFactory.class
-            .getClassLoader().getResourceAsStream("db.properties");
+        Properties props = carregarConfiguracoes();
 
-        if (is != null) {
-            try {
+        URL     = obterObrigatorio(props, "db.url", "DB_URL");
+        USUARIO = obterObrigatorio(props, "db.usuario", "DB_USUARIO");
+        SENHA   = obterObrigatorio(props, "db.senha", "DB_SENHA");
+    }
+
+    private static Properties carregarConfiguracoes() {
+        Properties props = new Properties();
+
+        try (InputStream is = ConnectionFactory.class
+                .getClassLoader().getResourceAsStream("db.properties")) {
+            if (is != null) {
                 props.load(is);
                 logger.info("Configuracoes de banco carregadas de db.properties");
-            } catch (IOException e) {
-                logger.warning("Erro ao ler db.properties: " + e.getMessage());
+            } else {
+                logger.info("db.properties nao encontrado; tentando variaveis de ambiente");
             }
-        } else {
-            logger.warning("db.properties nao encontrado — usando valores padrao de desenvolvimento");
+        } catch (IOException e) {
+            logger.warning("Erro ao ler db.properties: " + e.getMessage());
         }
 
-        URL     = props.getProperty("db.url",     "jdbc:postgresql://localhost:5432/LambadegaCometa");
-        USUARIO = props.getProperty("db.usuario", "postgres");
-        SENHA   = props.getProperty("db.senha",   "1234");
+        return props;
+    }
+
+    private static String obterObrigatorio(Properties props, String chave, String variavelAmbiente) {
+        String valorAmbiente = System.getenv(variavelAmbiente);
+        if (!vazio(valorAmbiente)) {
+            return valorAmbiente.trim();
+        }
+
+        String valorArquivo = props.getProperty(chave);
+        if (!vazio(valorArquivo)) {
+            return valorArquivo.trim();
+        }
+
+        throw new IllegalStateException(
+            "Configuracao obrigatoria de banco ausente: informe "
+            + variavelAmbiente + " ou " + chave + " em db.properties.");
+    }
+
+    private static boolean vazio(String valor) {
+        return valor == null || valor.trim().isEmpty();
     }
 
     public static Connection getConnection() {

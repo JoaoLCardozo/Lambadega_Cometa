@@ -151,7 +151,17 @@ db.usuario=postgres
 db.senha=sua_senha
 ```
 
-Esse arquivo contém credenciais locais e não deve conter dados reais em commits públicos.
+Também é possível configurar por variáveis de ambiente. Elas têm prioridade sobre o arquivo:
+
+```bash
+export DB_URL=jdbc:postgresql://localhost:5432/LambadegaCometa
+export DB_USUARIO=lambadega_app
+export DB_SENHA=sua_senha
+```
+
+O sistema não usa mais usuário e senha padrão quando a configuração está ausente. Se `db.properties` ou as variáveis de ambiente não forem informadas, a aplicação falha com uma mensagem clara.
+
+Esse arquivo contém credenciais locais e não deve conter dados reais em commits públicos. Para um ambiente mais seguro, crie um usuário específico da aplicação no PostgreSQL em vez de usar o superusuário `postgres`.
 
 ## Configuração de E-mail
 
